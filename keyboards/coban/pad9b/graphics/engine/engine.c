@@ -14,7 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "graphics/engine.h"
+#include "graphics/engine/engine.h"
 
 void vector_fill4(Vector *a, float x, float y, float z, float s) {
     a->x = x;

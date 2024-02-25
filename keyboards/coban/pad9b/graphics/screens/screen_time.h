@@ -14,9 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "qp_lvgl.h"
 
-void ui_init(void);
+lv_obj_t * screen_time_init(void);
 
-void ui_task(void);
+bool screen_time_is_visible(void);
+
+void screen_time_set_visible(void);
+
+void screen_time_set_invisible(void);
+
+void screen_time_set_time(uint8_t hour, uint8_t minute, uint8_t day, uint8_t month, uint8_t year);

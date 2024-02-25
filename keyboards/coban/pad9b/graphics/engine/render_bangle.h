@@ -14,9 +14,8 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include "qp_lvgl.h"
+#include "qp.h"
 
-void ui_init(void);
+void render_bangle_init(painter_device_t device);
 
-void ui_task(void);
+void render_bangle_task(painter_device_t device);

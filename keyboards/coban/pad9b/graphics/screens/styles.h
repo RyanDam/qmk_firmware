@@ -14,9 +14,13 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "qp_lvgl.h"
 
-void ui_init(void);
+extern lv_style_t style_screen;
+extern lv_style_t style_container;
+extern lv_style_t style_text;
+extern lv_style_t style_arc_main;
+extern lv_style_t style_arc_positive;
+extern lv_style_t style_arc_knob;
 
-void ui_task(void);
+void init_styles(void);

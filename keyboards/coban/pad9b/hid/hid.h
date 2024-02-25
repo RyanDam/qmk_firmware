@@ -14,9 +14,14 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include "qp_lvgl.h"
+#include "raw_hid.h"
 
-void ui_init(void);
+enum coban_command_id { // via start at 0x00, currently end at 0x15
+    coban_cmd_id_start = 0x50,
+    coban_cmd_id_version = 0x51,
+    coban_cmd_id_set_time = 0x52,
+    coban_cmd_id_set_cpu_util = 0x53,
+    coban_cmd_id_set_gpu_util = 0x54
+};
 
-void ui_task(void);
+void raw_hid_receive_kb(uint8_t *data, uint8_t length);

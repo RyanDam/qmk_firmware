@@ -16,51 +16,34 @@
 
 #include "qp.h"
 #include "qp_st7735.h"
-#include "graphics/resources/thintel15.qff.c"
-#include "graphics/resources/bangle.c"
-
 #include "graphics/ui.h"
-#include "graphics/engine.h"
+#include "graphics/engine/render_bangle.h"
 
-static painter_device_t      oled;
-static painter_font_handle_t font;
+#include "graphics/screens/styles.h"
+#include "graphics/screens/screen_hardware_stats.h"
+#include "graphics/screens/screen_time.h"
 
-static Matrix projectionMatrix;
-static Matrix cameraMatrix;
-static Vector cam_pos, cam_at, cam_up;
-static char c[64]; //size of the number
-static float counter = 0;
+static painter_device_t oled;
 
 void ui_init(void) {
 
     oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 4, 0);
+
     qp_init(oled, QP_ROTATION_270);
     qp_set_viewport_offsets(oled, 0, 24);
-    qp_rect(oled, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, true);
 
-    font = qp_load_font_mem(font_thintel15);
+    if (qp_lvgl_attach(oled)) {
+        lv_disp_t  *lv_display = lv_disp_get_default();
+        lv_theme_t *lv_theme   = lv_theme_default_init(lv_display, lv_palette_main(LV_PALETTE_AMBER), lv_palette_main(LV_PALETTE_BLUE), true, LV_FONT_DEFAULT);
+        lv_disp_set_theme(lv_display, lv_theme);
 
-    // init camera matrix
-    vector_fill4(&cam_pos, 0, 5, 0.5, 0);
-                  vector_fill4(&cam_at, 0, 0, 0, 0);
-    vector_fill4(&cam_up, 0, 0, 1, 0);
-    build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
+        init_styles();
 
-    // init projection matrix
-    build_projection_matrix(SCREEN_WIDTH, SCREEN_HEIGHT, 1, 2, 100, &projectionMatrix);
+        // screen_hardware_stat_init();
+        screen_time_init();
+    }
 
-    // char c[64]; //size of the number
-    // sprintf(c, "%d %d %d %d", (int)(cameraMatrix.r1.x*100), (int)(cameraMatrix.r1.y*100), (int)(cameraMatrix.r1.z*100), (int)(cameraMatrix.r1.s*100));
-    // qp_drawtext(oled, 0, 20, font, c);
-
-    // sprintf(c, "%d %d %d %d", (int)(cameraMatrix.r2.x*100), (int)(cameraMatrix.r2.y*100), (int)(cameraMatrix.r2.z*100), (int)(cameraMatrix.r2.s*100));
-    // qp_drawtext(oled, 0, 30, font, c);
-
-    // sprintf(c, "%d %d %d %d", (int)(cameraMatrix.r3.x*100), (int)(cameraMatrix.r3.y*100), (int)(cameraMatrix.r3.z*100), (int)(cameraMatrix.r3.s*100));
-    // qp_drawtext(oled, 0, 40, font, c);
-
-    // sprintf(c, "%d %d %d %d", (int)(cameraMatrix.r4.x*100), (int)(cameraMatrix.r4.y*100), (int)(cameraMatrix.r4.z*100), (int)(cameraMatrix.r4.s*100));
-    // qp_drawtext(oled, 0, 50, font, c);
+    render_bangle_init(oled);
 }
 
 void ui_task(void) {
@@ -70,52 +53,15 @@ void ui_task(void) {
     if (TIMER_DIFF_32(now, last_draw) < SCREEN_REFRESH_GAP_MS) // Throttle to 30fps
         return;
 
+    // clean screan
     qp_rect(oled, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, true);
 
-    float cx = 5*sin(counter);
-    float cy = 5*cos(counter);
-    vector_fill4(&cam_pos, cx, cy, 0.5, 0);
-    build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
-    counter += M_PI/200;
-
-    // char c[64]; //size of the number
-    // sprintf(c, "%d   %d", (int)cx, (int)cy);
-    // qp_drawtext(oled, 0, 20, font, c);
-
-    Vector p, pProj;
-    int nx, ny, lx, ly, sx, sy;
-    // starting point
-    vector_fill4(&p, bangle_mem[0], bangle_mem[1], bangle_mem[2], 1);
-    project(&p, &cameraMatrix, &projectionMatrix, &pProj);
-    lx = (int)((pProj.x+1)*SCREEN_WIDTH/2);
-    ly = (int)((pProj.y+1)*SCREEN_HEIGHT/2);
-    sx = lx;
-    sy = ly;
-
-    for (int i = 3; i < bangle_mem_point*3; i+=3) {
-        vector_fill4(&p, bangle_mem[i], bangle_mem[i + 1], bangle_mem[i + 2], 1);
-        project(&p, &cameraMatrix, &projectionMatrix, &pProj);
-
-        nx = (int)((pProj.x+1)*SCREEN_WIDTH/2);
-        ny = (int)((pProj.y+1)*SCREEN_HEIGHT/2);
-
-        if (pProj.z > -4) {
-            qp_line(oled, lx, ly, nx, ny, 0, 0, 255);
-        } else {
-            qp_line(oled, lx, ly, nx, ny, 0, 0, 125);
-        }
-
-        lx = nx;
-        ly = ny;
-        // qp_rect(oled, nx-1, ny-1, nx, ny, 0, 0, 255, true);
-    }
-
-    qp_line(oled, lx, ly, sx, sy, 0, 0, 255);
+    render_bangle_task(oled);
 
     uint32_t last       = timer_read32();
     // uint32_t total_draw = TIMER_DIFF_32(last, now);
     // sprintf(c, "%ld ms", total_draw);
-    qp_drawtext(oled, 5, 5, font, c);
+    // qp_drawtext(oled, 5, 5, font, c);
 
     last_draw = last;
 }
