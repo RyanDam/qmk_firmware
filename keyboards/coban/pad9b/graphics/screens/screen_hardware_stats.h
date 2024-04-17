@@ -18,12 +18,6 @@
 
 lv_obj_t * screen_hardware_stat_init(void);
 
-bool screen_hardware_stat_is_visible(void);
-
-void screen_hardware_stat_set_visible(void);
-
-void screen_hardware_stat_set_invisible(void);
-
 void screen_hardware_stat_set_cpu(uint8_t value);
 
 void screen_hardware_stat_set_gpu(uint8_t value);

@@ -16,21 +16,25 @@
 
 #include "qp.h"
 #include "qp_st7735.h"
-#include "graphics/ui.h"
-#include "graphics/engine/render_bangle.h"
+#include "backlight/backlight.h"
 
+#include "graphics/ui.h"
+// #include "graphics/engine/render_bangle.h"
 #include "graphics/screens/styles.h"
-#include "graphics/screens/screen_hardware_stats.h"
-#include "graphics/screens/screen_time.h"
 
 static painter_device_t oled;
 
+lv_obj_t * screen_clock;
+lv_obj_t * screen_stats;
+lv_obj_t * screen_anime;
+lv_obj_t * screen_layer;
+
 void ui_init(void) {
 
-    oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 4, 0);
+    oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 2, 0);
 
     qp_init(oled, QP_ROTATION_270);
-    qp_set_viewport_offsets(oled, 0, 24);
+    qp_set_viewport_offsets(oled, 1, 26);
 
     if (qp_lvgl_attach(oled)) {
         lv_disp_t  *lv_display = lv_disp_get_default();
@@ -39,29 +43,58 @@ void ui_init(void) {
 
         init_styles();
 
-        // screen_hardware_stat_init();
-        screen_time_init();
+        screen_stats = screen_hardware_stat_init();
+        screen_clock = screen_time_init();
+        screen_anime = screen_animation_init();
+        screen_layer = screen_layers_init();
+
+        // change_screen(coban_screen_clock);
     }
 
-    render_bangle_init(oled);
+    // render_bangle_init(oled);
+
+    backlight_enable();
+}
+
+void change_screen(uint8_t screen_idx) {
+    switch (screen_idx) {
+        case coban_screen_clock: {
+            lv_scr_load(screen_clock);
+            break;
+        }
+        case coban_screen_stats: {
+            lv_scr_load(screen_stats);
+            break;
+        }
+        case coban_screen_anime: {
+            lv_scr_load(screen_anime);
+            break;
+        }
+        case coban_screen_layer: {
+            lv_scr_load(screen_layer);
+            break;
+        }
+        default:
+            break;
+    }
 }
 
 void ui_task(void) {
 
-    static uint32_t last_draw = 0;
-    uint32_t        now       = timer_read32();
-    if (TIMER_DIFF_32(now, last_draw) < SCREEN_REFRESH_GAP_MS) // Throttle to 30fps
-        return;
+    // static uint32_t last_draw = 0;
+    // uint32_t        now       = timer_read32();
+    // if (TIMER_DIFF_32(now, last_draw) < SCREEN_REFRESH_GAP_MS) // Throttle to 30fps
+    //     return;
 
-    // clean screan
-    qp_rect(oled, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, true);
+    // // clean screan
+    // qp_rect(oled, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, true);
 
-    render_bangle_task(oled);
+    // render_bangle_task(oled);
 
-    uint32_t last       = timer_read32();
-    // uint32_t total_draw = TIMER_DIFF_32(last, now);
-    // sprintf(c, "%ld ms", total_draw);
-    // qp_drawtext(oled, 5, 5, font, c);
+    // uint32_t last       = timer_read32();
+    // // uint32_t total_draw = TIMER_DIFF_32(last, now);
+    // // sprintf(c, "%ld ms", total_draw);
+    // // qp_drawtext(oled, 5, 5, font, c);
 
-    last_draw = last;
+    // last_draw = last;
 }

@@ -14,24 +14,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
-#include "qp_lvgl.h"
-
-#include "graphics/screens/styles.h"
-#include "graphics/screens/screen_time.h"
-#include "graphics/screens/screen_hardware_stats.h"
 #include "graphics/screens/screen_animation.h"
-#include "graphics/screens/screen_layers.h"
+#include "graphics/screens/styles.h"
+#include "graphics/lvgl_helpers.h"
 
-enum coban_screen_id {
-    coban_screen_clock = 0x00,
-    coban_screen_stats = 0x01,
-    coban_screen_anime = 0x02,
-    coban_screen_layer = 0x03
-};
+// #include "graphics/animation/nyancat_1.c"
+// #include "graphics/animation/nyancat_crop.c"
+// #include "graphics/animation/ghibli_crop.c"
+#include "graphics/animation/ghibli5_crop.c"
 
-void ui_init(void);
+static lv_obj_t *screen_animation = NULL;
+static lv_obj_t *view_image;
 
-void ui_task(void);
+lv_obj_t * screen_animation_init(void) {
+    screen_animation = lv_obj_create(NULL);
+    lv_obj_add_style(screen_animation, &style_screen, 0);
+    use_flex_column(screen_animation);
 
-void change_screen(uint8_t screen_idx);
+    // view_image = lv_img_create(screen_animation);
+    // lv_img_set_src(view_image, &nyancat_1);
+
+    view_image = lv_gif_create(screen_animation);
+    lv_gif_set_src(view_image, &ghibli5_crop);
+
+    return screen_animation;
+}

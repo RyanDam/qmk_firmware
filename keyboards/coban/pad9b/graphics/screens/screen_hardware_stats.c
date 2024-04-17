@@ -18,7 +18,7 @@
 #include "graphics/lvgl_helpers.h"
 #include "graphics/screens/styles.h"
 
-static lv_obj_t *screen_home;
+static lv_obj_t *screen_home = NULL;
 static lv_obj_t *cpu_arc;
 static lv_obj_t *cpu_text;
 static lv_obj_t *gpu_arc;
@@ -45,12 +45,13 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_obj_t *cpu_stat_holder = lv_obj_create(stats_holder);
     lv_obj_add_style(cpu_stat_holder, &style_container, 0);
     use_flex_column(cpu_stat_holder);
+    lv_obj_set_style_pad_row(cpu_stat_holder, -8, 0);
 
     lv_obj_t *cpu_arc_holder = lv_obj_create(cpu_stat_holder);
     lv_obj_add_style(cpu_arc_holder, &style_container, 0);
 
     cpu_arc = lv_arc_create(cpu_arc_holder);
-    lv_obj_set_size(cpu_arc, 56, 56);
+    lv_obj_set_size(cpu_arc, 64, 64);
     lv_obj_add_style(cpu_arc, &style_arc_main, LV_PART_MAIN);
     lv_obj_add_style(cpu_arc, &style_arc_positive, LV_PART_INDICATOR);
     lv_obj_remove_style(cpu_arc, NULL, LV_PART_KNOB);
@@ -60,7 +61,7 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_obj_center(cpu_arc);
 
     cpu_text  = lv_label_create(cpu_arc_holder);
-    lv_label_set_text(cpu_text, "24C");
+    lv_label_set_text(cpu_text, "--C");
     lv_obj_add_style(cpu_text, &style_text, 0);
     lv_obj_center(cpu_text);
     resize_font(cpu_text, 16);
@@ -73,12 +74,13 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_obj_t *gpu_stat_holder = lv_obj_create(stats_holder);
     lv_obj_add_style(gpu_stat_holder, &style_container, 0);
     use_flex_column(gpu_stat_holder);
+    lv_obj_set_style_pad_row(gpu_stat_holder, -8, 0);
 
     lv_obj_t *gpu_arc_holder = lv_obj_create(gpu_stat_holder);
     lv_obj_add_style(gpu_arc_holder, &style_container, 0);
 
     gpu_arc = lv_arc_create(gpu_arc_holder);
-    lv_obj_set_size(gpu_arc, 56, 56);
+    lv_obj_set_size(gpu_arc, 64, 64);
     lv_obj_add_style(gpu_arc, &style_arc_main, LV_PART_MAIN);
     lv_obj_add_style(gpu_arc, &style_arc_positive, LV_PART_INDICATOR);
     lv_obj_remove_style(gpu_arc, NULL, LV_PART_KNOB);
@@ -88,7 +90,7 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_obj_center(gpu_arc);
 
     gpu_text = lv_label_create(gpu_arc_holder);
-    lv_label_set_text(gpu_text, "89%");
+    lv_label_set_text(gpu_text, "--%");
     lv_obj_add_style(gpu_text, &style_text, 0);
     lv_obj_center(gpu_text);
     resize_font(gpu_text, 16);
@@ -97,20 +99,7 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_label_set_text(gpu_name, "GPU");
     lv_obj_add_style(gpu_name, &style_text, 0);
 
-    lv_scr_load(screen_home);
     return screen_home;
-}
-
-bool screen_hardware_stat_is_visible(void) {
-    return true;
-}
-
-void screen_hardware_stat_set_visible(void) {
-
-}
-
-void screen_hardware_stat_set_invisible(void) {
-
 }
 
 void screen_hardware_stat_set_cpu(uint8_t value) {

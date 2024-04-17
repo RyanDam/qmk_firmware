@@ -5,7 +5,7 @@
     "bootloader": "rp2040",
     "encoder": {
         "rotary": [
-            {"pin_a": "GP21", "pin_b": "GP20", "resolution": 4}
+            {"pin_a": "GP20", "pin_b": "GP21", "resolution": 4}
         ]
     },
     "features": {
@@ -13,14 +13,23 @@
         "encoder": true,
         "extrakey": true,
         "mousekey": true,
-        "rgb_matrix": true
+        "rgb_matrix": true,
+        "backlight": true
     },
     "matrix_pins": {
         "direct": [
-            ["GP22", "GP8", "GP7", "GP10", "GP6", "GP17", "GP11"]
+            ["GP22", "GP19", "GP16", "GP10", "GP18", "GP17", "GP11"]
         ]
     },
-    "name": "Coban Pad 9A",
+    "backlight": {
+        "pin": "GP0",
+        "levels": 15,
+        "max_brightness": 255,
+        "default": {
+            "brightness": 7
+        }
+    },
+    "name": "Coban Pad 9B",
     "processor": "RP2040",
     "rgb_matrix": {
         "animations": {
@@ -45,7 +54,10 @@
             {"matrix": [0, 5], "x": 112, "y": 64, "flags": 4},
             {"matrix": [0, 6], "x": 224, "y": 64, "flags": 4}
         ],
-        "max_brightness": 150
+        "max_brightness": 150,
+        "default": {
+            "animation": "breathing"
+        }
     },
     "url": "https://cobanstationery.com",
     "usb": {

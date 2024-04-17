@@ -22,5 +22,14 @@ extern lv_style_t style_text;
 extern lv_style_t style_arc_main;
 extern lv_style_t style_arc_positive;
 extern lv_style_t style_arc_knob;
+extern lv_style_t style_indice;
+
+extern lv_style_t style_text_time1;
+extern lv_style_t style_text_time2;
+extern lv_style_t style_text_time3;
+extern lv_style_t style_text_time4;
+extern lv_style_t style_text_time5;
+
+extern lv_style_t style_key;
 
 void init_styles(void);

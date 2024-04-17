@@ -14,30 +14,22 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "raw_hid.h"
+typedef struct _cb_config_t {
+    uint8_t screen_idx;
+    uint8_t screen_brightness;
+    uint8_t screen_timeout;
+    uint8_t screen_timeout_brightness;
 
-enum coban_command_id { // via start at 0x00, currently end at 0x15
-    coban_cmd_id_start           = 0x50,
-    coban_cmd_id_set_screen      = 0x51,
-    coban_cmd_id_set_time        = 0x52,
-    coban_cmd_id_set_cpu_util    = 0x53,
-    coban_cmd_id_set_gpu_util    = 0x54,
-    coban_cmd_id_set_time_format = 0x55
-};
+    // datetime format
+    uint8_t time_style_id;
+    uint8_t time_format;
+    uint8_t time_indicator;
+    uint8_t date_format;
+    uint8_t date_visibility;
+} cb_config;
 
-#ifndef VIA_ENABLE
+extern cb_config config;
 
-enum via_command_id {
-    id_custom_set_value       = 0x07,
-    id_custom_get_value       = 0x08,
-    id_custom_save            = 0x09,
-    id_unhandled              = 0xff
-};
-
-enum via_channel_id {
-    id_custom_channel         = 0x00,
-};
-
-#endif // VIA_ENABLE
-
-void raw_hid_receive_kb(uint8_t *data, uint8_t length);
+void coban_init_config(void);
+void coban_save_config(void);
+void coban_load_config(void);

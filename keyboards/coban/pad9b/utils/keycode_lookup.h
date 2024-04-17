@@ -14,30 +14,15 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include "raw_hid.h"
+#pragma once
 
-enum coban_command_id { // via start at 0x00, currently end at 0x15
-    coban_cmd_id_start           = 0x50,
-    coban_cmd_id_set_screen      = 0x51,
-    coban_cmd_id_set_time        = 0x52,
-    coban_cmd_id_set_cpu_util    = 0x53,
-    coban_cmd_id_set_gpu_util    = 0x54,
-    coban_cmd_id_set_time_format = 0x55
-};
+#include "quantum.h"
 
-#ifndef VIA_ENABLE
+typedef struct {
+    char key_string[12];
+    uint16_t keycode;
+} lookup_table_t;
 
-enum via_command_id {
-    id_custom_set_value       = 0x07,
-    id_custom_get_value       = 0x08,
-    id_custom_save            = 0x09,
-    id_unhandled              = 0xff
-};
+char* translate_keycode_to_string(uint16_t code);
 
-enum via_channel_id {
-    id_custom_channel         = 0x00,
-};
-
-#endif // VIA_ENABLE
-
-void raw_hid_receive_kb(uint8_t *data, uint8_t length);
+extern lookup_table_t lookup_table[361];
