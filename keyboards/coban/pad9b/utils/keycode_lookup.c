@@ -34,20 +34,34 @@ int cmp(const void *v1, const void *v2) {
 
     Will return a string that says "UNKNOWN" if the keycode cannot be found.
 */
+// char* translate_keycode_to_string(uint16_t code) {
+//     lookup_table_t * result = NULL;
+//     lookup_table_t target = {.key_string = "", .keycode = code};
+//     char * return_p;
+
+//     result = bsearch(&target, lookup_table, num_keycodes, sizeof(lookup_table_t), cmp);
+
+//     if(result != NULL) {
+//         return_p = result->key_string;
+//     } else {
+//         return_p = UNKNOWN_KEYCODE;
+//     }
+
+//     return (return_p);
+// }
+
 char* translate_keycode_to_string(uint16_t code) {
-    lookup_table_t * result = NULL;
-    lookup_table_t target = {.key_string = "", .keycode = code};
     char * return_p;
 
-    result = bsearch(&target, lookup_table, num_keycodes, sizeof(lookup_table_t), cmp);
-
-    if(result != NULL) {
-        return_p = result->key_string;
-    } else {
-        return_p = UNKNOWN_KEYCODE;
+    for (int i=0; i<361; i++) {
+        if (lookup_table[i].keycode == code) {
+            return_p = lookup_table[i].key_string;
+            return return_p;
+        }
     }
 
-    return (return_p);
+    return_p = UNKNOWN_KEYCODE;
+    return return_p;
 }
 
 lookup_table_t lookup_table[361] = {

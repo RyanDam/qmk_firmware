@@ -139,12 +139,12 @@ void _update_layer_keycode(uint8_t layer_idx) {
     for (int r=0; r<MATRIX_ROWS; r++) {
         for (int c=0; c<MATRIX_COLS; c++) {
             uint16_t keycode = dynamic_keymap_get_keycode(layer_idx, r, c);
-            lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], "%d", keycode);
-            // lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], translate_keycode_to_string(keycode));
+            // lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], "%d", keycode);
+            lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], translate_keycode_to_string(keycode));
         }
-    }
+    }1
 }
-
+113
 void screen_layers_set_indice(uint8_t layer_idx) {
 
     if (screen_layers == NULL) {
