@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "quantum/dynamic_keymap.h"
 #include "graphics/screens/screen_layers.h"
 #include "graphics/screens/styles.h"
 #include "graphics/lvgl_helpers.h"
@@ -142,9 +143,9 @@ void _update_layer_keycode(uint8_t layer_idx) {
             // lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], "%d", keycode);
             lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], translate_keycode_to_string(keycode));
         }
-    }1
+    }
 }
-113
+
 void screen_layers_set_indice(uint8_t layer_idx) {
 
     if (screen_layers == NULL) {

@@ -15,8 +15,6 @@
  */
 
 #include "keycode_lookup.h"
-#include "print.h"
-#include "via.h"
 
 #define num_keycodes ARRAY_SIZE(lookup_table)
 static char UNKNOWN_KEYCODE[] = "?";
@@ -27,28 +25,6 @@ int cmp(const void *v1, const void *v2) {
 
     return (c1->keycode - c2->keycode);
 }
-
-/*
-    Returns a pointer to a string containing the string describing the keycode, such as those found here:
-    https://beta.docs.qmk.fm/using-qmk/simple-keycodes/keycodes
-
-    Will return a string that says "UNKNOWN" if the keycode cannot be found.
-*/
-// char* translate_keycode_to_string(uint16_t code) {
-//     lookup_table_t * result = NULL;
-//     lookup_table_t target = {.key_string = "", .keycode = code};
-//     char * return_p;
-
-//     result = bsearch(&target, lookup_table, num_keycodes, sizeof(lookup_table_t), cmp);
-
-//     if(result != NULL) {
-//         return_p = result->key_string;
-//     } else {
-//         return_p = UNKNOWN_KEYCODE;
-//     }
-
-//     return (return_p);
-// }
 
 char* translate_keycode_to_string(uint16_t code) {
     char * return_p;
