@@ -17,8 +17,12 @@
 #undef LV_USE_GIF
 #define LV_USE_GIF 1
 
-#undef MIN
-#undef MAX
+// #ifdef MIN
+// #undef MIN
+// #endif
+// #ifdef MAX
+// #undef MAX
+// #endif
 
 // #undef LV_FONT_MONTSERRAT_20
 // #define LV_FONT_MONTSERRAT_20 1
