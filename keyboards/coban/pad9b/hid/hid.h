@@ -22,7 +22,11 @@ enum coban_command_id { // via start at 0x00, currently end at 0x15
     coban_cmd_id_set_time        = 0x52,
     coban_cmd_id_set_cpu_util    = 0x53,
     coban_cmd_id_set_gpu_util    = 0x54,
-    coban_cmd_id_set_time_format = 0x55
+    coban_cmd_id_set_time_format = 0x55,
+    coban_cmd_id_set_gif_buffer  = 0x56,
+
+    coban_cmd_id_reboot_board    = 0x98,
+    coban_cmd_id_reset_board     = 0x99
 };
 
 #ifndef VIA_ENABLE

@@ -18,7 +18,7 @@
 #include "graphics/ui.h"
 
 // Check if the size of the reserved persistent memory is the same as the size of struct apc_config
-_Static_assert(sizeof(cb_config) == VIA_EEPROM_CUSTOM_CONFIG_SIZE, "Mismatch in keyboard EECONFIG stored data");
+_Static_assert(sizeof(cb_config) == EEPROM_CB_CONFIG_SIZE, "Mismatch in keyboard EECONFIG stored data");
 
 cb_config config;
 
@@ -33,15 +33,17 @@ void coban_init_config(void) {
     config.time_indicator = coban_time_indicator_default;
     config.date_format = coban_date_format_ddmmyyyy;
     config.date_visibility = coban_date_visibility_visible;
+
+    config.gif_data_size = 44895;
 }
 
 void coban_save_config(void) {
     // Write default value to EEPROM now
-    eeprom_write_block(&config, (void *)EEPROM_CB_CONFIG_ADDR, VIA_EEPROM_CUSTOM_CONFIG_SIZE);
+    eeprom_write_block(&config, (void *)EEPROM_CB_CONFIG_ADDR, EEPROM_CB_CONFIG_SIZE);
 }
 
 void coban_load_config(void) {
     // read config from eeprom
     // config.screen_idx = eeprom_read_byte((void*)EEPROM_CB_CONFIG_ADDR);
-    eeprom_read_block(&config, (void *)EEPROM_CB_CONFIG_ADDR, VIA_EEPROM_CUSTOM_CONFIG_SIZE);
+    eeprom_read_block(&config, (void *)EEPROM_CB_CONFIG_ADDR, EEPROM_CB_CONFIG_SIZE);
 }

@@ -47,6 +47,8 @@ enum coban_date_visibility_id {
 
 lv_obj_t * screen_time_init(void);
 
+void screen_time_set_time2(uint32_t hour);
+
 void screen_time_set_time(uint8_t hour, uint8_t minute);
 
 void screen_time_set_date(uint8_t day, uint8_t month, uint8_t year);

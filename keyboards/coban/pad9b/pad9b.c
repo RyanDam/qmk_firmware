@@ -10,6 +10,9 @@ void keyboard_post_init_kb(void) {
 
     // Load eeprom
     coban_load_config();
+    // Load gif data
+    gif_data_header.data_size = config.gif_data_size;
+    eeprom_read_block(&gif_data, (void *)EEROM_CB_GIF_ADDR, config.gif_data_size);
 
     // Init the display
     ui_init();

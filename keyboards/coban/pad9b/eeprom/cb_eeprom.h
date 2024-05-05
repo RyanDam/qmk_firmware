@@ -26,6 +26,9 @@ typedef struct _cb_config_t {
     uint8_t time_indicator;
     uint8_t date_format;
     uint8_t date_visibility;
+
+    // gif data
+    uint32_t gif_data_size;
 } cb_config;
 
 extern cb_config config;

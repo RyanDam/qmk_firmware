@@ -54,6 +54,10 @@ lv_obj_t * screen_time_init(void) {
     return screen_time;
 }
 
+void screen_time_set_time2(uint32_t hour) {
+    lv_label_set_text_fmt(time_text, "%02ld", hour);
+}
+
 void screen_time_set_time(uint8_t hour, uint8_t minute) {
 
     switch (config.time_format) {
