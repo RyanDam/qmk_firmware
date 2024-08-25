@@ -19,6 +19,10 @@
 
 #include "graphics/ui.h"
 #include "eeprom/cb_eeprom.h"
+#include "hardware/flash.h"
+#include <hardware/sync.h>
+
+#define GIF_TRANSFER_BLOCK_SIZE 25
 
 void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
     uint8_t *command_id   = &(data[0]);
@@ -57,16 +61,32 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_gif_buffer: {
-            uint8_t *offset_big = &(command_data[0]);
-            uint8_t *offset_little = &(command_data[1]);
-            uint32_t offset = 0x00000000 | (*offset_big << 8) | (*offset_little << 0);
-            offset *= 27; // 32 - 2 (via cmd + channel id) - 1 (custom cmd id) - 2 (offsets)
+            // first, stop animation to prevent crash because of data writing
+            screen_animation_stop();
 
-            // screen_time_set_time2(offset);
-            // // screen_time_set_datetime(*offset_big, *offset_little, 0, 0, 0);
+            uint8_t *offset_1 = &(command_data[0]);
+            uint8_t *offset_2 = &(command_data[1]);
+            uint8_t *offset_3 = &(command_data[2]);
+            uint8_t *offset_4 = &(command_data[3]);
+            uint32_t offset = 0x00000000 | (*offset_1 << 24) | (*offset_2 << 16) | (*offset_3 << 8) | (*offset_4 << 0);
+            if ((offset + GIF_TRANSFER_BLOCK_SIZE) <= EEPROM_MAX_GIF_SIZE) {
+                uint8_t *data =  &(command_data[4]);
+                for (uint32_t i = 0; i < GIF_TRANSFER_BLOCK_SIZE; i++) {
+                    *(gif_data + offset + i) = *(data + i);
+                }
+            }
+            break;
+        }
+        case coban_cmd_id_set_gif_size: {
+            uint8_t *offset_1 = &(command_data[0]);
+            uint8_t *offset_2 = &(command_data[1]);
+            uint8_t *offset_3 = &(command_data[2]);
+            uint8_t *offset_4 = &(command_data[3]);
+            uint32_t gif_datasize = 0x00000000 | (*offset_1 << 24) | (*offset_2 << 16) | (*offset_3 << 8) | (*offset_4 << 0);
 
-            uint8_t *data =  &(command_data[2]);
-            eeprom_write_block(data, (void *)(EEROM_CB_GIF_ADDR + offset), 27);
+            config.gif_data_size = gif_datasize;
+            gif_data_header.data_size = config.gif_data_size;
+            screen_animation_reload();
             break;
         }
         case coban_cmd_id_reboot_board: {
@@ -97,14 +117,43 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 2) = config.time_indicator;
             *(command_data + 3) = config.date_format;
             *(command_data + 4) = config.date_visibility;
+            break;
         }
         case coban_cmd_id_set_gif_buffer: {
-            uint8_t *offset_big = &(command_data[0]);
-            uint8_t *offset_little = &(command_data[1]);
-            uint32_t offset = 0x00000000 | (*offset_big << 8) | (*offset_little << 0);
-            offset *= 27; // 32 - 2 (via cmd + channel id) - 1 (custom cmd id) - 2 (offsets)
+            uint8_t *offset_1 = &(command_data[0]);
+            uint8_t *offset_2 = &(command_data[1]);
+            uint8_t *offset_3 = &(command_data[2]);
+            uint8_t *offset_4 = &(command_data[3]);
+            uint32_t offset = 0x00000000 | (*offset_1 << 24) | (*offset_2 << 16) | (*offset_3 << 8) | (*offset_4 << 0);
 
-            eeprom_read_block(command_data+2, (void *)(EEROM_CB_GIF_ADDR + offset), 27);
+            if ((offset + GIF_TRANSFER_BLOCK_SIZE) <= EEPROM_MAX_GIF_SIZE) {
+                for (uint32_t i = 0; i < GIF_TRANSFER_BLOCK_SIZE; i++) {
+                    *(command_data + i + 4) = *(gif_data + offset + i);
+                }
+            }
+            break;
+        }
+        case coban_cmd_id_set_gif_size: {
+            *(command_data + 0) = (uint8_t) ((config.gif_data_size & 0xff000000) >> 24);
+            *(command_data + 1) = (uint8_t) ((config.gif_data_size & 0x00ff0000) >> 16);
+            *(command_data + 2) = (uint8_t) ((config.gif_data_size & 0x0000ff00) >> 8);
+            *(command_data + 3) = (uint8_t) ((config.gif_data_size & 0x000000ff) >> 0);
+            break;
+        }
+        case coban_cmd_id_set_gif_flash: {
+            uint8_t *offset_1 = &(command_data[0]);
+            uint8_t *offset_2 = &(command_data[1]);
+            uint8_t *offset_3 = &(command_data[2]);
+            uint8_t *offset_4 = &(command_data[3]);
+            uint32_t offset = 0x00000000 | (*offset_1 << 24) | (*offset_2 << 16) | (*offset_3 << 8) | (*offset_4 << 0);
+
+            if ((offset + GIF_TRANSFER_BLOCK_SIZE) <= EEPROM_MAX_GIF_SIZE) {
+                const uint8_t *pointer = (const uint8_t *) (XIP_BASE + EEROM_CB_GIF_ADDR + offset);
+                for (int i = 0; i < GIF_TRANSFER_BLOCK_SIZE; i++) {
+                    *(command_data + i + 4) = *(pointer + i);
+                }
+            }
+            break;
         }
         default:
             break;
@@ -113,6 +162,25 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
 
 void cb_config_save(void) {
     coban_save_config();
+    // save gif to flash
+    uint32_t ints = save_and_disable_interrupts();
+    // Calculate the absolute address in flash memory
+    if (EEROM_CB_GIF_ADDR + config.gif_data_size <= PICO_FLASH_SIZE_BYTES) {
+        // Write data to flash
+        int plus_erase = config.gif_data_size % FLASH_SECTOR_SIZE > 0 ? 1 : 0;
+        size_t datasize_erase = (((size_t) config.gif_data_size / FLASH_SECTOR_SIZE) + plus_erase) * FLASH_SECTOR_SIZE;
+        // first, earse target flash is required befor write data to it
+        flash_range_erase(EEROM_CB_GIF_ADDR, datasize_erase);
+
+        // Write data to flash
+        int plus_program = config.gif_data_size % FLASH_PAGE_SIZE > 0 ? 1 : 0;
+        size_t datasize_program = (((size_t) config.gif_data_size / FLASH_PAGE_SIZE) + plus_program) * FLASH_PAGE_SIZE;
+        // program flash
+        flash_range_program(EEROM_CB_GIF_ADDR, gif_data, datasize_program);
+    } else {
+        // Handle error: offset exceeds flash size
+    }
+    restore_interrupts (ints);
 }
 
 #ifdef RAW_ENABLE
@@ -129,26 +197,21 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
     uint8_t *value_id_and_data = &(data[2]);
 
     if ( *channel_id == id_custom_channel ) {
-        switch ( *command_id )
-        {
-            case id_custom_set_value:
-            {
+        switch ( *command_id ) {
+            case id_custom_set_value: {
                 // cb_config_set_value(value_id_and_data);
                 cb_raw_hid_receive_kb(value_id_and_data, length-2);
                 break;
             }
-            case id_custom_get_value:
-            {
+            case id_custom_get_value: {
                 cb_raw_hid_response_kb(value_id_and_data, length-2);
                 break;
             }
-            case id_custom_save:
-            {
+            case id_custom_save: {
                 cb_config_save();
                 break;
             }
-            default:
-            {
+            default: {
                 // Unhandled message.
                 *command_id = id_unhandled;
                 break;
@@ -156,7 +219,6 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
         }
         return;
     }
-
     // Return the unhandled state
     *command_id = id_unhandled;
 

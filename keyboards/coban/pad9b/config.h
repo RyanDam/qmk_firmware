@@ -30,6 +30,14 @@
 #define OLED_RST_PIN GP4
 #define OLED_DC_PIN GP1
 #define OLED_BKL_PIN GP0
+#define OLED_DC_PIN GP1
+#define OLED_BKL_PIN GP0
+
+// Test platform config
+// #define OLED_CS_PIN GP6
+// #define OLED_RST_PIN GP4
+// #define OLED_DC_PIN GP5
+// #define OLED_BKL_PIN GP7
 
 #ifdef BACKLIGHT_ENABLE
 #   define BACKLIGHT_PWM_DRIVER PWMD0
@@ -54,5 +62,6 @@
 #define EEPROM_CB_CONFIG_ADDR (VIA_EEPROM_CUSTOM_CONFIG_ADDR)
 #define VIA_EEPROM_CUSTOM_CONFIG_SIZE EEPROM_CB_CONFIG_SIZE
 
-#define EEPROM_MAX_GIF_SIZE 100 * 1024 // 100KB
-#define EEROM_CB_GIF_ADDR (DYNAMIC_KEYMAP_EEPROM_MAX_ADDR) // TODO: find where eeprom addr end
+// https://www.makermatrix.com/blog/read-and-write-data-with-the-pi-pico-onboard-flash/
+#define EEPROM_MAX_GIF_SIZE 102400 // 25*FLASH_SECTOR_SIZE // 50*4096 = 102400 B
+#define EEROM_CB_GIF_ADDR (PICO_FLASH_SIZE_BYTES - EEPROM_MAX_GIF_SIZE - 4096) // TODO: find where eeprom addr end

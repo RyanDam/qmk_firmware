@@ -20,3 +20,7 @@ extern lv_img_dsc_t gif_data_header;
 extern uint8_t gif_data[];
 
 lv_obj_t * screen_animation_init(void);
+
+void screen_animation_stop(void);
+
+void screen_animation_reload(void);

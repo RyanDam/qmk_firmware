@@ -38,6 +38,7 @@ void ui_init(void) {
 
     qp_init(oled, QP_ROTATION_270);
     qp_set_viewport_offsets(oled, 1, 26);
+    // qp_set_viewport_offsets(oled, 0, 24);
 
     if (qp_lvgl_attach(oled)) {
         lv_disp_t  *lv_display = lv_disp_get_default();
@@ -71,6 +72,7 @@ void change_screen(uint8_t screen_idx) {
         }
         case coban_screen_anime: {
             lv_scr_load(screen_anime);
+            screen_animation_reload();
             break;
         }
         case coban_screen_layer: {

@@ -5,6 +5,7 @@
 #include "graphics/ui.h"
 #include "hid/hid.h"
 #include "eeprom/cb_eeprom.h"
+#include "hardware/flash.h"
 
 void keyboard_post_init_kb(void) {
 
@@ -12,7 +13,11 @@ void keyboard_post_init_kb(void) {
     coban_load_config();
     // Load gif data
     gif_data_header.data_size = config.gif_data_size;
-    eeprom_read_block(&gif_data, (void *)EEROM_CB_GIF_ADDR, config.gif_data_size);
+    // load gif from flash to ram
+    const uint8_t *pointer = (const uint8_t *) (XIP_BASE + EEROM_CB_GIF_ADDR);
+    for (int i = 0; i < config.gif_data_size; i++) {
+        gif_data[i] = *(pointer + i);
+    }
 
     // Init the display
     ui_init();
