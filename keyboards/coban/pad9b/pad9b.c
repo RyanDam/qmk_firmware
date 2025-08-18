@@ -12,10 +12,11 @@ void keyboard_post_init_kb(void) {
     // Load eeprom
     coban_load_config();
     // Load gif data
-    gif_data_header.data_size = config.gif_data_size;
+    gif_data_header.data_size = EEPROM_MAX_GIF_SIZE;
+    // gif_data_header.data_size = 29524;
     // load gif from flash to ram
     const uint8_t *pointer = (const uint8_t *) (XIP_BASE + EEROM_CB_GIF_ADDR);
-    for (int i = 0; i < config.gif_data_size; i++) {
+    for (int i = 0; i < EEPROM_MAX_GIF_SIZE; i++) {
         gif_data[i] = *(pointer + i);
     }
 

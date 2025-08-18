@@ -165,16 +165,16 @@ void cb_config_save(void) {
     // save gif to flash
     uint32_t ints = save_and_disable_interrupts();
     // Calculate the absolute address in flash memory
-    if (EEROM_CB_GIF_ADDR + config.gif_data_size <= PICO_FLASH_SIZE_BYTES) {
+    if (EEROM_CB_GIF_ADDR + EEPROM_MAX_GIF_SIZE <= PICO_FLASH_SIZE_BYTES) {
         // Write data to flash
-        int plus_erase = config.gif_data_size % FLASH_SECTOR_SIZE > 0 ? 1 : 0;
-        size_t datasize_erase = (((size_t) config.gif_data_size / FLASH_SECTOR_SIZE) + plus_erase) * FLASH_SECTOR_SIZE;
+        int plus_erase = EEPROM_MAX_GIF_SIZE % FLASH_SECTOR_SIZE > 0 ? 1 : 0;
+        size_t datasize_erase = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_SECTOR_SIZE) + plus_erase) * FLASH_SECTOR_SIZE;
         // first, earse target flash is required befor write data to it
         flash_range_erase(EEROM_CB_GIF_ADDR, datasize_erase);
 
         // Write data to flash
-        int plus_program = config.gif_data_size % FLASH_PAGE_SIZE > 0 ? 1 : 0;
-        size_t datasize_program = (((size_t) config.gif_data_size / FLASH_PAGE_SIZE) + plus_program) * FLASH_PAGE_SIZE;
+        int plus_program = EEPROM_MAX_GIF_SIZE % FLASH_PAGE_SIZE > 0 ? 1 : 0;
+        size_t datasize_program = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_PAGE_SIZE) + plus_program) * FLASH_PAGE_SIZE;
         // program flash
         flash_range_program(EEROM_CB_GIF_ADDR, gif_data, datasize_program);
     } else {
