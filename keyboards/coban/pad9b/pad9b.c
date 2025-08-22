@@ -33,21 +33,42 @@ void keyboard_post_init_kb(void) {
         config.date_visibility
     );
 
-    keyboard_post_init_user();
+    // keyboard_post_init_user();
 }
 
-void housekeeping_task_kb(void) {
-    // Draw the display
-    // ui_task();
+// void housekeeping_task_kb(void) {
+//     // Draw the display
+//     // ui_task();
 
-// #ifdef ENCODER_ENABLE
-//     encoder_read();
-// #endif
-}
+// // #ifdef ENCODER_ENABLE
+// //     encoder_read();
+// // #endif
+// }
+
+// void suspend_power_down_user(void) {
+//     // code will run multiple times while keyboard is suspended
+//     backlight_disable();
+// }
+
+// void suspend_wakeup_init_user(void) {
+//     // code will run on keyboard wakeup
+//     backlight_enable();
+// }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
-    screen_layers_set_indice(get_highest_layer(state));
+    if (config.screen_idx == coban_screen_layer) {
+        screen_layers_set_indice(get_highest_layer(state));
+    }
     return state;
 }
+
+// bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+//     switch (keycode) {
+//       case KC_ENTER:
+//         return true; // Let QMK send the enter press/release events
+//       default:
+//         return true; // Process all other keycodes normally
+//     }
+// }
 
 #endif //QUANTUM_PAINTER_ENABLE

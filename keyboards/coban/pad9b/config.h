@@ -45,12 +45,12 @@
 #endif
 
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0
-// #define QUANTUM_PAINTER_TASK_THROTTLE 999 // 50 // 1000 / 50 = 20 FPS
+// #define QUANTUM_PAINTER_TASK_THROTTLE 100 // 50 // 1000 / 50 = 20 FPS
 // #define QUANTUM_PAINTER_PIXDATA_BUFFER_SIZE 4096
 
 #define SCREEN_WIDTH 160
 #define SCREEN_HEIGHT 80
-#define SCREEN_REFRESH_GAP_MS 41 // 1000 / 41 = 24 FPS
+// #define SCREEN_REFRESH_GAP_MS 41 // 1000 / 41 = 24 FPS
 
 #define QP_LVGL_TASK_PERIOD 41
 
@@ -60,3 +60,5 @@
 // https://www.makermatrix.com/blog/read-and-write-data-with-the-pi-pico-onboard-flash/
 #define EEPROM_MAX_GIF_SIZE 102400 // 25*FLASH_SECTOR_SIZE // 50*4096 = 102400 B
 #define EEROM_CB_GIF_ADDR (PICO_FLASH_SIZE_BYTES - EEPROM_MAX_GIF_SIZE - 4096) // TODO: find where eeprom addr end
+
+#define TAP_CODE_DELAY 10

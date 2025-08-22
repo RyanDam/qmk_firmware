@@ -160,27 +160,41 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
     }
 }
 
-void cb_config_save(void) {
-    coban_save_config();
-    // save gif to flash
-    uint32_t ints = save_and_disable_interrupts();
-    // Calculate the absolute address in flash memory
-    if (EEROM_CB_GIF_ADDR + EEPROM_MAX_GIF_SIZE <= PICO_FLASH_SIZE_BYTES) {
-        // Write data to flash
-        int plus_erase = EEPROM_MAX_GIF_SIZE % FLASH_SECTOR_SIZE > 0 ? 1 : 0;
-        size_t datasize_erase = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_SECTOR_SIZE) + plus_erase) * FLASH_SECTOR_SIZE;
-        // first, earse target flash is required befor write data to it
-        flash_range_erase(EEROM_CB_GIF_ADDR, datasize_erase);
+void cb_config_save(uint8_t *data, uint8_t length) {
+    uint8_t *command_id   = &(data[0]);
+    // uint8_t *command_data = &(data[1]);
 
-        // Write data to flash
-        int plus_program = EEPROM_MAX_GIF_SIZE % FLASH_PAGE_SIZE > 0 ? 1 : 0;
-        size_t datasize_program = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_PAGE_SIZE) + plus_program) * FLASH_PAGE_SIZE;
-        // program flash
-        flash_range_program(EEROM_CB_GIF_ADDR, gif_data, datasize_program);
-    } else {
-        // Handle error: offset exceeds flash size
+    switch (*command_id)
+    {
+    case coban_cmd_id_save_eeprom: {
+        coban_save_config();
+        break;
     }
-    restore_interrupts (ints);
+    case coban_cmd_id_save_gif_data: {
+        // save gif to flash
+        uint32_t ints = save_and_disable_interrupts();
+        // Calculate the absolute address in flash memory
+        if (EEROM_CB_GIF_ADDR + EEPROM_MAX_GIF_SIZE <= PICO_FLASH_SIZE_BYTES) {
+            // Write data to flash
+            int plus_erase = EEPROM_MAX_GIF_SIZE % FLASH_SECTOR_SIZE > 0 ? 1 : 0;
+            size_t datasize_erase = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_SECTOR_SIZE) + plus_erase) * FLASH_SECTOR_SIZE;
+            // first, earse target flash is required befor write data to it
+            flash_range_erase(EEROM_CB_GIF_ADDR, datasize_erase);
+
+            // Write data to flash
+            int plus_program = EEPROM_MAX_GIF_SIZE % FLASH_PAGE_SIZE > 0 ? 1 : 0;
+            size_t datasize_program = (((size_t) EEPROM_MAX_GIF_SIZE / FLASH_PAGE_SIZE) + plus_program) * FLASH_PAGE_SIZE;
+            // program flash
+            flash_range_program(EEROM_CB_GIF_ADDR, gif_data, datasize_program);
+        } else {
+            // Handle error: offset exceeds flash size
+        }
+        restore_interrupts (ints);
+        break;
+    }
+    default:
+        break;
+    }
 }
 
 #ifdef RAW_ENABLE
@@ -208,7 +222,7 @@ void via_custom_value_command_kb(uint8_t *data, uint8_t length) {
                 break;
             }
             case id_custom_save: {
-                cb_config_save();
+                cb_config_save(value_id_and_data, length-2);
                 break;
             }
             default: {

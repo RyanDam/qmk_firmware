@@ -18,6 +18,7 @@
 
 #include "quantum.h"
 
+#define NUMBER_KNOWN_KEYCODE 366
 typedef struct {
     char key_string[12];
     uint16_t keycode;
@@ -25,4 +26,4 @@ typedef struct {
 
 char* translate_keycode_to_string(uint16_t code);
 
-extern lookup_table_t lookup_table[361];
+extern lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE];

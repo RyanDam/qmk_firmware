@@ -27,6 +27,9 @@ enum coban_command_id { // via start at 0x00, currently end at 0x15
     coban_cmd_id_set_gif_size    = 0x57,
     coban_cmd_id_set_gif_flash   = 0x58,
 
+    coban_cmd_id_save_eeprom     = 0x96,
+    coban_cmd_id_save_gif_data   = 0x97,
+
     coban_cmd_id_reboot_board    = 0x98,
     coban_cmd_id_reset_board     = 0x99
 };

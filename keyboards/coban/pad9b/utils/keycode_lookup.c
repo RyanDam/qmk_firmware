@@ -29,18 +29,21 @@ int cmp(const void *v1, const void *v2) {
 char* translate_keycode_to_string(uint16_t code) {
     char * return_p;
 
-    for (int i=0; i<361; i++) {
+    for (int i=0; i<NUMBER_KNOWN_KEYCODE; i++) {
         if (lookup_table[i].keycode == code) {
             return_p = lookup_table[i].key_string;
             return return_p;
         }
     }
 
-    return_p = UNKNOWN_KEYCODE;
-    return return_p;
+    // static char buffer[8]; // enough for "65535\0"
+    // snprintf(buffer, sizeof(buffer), "%u", code);
+    // return buffer;
+
+    return UNKNOWN_KEYCODE;
 }
 
-lookup_table_t lookup_table[361] = {
+lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"M0", 0x7700}, //_QK_MACRO
     {"M1", 0x7701},
     {"M2", 0x7702},
@@ -51,6 +54,10 @@ lookup_table_t lookup_table[361] = {
     {"M7", 0x7707},
     {"M8", 0x7708},
     {"M9", 0x7709},
+    {"SPC L0", 0x402c}, //_QK_LAYER_TAP
+    {"SPC L1", 0x412c},
+    {"SPC L2", 0x422c},
+    {"SPC L3", 0x432c},
     {"MO(0)", 0x5220}, //_QK_MOMENTARY
     {"MO(1)", 0x5221},
     {"MO(2)", 0x5222},
@@ -402,4 +409,5 @@ lookup_table_t lookup_table[361] = {
     {"M7", QK_MACRO_7},
     {"M8", QK_MACRO_8},
     {"M9", QK_MACRO_9},
+    {"Reset", 0x7c00},
 };
