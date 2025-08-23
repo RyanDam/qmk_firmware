@@ -30,7 +30,9 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 
     switch (*command_id) {
         case coban_cmd_id_set_screen: {
-            config.screen_idx = *command_data;
+            config.screen_idx = command_data[0];
+            config.screen_switch_layer = command_data[1];
+            config.screen_switch_layer_timeout = command_data[2];
             change_screen(config.screen_idx);
             break;
         }
@@ -108,15 +110,17 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
 
     switch (*command_id) {
         case coban_cmd_id_set_screen: {
-            *command_data = config.screen_idx;
+            *(command_data + 0) = config.screen_idx & 0xff;
+            *(command_data + 1) = config.screen_switch_layer & 0xff;
+            *(command_data + 2) = config.screen_switch_layer_timeout & 0xff;
             break;
         }
         case coban_cmd_id_set_time_format: {
-            *(command_data + 0) = config.time_style_id;
-            *(command_data + 1) = config.time_format;
-            *(command_data + 2) = config.time_indicator;
-            *(command_data + 3) = config.date_format;
-            *(command_data + 4) = config.date_visibility;
+            *(command_data + 0) = config.time_style_id & 0xff;
+            *(command_data + 1) = config.time_format & 0xff;
+            *(command_data + 2) = config.time_indicator & 0xff;
+            *(command_data + 3) = config.date_format & 0xff;
+            *(command_data + 4) = config.date_visibility & 0xff;
             break;
         }
         case coban_cmd_id_set_gif_buffer: {
@@ -134,10 +138,10 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_gif_size: {
-            *(command_data + 0) = (uint8_t) ((config.gif_data_size & 0xff000000) >> 24);
-            *(command_data + 1) = (uint8_t) ((config.gif_data_size & 0x00ff0000) >> 16);
-            *(command_data + 2) = (uint8_t) ((config.gif_data_size & 0x0000ff00) >> 8);
-            *(command_data + 3) = (uint8_t) ((config.gif_data_size & 0x000000ff) >> 0);
+            *(command_data + 0) = ((config.gif_data_size & 0xff000000) >> 24)  & 0xff;
+            *(command_data + 1) = ((config.gif_data_size & 0x00ff0000) >> 16)  & 0xff;
+            *(command_data + 2) = ((config.gif_data_size & 0x0000ff00) >> 8)  & 0xff;
+            *(command_data + 3) = ((config.gif_data_size & 0x000000ff) >> 0)  & 0xff;
             break;
         }
         case coban_cmd_id_set_gif_flash: {

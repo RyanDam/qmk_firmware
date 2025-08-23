@@ -37,6 +37,7 @@ lv_style_t style_text_time4;
 lv_style_t style_text_time5;
 
 lv_style_t style_key;
+lv_style_t style_key_pressed;
 
 void init_styles(void) {
     lv_style_init(&style_screen);
@@ -83,8 +84,25 @@ void init_styles(void) {
     lv_style_set_height(&style_key, 22);
     lv_style_set_text_align(&style_key, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style_key, lv_color_hex(0xffffff));
+    lv_style_set_bg_color(&style_key, lv_color_hex(0x000000));
+    lv_style_set_bg_opa(&style_key, LV_OPA_100);
     lv_style_set_border_color(&style_key, lv_color_hex(0x555555));
     lv_style_set_radius(&style_key, 5);
+
+    lv_style_init(&style_key_pressed);
+    lv_style_set_pad_top(&style_key_pressed, 3);
+    lv_style_set_pad_bottom(&style_key_pressed, 3);
+    lv_style_set_pad_left(&style_key_pressed, 0);
+    lv_style_set_pad_right(&style_key_pressed, 0);
+    lv_style_set_border_width(&style_key_pressed, 1);
+    lv_style_set_width(&style_key_pressed, 50);
+    lv_style_set_height(&style_key_pressed, 22);
+    lv_style_set_text_align(&style_key_pressed, LV_TEXT_ALIGN_CENTER);
+    lv_style_set_text_color(&style_key_pressed, lv_color_hex(0x000000));
+    lv_style_set_bg_color(&style_key_pressed, lv_color_hex(0xffffff));
+    lv_style_set_bg_opa(&style_key_pressed, LV_OPA_100);
+    lv_style_set_border_color(&style_key_pressed, lv_color_hex(0x555555));
+    lv_style_set_radius(&style_key_pressed, 5);
 
     lv_style_init(&style_arc_main);
     lv_style_set_arc_color(&style_arc_main, lv_palette_main(LV_PALETTE_GREY));

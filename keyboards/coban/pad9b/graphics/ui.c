@@ -68,10 +68,12 @@ void ui_init(void) {
 void change_screen(uint8_t screen_idx) {
     switch (screen_idx) {
         case coban_screen_clock: {
+            screen_animation_stop();
             lv_scr_load(screen_clock);
             break;
         }
         case coban_screen_stats: {
+            screen_animation_stop();
             lv_scr_load(screen_stats);
             break;
         }
@@ -81,6 +83,7 @@ void change_screen(uint8_t screen_idx) {
             break;
         }
         case coban_screen_layer: {
+            screen_animation_stop();
             lv_scr_load(screen_layer);
             break;
         }
@@ -144,7 +147,7 @@ void change_screen(uint8_t screen_idx) {
     //             screen_anime = screen_animation_init();
     //         }
     //         lv_scr_load(screen_anime);
-    //         screen_animation_reload();
+    //         // screen_animation_reload();
     //         break;
     //     }
     //     case coban_screen_layer: {

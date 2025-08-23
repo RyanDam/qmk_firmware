@@ -58,6 +58,7 @@ void screen_animation_stop(void) {
     view_image = NULL;
 }
 
+
 void screen_animation_reload(void) {
     screen_animation_stop();
     int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);

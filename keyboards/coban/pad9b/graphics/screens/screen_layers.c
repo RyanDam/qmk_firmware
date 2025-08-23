@@ -34,6 +34,7 @@ static lv_obj_t *holder_layer_indices;
 
 static lv_obj_t *indices[4];
 static lv_obj_t *keys[MATRIX_ROWS*MATRIX_COLS];
+static uint16_t key_codes[MATRIX_ROWS*MATRIX_COLS];
 
 // static uint8_t last_layer_idx = 0;
 
@@ -137,11 +138,15 @@ lv_obj_t * screen_layers_init(void) {
 }
 
 void _update_layer_keycode(uint8_t layer_idx) {
+    for (int idx=0; idx < MATRIX_ROWS*MATRIX_COLS; idx++) {
+        lv_obj_add_style(keys[idx], &style_key, 0);
+    }
     for (int r=0; r<MATRIX_ROWS; r++) {
         for (int c=0; c<MATRIX_COLS; c++) {
             uint16_t keycode = dynamic_keymap_get_keycode(layer_idx, r, c);
             // lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], "%d", keycode);
             lv_label_set_text_fmt(keys[r*MATRIX_COLS + c], translate_keycode_to_string(keycode));
+            key_codes[r*MATRIX_COLS + c] = keycode;
         }
     }
 }
@@ -164,6 +169,13 @@ void screen_layers_set_indice(uint8_t layer_idx) {
     _update_layer_keycode(layer_idx);
 }
 
-void screen_layers_set_key_code(void) {
-
+void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record) {
+    for (int idx=0; idx < MATRIX_ROWS*MATRIX_COLS; idx++) {
+        if (key_codes[idx] != keycode) continue;
+        if (record->event.pressed) {
+            lv_obj_add_style(keys[idx], &style_key_pressed, 0);
+        } else {
+            lv_obj_add_style(keys[idx], &style_key, 0);
+        }
+    }
 }

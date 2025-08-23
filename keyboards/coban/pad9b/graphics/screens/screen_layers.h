@@ -20,4 +20,4 @@ lv_obj_t * screen_layers_init(void);
 
 void screen_layers_set_indice(uint8_t layer_idx);
 
-void screen_layers_set_key_code(void);
+void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record);

@@ -27,8 +27,8 @@ cb_config config;
 void coban_init_config(void) {
     config.screen_idx = coban_screen_clock;
     config.screen_brightness = 127;
-    config.screen_timeout = 0; // no timeout
-    config.screen_timeout_brightness = 55;
+    config.screen_switch_layer = 1;
+    config.screen_switch_layer_timeout = 5;
 
     config.time_style_id = coban_time_style_1;
     config.time_format = coban_time_format_24h;
