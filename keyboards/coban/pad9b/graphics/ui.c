@@ -31,6 +31,7 @@ lv_obj_t * screen_clock;
 lv_obj_t * screen_stats;
 lv_obj_t * screen_anime;
 lv_obj_t * screen_layer;
+lv_obj_t * screen_boot;
 
 void ui_init(void) {
 
@@ -52,10 +53,14 @@ void ui_init(void) {
         // screen_anime = NULL;
         // screen_layer = NULL;
 
+        screen_boot = screen_boot_init();
+        lv_scr_load(screen_boot);
+
         screen_stats = screen_hardware_stat_init();
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
+
 
         // change_screen(coban_screen_clock);
     }

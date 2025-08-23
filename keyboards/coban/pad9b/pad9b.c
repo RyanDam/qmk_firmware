@@ -24,7 +24,7 @@ void keyboard_post_init_kb(void) {
     ui_init();
 
     // Load config
-    change_screen(config.screen_idx);
+    // change_screen(config.screen_idx);
     // screen_time_set_format(
     //     config.time_style_id,
     //     config.time_format,
@@ -38,12 +38,22 @@ void keyboard_post_init_kb(void) {
 
 uint32_t last_key_press_timestamp = 0;
 bool screen_turned_back = true;
+bool screen_boot_done = false;
 
 void housekeeping_task_user(void) {
     // Draw the display
     // ui_task();
 
     uint32_t current_timestamp = timer_read32();
+    if (current_timestamp < KEYBOAD_BOOT_TIME) {
+        return;
+    }
+
+    if (screen_boot_done == false) {
+        change_screen(config.screen_idx);
+        screen_boot_done = true;
+    }
+
     if (current_timestamp - last_key_press_timestamp < config.screen_switch_layer_timeout*1000) return;
 
     if (config.screen_switch_layer && config.screen_idx != coban_screen_layer && screen_turned_back == false) {
@@ -63,6 +73,11 @@ void suspend_wakeup_init_user(void) {
 }
 
 layer_state_t layer_state_set_user(layer_state_t state) {
+    uint32_t current_timestamp = timer_read32();
+    if (current_timestamp < KEYBOAD_BOOT_TIME) {
+        return true;
+    }
+
     // if (config.screen_idx == coban_screen_layer) {
         screen_layers_set_indice(get_highest_layer(state));
     // }
@@ -70,6 +85,11 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+    uint32_t current_timestamp = timer_read32();
+    if (current_timestamp < KEYBOAD_BOOT_TIME) {
+        return true;
+    }
 
     last_key_press_timestamp = timer_read32();
     if (config.screen_switch_layer && config.screen_idx != coban_screen_layer && screen_turned_back == true) {

@@ -16,6 +16,7 @@ SRC += graphics/screens/screen_hardware_stats.c
 SRC += graphics/screens/screen_time.c
 SRC += graphics/screens/screen_animation.c
 SRC += graphics/screens/screen_layers.c
+SRC += graphics/screens/screen_boot.c
 
 SRC += graphics/fonts/inter.c
 SRC += graphics/fonts/bai_jamjuree.c
