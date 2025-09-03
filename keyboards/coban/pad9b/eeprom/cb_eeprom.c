@@ -29,6 +29,7 @@ void coban_init_config(void) {
     config.screen_brightness = 127;
     config.screen_switch_layer = 1;
     config.screen_switch_layer_timeout = 5;
+    config.screen_idle_timeout = 15;
 
     config.time_style_id = coban_time_style_1;
     config.time_format = coban_time_format_24h;

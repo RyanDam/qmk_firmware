@@ -20,6 +20,7 @@ typedef struct _cb_config_t {
     uint8_t screen_brightness; //
     uint8_t screen_switch_layer; // 1, switch to layer when key event
     uint8_t screen_switch_layer_timeout; // in sec, switch back to original screen if not have key event
+    uint8_t screen_idle_timeout; // in minute, turn off screen if not have key event
 
     // datetime format
     uint8_t time_style_id;

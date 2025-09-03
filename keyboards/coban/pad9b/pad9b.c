@@ -7,6 +7,10 @@
 #include "eeprom/cb_eeprom.h"
 #include "hardware/flash.h"
 
+uint32_t last_key_press_timestamp = 0;
+bool screen_turned_back = true;
+bool screen_boot_done = false;
+
 void keyboard_post_init_kb(void) {
 
     // Load eeprom
@@ -22,6 +26,7 @@ void keyboard_post_init_kb(void) {
 
     // Init the display
     ui_init();
+    last_key_press_timestamp = timer_read32();
 
     // Load config
     // change_screen(config.screen_idx);
@@ -36,9 +41,7 @@ void keyboard_post_init_kb(void) {
     // keyboard_post_init_user();
 }
 
-uint32_t last_key_press_timestamp = 0;
-bool screen_turned_back = true;
-bool screen_boot_done = false;
+
 
 void housekeeping_task_user(void) {
     // Draw the display
@@ -54,11 +57,30 @@ void housekeeping_task_user(void) {
         screen_boot_done = true;
     }
 
-    if (current_timestamp - last_key_press_timestamp < config.screen_switch_layer_timeout*1000) return;
+    uint32_t current_idle_time_ms = current_timestamp - last_key_press_timestamp;
+    uint32_t idle_time_ms = config.screen_idle_timeout * 60 * 1000;
 
-    if (config.screen_switch_layer && config.screen_idx != coban_screen_layer && screen_turned_back == false) {
-        change_screen(config.screen_idx);
-        screen_turned_back = true;
+    // handle backlight idling
+    if (
+        idle_time_ms > 0 // 0 means disable idle timeout
+        && current_idle_time_ms > idle_time_ms
+    ) {
+        if (is_backlight_enabled()) {
+            backlight_disable();
+        }
+        return;
+    }
+
+    // handle screen layer switch back
+    if (current_idle_time_ms > config.screen_switch_layer_timeout*1000) {
+        if (
+            config.screen_switch_layer
+            && config.screen_idx != coban_screen_layer
+            && screen_turned_back == false
+        ) {
+            change_screen(config.screen_idx);
+            screen_turned_back = true;
+        }
     }
 }
 
@@ -92,9 +114,17 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     }
 
     last_key_press_timestamp = timer_read32();
-    if (config.screen_switch_layer && config.screen_idx != coban_screen_layer && screen_turned_back == true) {
+    if (
+        config.screen_switch_layer
+        && config.screen_idx != coban_screen_layer
+        && screen_turned_back == true
+    ) {
         change_screen(coban_screen_layer);
         screen_turned_back = false;
+    }
+
+    if (!is_backlight_enabled()) {
+        backlight_enable();
     }
 
     // if (config.screen_idx == coban_screen_layer) {

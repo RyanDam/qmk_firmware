@@ -33,6 +33,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             config.screen_idx = command_data[0];
             config.screen_switch_layer = command_data[1];
             config.screen_switch_layer_timeout = command_data[2];
+            config.screen_idle_timeout = command_data[3];
             change_screen(config.screen_idx);
             break;
         }
@@ -113,6 +114,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 0) = config.screen_idx & 0xff;
             *(command_data + 1) = config.screen_switch_layer & 0xff;
             *(command_data + 2) = config.screen_switch_layer_timeout & 0xff;
+            *(command_data + 3) = config.screen_idle_timeout & 0xff;
             break;
         }
         case coban_cmd_id_set_time_format: {
