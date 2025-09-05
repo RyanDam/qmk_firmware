@@ -60,7 +60,7 @@ lv_obj_t * screen_hardware_stat_init(void) {
     lv_arc_set_value(cpu_arc, 45);
     lv_obj_center(cpu_arc);
 
-    cpu_text  = lv_label_create(cpu_arc_holder);
+    cpu_text = lv_label_create(cpu_arc_holder);
     lv_label_set_text(cpu_text, "--C");
     lv_obj_add_style(cpu_text, &style_text, 0);
     lv_obj_center(cpu_text);

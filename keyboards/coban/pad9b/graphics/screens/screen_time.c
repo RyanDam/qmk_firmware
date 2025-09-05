@@ -36,7 +36,7 @@ lv_obj_t * screen_time_init(void) {
     use_flex_column(datetime_holder);
     lv_obj_set_style_pad_row(datetime_holder, 10, 0);
 
-    date_text  = lv_label_create(datetime_holder);
+    date_text = lv_label_create(datetime_holder);
     lv_label_set_text(date_text, "-- / -- / ---");
     lv_obj_add_style(date_text, &style_text, 0);
 
@@ -44,11 +44,11 @@ lv_obj_t * screen_time_init(void) {
     lv_obj_add_style(time_holder, &style_container, 0);
     use_flex_row(time_holder);
 
-    time_text  = lv_label_create(time_holder);
+    time_text = lv_label_create(time_holder);
     lv_label_set_text(time_text, "--:--");
     lv_obj_add_style(time_text, &style_text_time1, 0);
 
-    indicator_text  = lv_label_create(time_holder);
+    indicator_text = lv_label_create(time_holder);
     lv_label_set_text(indicator_text, "--");
 
     return screen_time;
