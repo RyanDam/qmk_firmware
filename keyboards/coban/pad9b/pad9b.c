@@ -7,6 +7,14 @@
 #include "eeprom/cb_eeprom.h"
 #include "hardware/flash.h"
 
+#define CB_SCREEN_NEXT QK_KB_0
+#define CB_SCREEN_PREV QK_KB_1
+#define CB_SCREEN_CLOCK QK_KB_2
+#define CB_SCREEN_STATS QK_KB_3
+#define CB_SCREEN_ANIME QK_KB_4
+#define CB_SCREEN_LAYER QK_KB_5
+#define CB_SCREEN_RENDER QK_KB_6
+
 uint32_t last_key_press_timestamp = 0;
 bool screen_turned_back = true;
 bool screen_boot_done = false;
@@ -132,6 +140,58 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // }
 
     screen_render_set_key_code(keycode, record);
+
+    if (record->event.pressed) {
+        switch (keycode) {
+            case CB_SCREEN_NEXT: {
+                uint8_t screen_idx = (config.screen_idx + 1) % 5;
+                config.screen_idx = screen_idx;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_PREV: {
+                uint8_t screen_idx = (config.screen_idx + 4) % 5;
+                config.screen_idx = screen_idx;
+                change_screen(config.screen_idx); // 5 - 1 = 4
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_CLOCK: {
+                config.screen_idx = coban_screen_clock;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_STATS: {
+                config.screen_idx = coban_screen_stats;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_ANIME: {
+                config.screen_idx = coban_screen_anime;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_LAYER: {
+                config.screen_idx = coban_screen_layer;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            case CB_SCREEN_RENDER: {
+                config.screen_idx = coban_screen_render;
+                change_screen(config.screen_idx);
+                coban_save_config();
+                break;
+            }
+            default:
+                break;
+        }
+    }
+
     return true;
 }
 
