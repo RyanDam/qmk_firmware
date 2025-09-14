@@ -130,6 +130,8 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     // if (config.screen_idx == coban_screen_layer) {
         // screen_layers_set_key_code(keycode, record);
     // }
+
+    screen_render_set_key_code(keycode, record);
     return true;
 }
 

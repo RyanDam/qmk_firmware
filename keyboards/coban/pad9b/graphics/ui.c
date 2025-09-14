@@ -31,6 +31,7 @@ lv_obj_t * screen_clock;
 lv_obj_t * screen_stats;
 lv_obj_t * screen_anime;
 lv_obj_t * screen_layer;
+lv_obj_t * screen_render;
 lv_obj_t * screen_boot;
 
 void ui_init(void) {
@@ -60,7 +61,7 @@ void ui_init(void) {
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
-
+        screen_render = screen_render_init();
 
         // change_screen(coban_screen_clock);
     }
@@ -74,22 +75,37 @@ void change_screen(uint8_t screen_idx) {
     switch (screen_idx) {
         case coban_screen_clock: {
             screen_animation_stop();
+            screen_render_stop();
             lv_scr_load(screen_clock);
+            screen_time_reload();
             break;
         }
         case coban_screen_stats: {
             screen_animation_stop();
+            screen_render_stop();
+            screen_time_stop();
             lv_scr_load(screen_stats);
             break;
         }
         case coban_screen_anime: {
+            screen_render_stop();
+            screen_time_stop();
             lv_scr_load(screen_anime);
             screen_animation_reload();
             break;
         }
         case coban_screen_layer: {
             screen_animation_stop();
+            screen_render_stop();
+            screen_time_stop();
             lv_scr_load(screen_layer);
+            break;
+        }
+        case coban_screen_render: {
+            screen_animation_stop();
+            screen_time_stop();
+            lv_scr_load(screen_render);
+            screen_render_reload();
             break;
         }
         default:

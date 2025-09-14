@@ -1,4 +1,4 @@
-/* Copyright 2024 RyanDam (https://github.com/RyanDam)
+/* Copyright 2025 RyanDam (https://github.com/RyanDam)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -14,27 +14,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-#include <stdio.h>
 #include "qp_lvgl.h"
 
-#include "graphics/screens/styles.h"
-#include "graphics/screens/screen_boot.h"
-#include "graphics/screens/screen_time.h"
-#include "graphics/screens/screen_hardware_stats.h"
-#include "graphics/screens/screen_animation.h"
-#include "graphics/screens/screen_layers.h"
-#include "graphics/screens/screen_render.h"
+lv_obj_t * screen_render_init(void);
 
-enum coban_screen_id {
-    coban_screen_clock = 0x00,
-    coban_screen_stats = 0x01,
-    coban_screen_anime = 0x02,
-    coban_screen_layer = 0x03,
-    coban_screen_render = 0x04,
-};
+void screen_render_stop(void);
 
-void ui_init(void);
+void screen_render_reload(void);
 
-void ui_task(void);
-
-void change_screen(uint8_t screen_idx);
+void screen_render_set_key_code(uint16_t keycode, keyrecord_t *record);

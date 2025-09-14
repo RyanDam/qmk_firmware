@@ -48,7 +48,7 @@ lv_obj_t * screen_animation_init(void) {
     lv_obj_add_style(screen_animation, &style_screen, 0);
     use_flex_column(screen_animation);
 
-    screen_animation_reload();
+    // screen_animation_reload();
 
     return screen_animation;
 }

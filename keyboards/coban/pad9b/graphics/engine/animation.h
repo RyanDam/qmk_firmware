@@ -13,28 +13,20 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
+#include <stdint.h>
 
-#include <stdio.h>
-#include "qp_lvgl.h"
+typedef struct {
+    float max;
+    float min;
+    float delta_speed; // value per sec
+    float current;
+    float target;
 
-#include "graphics/screens/styles.h"
-#include "graphics/screens/screen_boot.h"
-#include "graphics/screens/screen_time.h"
-#include "graphics/screens/screen_hardware_stats.h"
-#include "graphics/screens/screen_animation.h"
-#include "graphics/screens/screen_layers.h"
-#include "graphics/screens/screen_render.h"
+    uint32_t last_time_tick;
+} AnimationValue;
 
-enum coban_screen_id {
-    coban_screen_clock = 0x00,
-    coban_screen_stats = 0x01,
-    coban_screen_anime = 0x02,
-    coban_screen_layer = 0x03,
-    coban_screen_render = 0x04,
-};
+void animation_init_set(AnimationValue *set, float max, float min, float delta_speed, float current, float target, uint32_t last_time_tick);
 
-void ui_init(void);
+void animation_set_target(AnimationValue *set, float target);
 
-void ui_task(void);
-
-void change_screen(uint8_t screen_idx);
+void animation_update(AnimationValue *set, uint32_t current_time);

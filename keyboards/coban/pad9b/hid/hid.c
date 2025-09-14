@@ -40,10 +40,11 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
         case coban_cmd_id_set_time: {
             uint8_t *hour = &(command_data[0]);
             uint8_t *minute = &(command_data[1]);
-            uint8_t *day = &(command_data[2]);
-            uint8_t *month = &(command_data[3]);
-            uint8_t *year = &(command_data[4]);
-            screen_time_set_datetime(*hour, *minute, *day, *month, *year);
+            uint8_t *second = &(command_data[2]);
+            uint8_t *day = &(command_data[3]);
+            uint8_t *month = &(command_data[4]);
+            uint8_t *year = &(command_data[5]);
+            screen_time_sync_datetime(*hour, *minute, *second, *day, *month, *year);
             break;
         }
         case coban_cmd_id_set_cpu_util: {
