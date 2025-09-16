@@ -1,4 +1,4 @@
-/* Copyright 2024 RyanDam (https://github.com/RyanDam)
+/* Copyright 2025 RyanDam (https://github.com/RyanDam)
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,21 +16,28 @@
 
 #include "qp_lvgl.h"
 
-extern lv_style_t style_screen;
-extern lv_style_t style_container;
-extern lv_style_t style_text;
-extern lv_style_t style_arc_main;
-extern lv_style_t style_arc_positive;
-extern lv_style_t style_arc_knob;
-extern lv_style_t style_indice;
+lv_obj_t * screen_pomodoro_init(void);
 
-extern lv_style_t style_text_time1;
-extern lv_style_t style_text_time2;
-extern lv_style_t style_text_time3;
-// extern lv_style_t style_text_time4;
-// extern lv_style_t style_text_time5;
+void screen_pomodoro_ui_update(void);
 
-extern lv_style_t style_key;
-extern lv_style_t style_key_pressed;
+// Controller
 
-void init_styles(void);
+void screen_pomodoro_session_start(void);
+
+void screen_pomodoro_session_cancel(void);
+
+bool screen_pomodoro_session_running(void);
+
+// Event
+
+void screen_pomodoro_session_complete(void);
+
+void screen_pomodoro_set_complete(uint8_t set_idx, bool is_work_set);
+
+void screen_pomodoro_set_start(uint8_t set_idx, bool is_work_set);
+
+// Tas
+
+void screen_pomodoro_stop(void);
+
+void screen_pomodoro_reload(void);

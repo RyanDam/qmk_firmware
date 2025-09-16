@@ -40,19 +40,17 @@ static const float cam_moving_speed = 10.0f; // degree per sec
 /* Object modifier */
 static AnimationValue object_height_scale;
 
-/* Canvas buffer (true color, 16-bit RGB565 usually) */
-#define CANVAS_WIDTH SCREEN_WIDTH
-#define CANVAS_HEIGHT SCREEN_HEIGHT
-static lv_color_t canvas_buf[LV_IMG_BUF_SIZE_INDEXED_2BIT(CANVAS_WIDTH, CANVAS_HEIGHT)];
-static lv_obj_t * canvas;
-static lv_color_t background_color;
-static lv_color_t midground_color;
-static lv_color_t foreground_color;
+/* Canvas buffer */
+#define CANVAS_RENDER_WIDTH SCREEN_WIDTH
+#define CANVAS_RENDER_HEIGHT SCREEN_HEIGHT
+static lv_color_t canvas_render_buf[LV_IMG_BUF_SIZE_INDEXED_2BIT(CANVAS_RENDER_WIDTH, CANVAS_RENDER_HEIGHT)];
+static lv_obj_t * canvas_render;
+static lv_color_t color_render_background;
+static lv_color_t color_render_midground;
+static lv_color_t color_render_foreground;
 
 /* Debug */
 // static lv_obj_t *debug_text;
-
-static void anim_cb(lv_timer_t * timer);
 
 void screen_resource_init(void);
 
@@ -60,17 +58,17 @@ lv_obj_t * screen_render_init(void) {
     screen_render = lv_obj_create(NULL);
     lv_obj_add_style(screen_render, &style_screen, 0);
 
-    canvas = lv_canvas_create(screen_render);  // attach to active screen
-    lv_canvas_set_buffer(canvas, canvas_buf, CANVAS_WIDTH, CANVAS_HEIGHT, LV_IMG_CF_INDEXED_2BIT);
-    lv_canvas_set_palette(canvas, 0, lv_color_hex(0x000000));
-    lv_canvas_set_palette(canvas, 1, lv_color_hex(0xaaaaaa));
-    lv_canvas_set_palette(canvas, 2, lv_color_hex(0xffffff));
-    lv_obj_center(canvas); // place in middle
+    canvas_render = lv_canvas_create(screen_render);  // attach to active screen
+    lv_canvas_set_buffer(canvas_render, canvas_render_buf, CANVAS_RENDER_WIDTH, CANVAS_RENDER_HEIGHT, LV_IMG_CF_INDEXED_2BIT);
+    lv_canvas_set_palette(canvas_render, 0, lv_color_hex(0x000000));
+    lv_canvas_set_palette(canvas_render, 1, lv_color_hex(0xaaaaaa));
+    lv_canvas_set_palette(canvas_render, 2, lv_color_hex(0xffffff));
+    lv_obj_center(canvas_render); // place in middle
 
-    background_color.full = 0;
-    midground_color.full = 1;
-    foreground_color.full = 2;
-    lv_canvas_fill_bg(canvas, background_color, LV_OPA_COVER);
+    color_render_background.full = 0;
+    color_render_midground.full = 1;
+    color_render_foreground.full = 2;
+    lv_canvas_fill_bg(canvas_render, color_render_background, LV_OPA_COVER);
 
     screen_resource_init();
 
@@ -90,7 +88,7 @@ void screen_resource_init(void) {
     build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
 
     // init projection matrix
-    build_projection_matrix(CANVAS_WIDTH, CANVAS_HEIGHT, 1, 2, 100, &projectionMatrix);
+    build_projection_matrix(CANVAS_RENDER_WIDTH, CANVAS_RENDER_HEIGHT, 1, 2, 100, &projectionMatrix);
 
     // init animation
     animation_init_set(&object_height_scale, 2.0f, 0.5f, 2.0f, 0.5f, 0.5f, timer_read32());
@@ -101,7 +99,7 @@ static void anim_cb(lv_timer_t * timer) {
         return;
     }
     // clear screen
-    lv_canvas_fill_bg(canvas, background_color, LV_OPA_COVER);
+    lv_canvas_fill_bg(canvas_render, color_render_background, LV_OPA_COVER);
 
     uint32_t delta_time = timer_read32() - last_time_tick;
     last_time_tick = timer_read32(); // update time tick
@@ -143,19 +141,19 @@ static void anim_cb(lv_timer_t * timer) {
 
     lv_draw_line_dsc_t foreground_line_dsc;
     lv_draw_line_dsc_init(&foreground_line_dsc);
-    foreground_line_dsc.color = foreground_color;
+    foreground_line_dsc.color = color_render_foreground;
     foreground_line_dsc.width = 1;
 
     lv_draw_line_dsc_t background_line_dsc;
     lv_draw_line_dsc_init(&background_line_dsc);
-    background_line_dsc.color = midground_color;
+    background_line_dsc.color = color_render_midground;
     background_line_dsc.width = 1;
 
     // starting point
     vector_fill4(&p, bangle_mem[0], bangle_mem[1], bangle_mem[2] * object_height_scale.current, 1);
     project(&p, &cameraMatrix, &projectionMatrix, &pProj);
-    sx = lx = (int)((pProj.x+1)*CANVAS_WIDTH/2);
-    sy = ly = (int)((pProj.y+1)*CANVAS_HEIGHT/2);
+    sx = lx = (int)((pProj.x+1)*CANVAS_RENDER_WIDTH/2);
+    sy = ly = (int)((pProj.y+1)*CANVAS_RENDER_HEIGHT/2);
     sz = pProj.z;
 
     if (lx < min_x) min_x = lx;
@@ -167,15 +165,15 @@ static void anim_cb(lv_timer_t * timer) {
         vector_fill4(&p, bangle_mem[i], bangle_mem[i + 1], bangle_mem[i + 2] * object_height_scale.current, 1);
         project(&p, &cameraMatrix, &projectionMatrix, &pProj);
 
-        nx = (int)((pProj.x+1)*CANVAS_WIDTH/2);
-        ny = (int)((pProj.y+1)*CANVAS_HEIGHT/2);
+        nx = (int)((pProj.x+1)*CANVAS_RENDER_WIDTH/2);
+        ny = (int)((pProj.y+1)*CANVAS_RENDER_HEIGHT/2);
 
         line_points[0].x = lx;
         line_points[0].y = ly;
         line_points[1].x = nx;
         line_points[1].y = ny;
-        lv_canvas_draw_line(canvas, line_points, 2, pProj.z > -4 ? &foreground_line_dsc : &background_line_dsc);
-        lv_canvas_set_px_color(canvas, lx, ly, pProj.z > -4 ? foreground_color : midground_color);
+        lv_canvas_draw_line(canvas_render, line_points, 2, pProj.z > -4 ? &foreground_line_dsc : &background_line_dsc);
+        lv_canvas_set_px_color(canvas_render, lx, ly, pProj.z > -4 ? color_render_foreground : color_render_midground);
 
         lx = nx;
         ly = ny;
@@ -191,8 +189,8 @@ static void anim_cb(lv_timer_t * timer) {
     line_points[0].y = ly;
     line_points[1].x = sx;
     line_points[1].y = sy;
-    lv_canvas_draw_line(canvas, line_points, 2, sz > -4 ? &foreground_line_dsc : &background_line_dsc);
-    lv_canvas_set_px_color(canvas, lx, ly, sz > -4 ? foreground_color : midground_color);
+    lv_canvas_draw_line(canvas_render, line_points, 2, sz > -4 ? &foreground_line_dsc : &background_line_dsc);
+    lv_canvas_set_px_color(canvas_render, lx, ly, sz > -4 ? color_render_foreground : color_render_midground);
 
     // // debuging
     // uint32_t process_time = timer_read32() - last_time_tick;

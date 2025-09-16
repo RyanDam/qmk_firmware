@@ -24,6 +24,7 @@
 #include "graphics/screens/screen_animation.h"
 #include "graphics/screens/screen_layers.h"
 #include "graphics/screens/screen_render.h"
+#include "graphics/screens/screen_pomodoro.h"
 
 enum coban_screen_id {
     coban_screen_clock = 0x00,
@@ -31,6 +32,7 @@ enum coban_screen_id {
     coban_screen_anime = 0x02,
     coban_screen_layer = 0x03,
     coban_screen_render = 0x04,
+    coban_screen_pomodoro = 0x05,
 };
 
 void ui_init(void);
@@ -38,3 +40,7 @@ void ui_init(void);
 void ui_task(void);
 
 void change_screen(uint8_t screen_idx);
+
+int next_screen(void);
+
+int prev_screen(void);

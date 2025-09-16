@@ -50,6 +50,7 @@ lv_obj_t * screen_time_init(void) {
     time_holder = lv_obj_create(datetime_holder);
     lv_obj_add_style(time_holder, &style_container, 0);
     use_flex_row(time_holder);
+    lv_obj_set_style_pad_column(time_holder, 7, 0);
 
     time_text = lv_label_create(time_holder);
     lv_label_set_text(time_text, "--:--");
@@ -163,14 +164,14 @@ void screen_time_set_time_style(uint8_t time_style) {
             lv_obj_add_style(time_text, &style_text_time3, 0);
             break;
         }
-        case coban_time_style_4: {
-            lv_obj_add_style(time_text, &style_text_time4, 0);
-            break;
-        }
-        case coban_time_style_5: {
-            lv_obj_add_style(time_text, &style_text_time5, 0);
-            break;
-        }
+        // case coban_time_style_4: {
+        //     lv_obj_add_style(time_text, &style_text_time4, 0);
+        //     break;
+        // }
+        // case coban_time_style_5: {
+        //     lv_obj_add_style(time_text, &style_text_time5, 0);
+        //     break;
+        // }
         case coban_time_style_1:
         default: {
             lv_obj_add_style(time_text, &style_text_time1, 0);

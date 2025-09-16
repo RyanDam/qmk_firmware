@@ -29,6 +29,11 @@ typedef struct _cb_config_t {
     uint8_t date_format;
     uint8_t date_visibility;
 
+    // pomodoro
+    uint8_t pomo_num_set;
+    uint8_t pomo_work_duration;
+    uint8_t pomo_rest_duration;
+
     // gif data
     uint32_t gif_data_size;
 } cb_config;

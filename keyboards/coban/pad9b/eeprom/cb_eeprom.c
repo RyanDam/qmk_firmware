@@ -37,6 +37,10 @@ void coban_init_config(void) {
     config.date_format = coban_date_format_ddmmyyyy;
     config.date_visibility = coban_date_visibility_visible;
 
+    config.pomo_num_set = 4;
+    config.pomo_work_duration = 25;
+    config.pomo_rest_duration = 5;
+
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 }
 

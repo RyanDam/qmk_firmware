@@ -19,11 +19,12 @@ SRC += graphics/screens/screen_animation.c
 SRC += graphics/screens/screen_layers.c
 SRC += graphics/screens/screen_boot.c
 SRC += graphics/screens/screen_render.c
+SRC += graphics/screens/screen_pomodoro.c
 
 SRC += graphics/fonts/inter.c
 SRC += graphics/fonts/bai_jamjuree.c
 SRC += graphics/fonts/delius.c
-SRC += graphics/fonts/truculenta.c
-SRC += graphics/fonts/vidaloka.c
+# SRC += graphics/fonts/truculenta.c
+# SRC += graphics/fonts/vidaloka.c
 
 OPT_DEFS = -O2

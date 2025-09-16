@@ -19,8 +19,8 @@
 LV_FONT_DECLARE(inter)
 LV_FONT_DECLARE(bai_jamjuree)
 LV_FONT_DECLARE(delius)
-LV_FONT_DECLARE(truculenta)
-LV_FONT_DECLARE(vidaloka)
+// LV_FONT_DECLARE(truculenta)
+// LV_FONT_DECLARE(vidaloka)
 
 lv_style_t style_screen;
 lv_style_t style_container;
@@ -33,8 +33,8 @@ lv_style_t style_indice;
 lv_style_t style_text_time1;
 lv_style_t style_text_time2;
 lv_style_t style_text_time3;
-lv_style_t style_text_time4;
-lv_style_t style_text_time5;
+// lv_style_t style_text_time4;
+// lv_style_t style_text_time5;
 
 lv_style_t style_key;
 lv_style_t style_key_pressed;
@@ -140,19 +140,19 @@ void init_styles(void) {
     lv_style_set_text_color(&style_text_time3, lv_color_hex(0xffffff));
     lv_style_set_text_font(&style_text_time3, &delius);
 
-    lv_style_init(&style_text_time4);
-    lv_style_set_pad_top(&style_text_time4, 0);
-    lv_style_set_pad_bottom(&style_text_time4, 0);
-    lv_style_set_pad_left(&style_text_time4, 0);
-    lv_style_set_pad_right(&style_text_time4, 0);
-    lv_style_set_text_color(&style_text_time4, lv_color_hex(0xffffff));
-    lv_style_set_text_font(&style_text_time4, &truculenta);
+    // lv_style_init(&style_text_time4);
+    // lv_style_set_pad_top(&style_text_time4, 0);
+    // lv_style_set_pad_bottom(&style_text_time4, 0);
+    // lv_style_set_pad_left(&style_text_time4, 0);
+    // lv_style_set_pad_right(&style_text_time4, 0);
+    // lv_style_set_text_color(&style_text_time4, lv_color_hex(0xffffff));
+    // lv_style_set_text_font(&style_text_time4, &truculenta);
 
-    lv_style_init(&style_text_time5);
-    lv_style_set_pad_top(&style_text_time5, 0);
-    lv_style_set_pad_bottom(&style_text_time5, 0);
-    lv_style_set_pad_left(&style_text_time5, 0);
-    lv_style_set_pad_right(&style_text_time5, 0);
-    lv_style_set_text_color(&style_text_time5, lv_color_hex(0xffffff));
-    lv_style_set_text_font(&style_text_time5, &vidaloka);
+    // lv_style_init(&style_text_time5);
+    // lv_style_set_pad_top(&style_text_time5, 0);
+    // lv_style_set_pad_bottom(&style_text_time5, 0);
+    // lv_style_set_pad_left(&style_text_time5, 0);
+    // lv_style_set_pad_right(&style_text_time5, 0);
+    // lv_style_set_text_color(&style_text_time5, lv_color_hex(0xffffff));
+    // lv_style_set_text_font(&style_text_time5, &vidaloka);
 }
