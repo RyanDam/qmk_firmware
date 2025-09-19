@@ -190,7 +190,7 @@ void screen_pomodoro_ui_update(void) {
         lv_obj_set_style_width(pomo_progress_block, width, 0);
     }
 
-    lv_label_set_text_fmt(pomo_time_status, "%03d\n%03d\n%03d", pomo_work_set_width, pomo_rest_set_width, pomo_total_set_num);
+    // lv_label_set_text_fmt(pomo_time_status, "%03d\n%03d\n%03d", pomo_work_set_width, pomo_rest_set_width, pomo_total_set_num);
 }
 
 void screen_pomodoro_session_start(void) {
@@ -238,10 +238,8 @@ static void pomo_cb(lv_timer_t * timer) {
         return;
     }
 
-
-
     uint32_t current_timestamp = timer_read32();
-    uint32_t elapsed_time_sec = 13*60 + 5 + (current_timestamp - session_start_timestamp)/1000;
+    uint32_t elapsed_time_sec = (current_timestamp - session_start_timestamp)/1000;
 
     if (elapsed_time_sec >= pomo_total_session_duration_min * 60) {
         // session is completed
@@ -267,7 +265,15 @@ static void pomo_cb(lv_timer_t * timer) {
         set_time_start_sec = set_time_end_sec;
     }
 
-    // Update time text and status
+    // Check if set changed
+    if (pomo_current_set_idx != set_idx) {
+        // set changed, trigger set event
+        screen_pomodoro_set_complete(pomo_current_set_idx, pomo_current_set_idx % 2 == 0);
+        screen_pomodoro_set_start(set_idx, set_idx % 2 == 0);
+    }
+    pomo_current_set_idx = set_idx;
+
+    // Update UI
     uint8_t time_left_minute = set_time_left_sec / 60;
     uint8_t time_left_second = set_time_left_sec % 60;
     lv_label_set_text_fmt(pomo_time_text, "%02d:%02d", time_left_minute, time_left_second);
@@ -276,14 +282,6 @@ static void pomo_cb(lv_timer_t * timer) {
     } else {
         lv_label_set_text(pomo_time_status, "RELAX");
     }
-
-    // Check if set changed
-    if (pomo_current_set_idx != set_idx) {
-        // set changed, trigger set event
-        screen_pomodoro_set_complete(pomo_current_set_idx, pomo_current_set_idx % 2 == 0);
-        screen_pomodoro_set_start(set_idx, set_idx % 2 == 0);
-    }
-    pomo_current_set_idx = set_idx;
 
     float progress_percentage = ((float)elapsed_time_sec) / ((float)pomo_total_session_duration_min * 60);
     int indice_x = SCREEN_WIDTH*progress_percentage;
@@ -312,6 +310,7 @@ static void pomo_cb(lv_timer_t * timer) {
 }
 
 void screen_pomodoro_stop(void) {
+    if (screen_pomodoro == NULL) return;
     if (!pomo_running) {
         return;
     }
@@ -320,6 +319,7 @@ void screen_pomodoro_stop(void) {
 }
 
 void screen_pomodoro_reload(void) {
+    if (screen_pomodoro == NULL) return;
     if (pomo_running) {
         return;
     }

@@ -20,27 +20,32 @@
 #include "graphics/screens/styles.h"
 #include "graphics/screens/screen_boot.h"
 #include "graphics/screens/screen_time.h"
-#include "graphics/screens/screen_hardware_stats.h"
+// #include "graphics/screens/screen_hardware_stats.h"
 #include "graphics/screens/screen_animation.h"
 #include "graphics/screens/screen_layers.h"
-#include "graphics/screens/screen_render.h"
+// #include "graphics/screens/screen_render.h"
 #include "graphics/screens/screen_pomodoro.h"
 
 enum coban_screen_id {
     coban_screen_clock = 0x00,
-    coban_screen_stats = 0x01,
+    // coban_screen_stats = 0x01,
     coban_screen_anime = 0x02,
     coban_screen_layer = 0x03,
-    coban_screen_render = 0x04,
+    // coban_screen_render = 0x04,
     coban_screen_pomodoro = 0x05,
+
+
+    coban_screen_undefined = 0x99
 };
 
 void ui_init(void);
 
 void ui_task(void);
 
-void change_screen(uint8_t screen_idx);
+enum coban_screen_id current_screen(void);
 
-int next_screen(void);
+enum coban_screen_id change_screen(uint8_t screen_idx);
 
-int prev_screen(void);
+enum coban_screen_id next_screen(void);
+
+enum coban_screen_id prev_screen(void);

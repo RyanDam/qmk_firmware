@@ -54,12 +54,14 @@ lv_obj_t * screen_animation_init(void) {
 }
 
 void screen_animation_stop(void) {
+    if (screen_animation == NULL) return;
     if (view_image != NULL) lv_obj_del(view_image);
     view_image = NULL;
 }
 
 
 void screen_animation_reload(void) {
+    if (screen_animation == NULL) return;
     screen_animation_stop();
     int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
     if (check_code > 0 && check_code < 15) {

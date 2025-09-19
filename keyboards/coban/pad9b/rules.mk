@@ -13,12 +13,12 @@ SRC += hid/hid.c
 SRC += eeprom/cb_eeprom.c
 SRC += utils/keycode_lookup.c
 SRC += graphics/screens/styles.c
-SRC += graphics/screens/screen_hardware_stats.c
+# SRC += graphics/screens/screen_hardware_stats.c
 SRC += graphics/screens/screen_time.c
 SRC += graphics/screens/screen_animation.c
 SRC += graphics/screens/screen_layers.c
 SRC += graphics/screens/screen_boot.c
-SRC += graphics/screens/screen_render.c
+# SRC += graphics/screens/screen_render.c
 SRC += graphics/screens/screen_pomodoro.c
 
 SRC += graphics/fonts/inter.c

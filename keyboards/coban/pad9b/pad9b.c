@@ -16,14 +16,12 @@
 #define CB_POMO_START       QK_KB_6
 #define CB_POMO_CANCEL      QK_KB_7
 
-// #define CB_SCREEN_STATS     QK_KB_3
-// #define CB_SCREEN_RENDER    QK_KB_6
-
 uint32_t last_key_press_timestamp = 0;
-bool screen_turned_back = true;
+bool layer_mode_activated = true;
 bool screen_boot_done = false;
+enum coban_screen_id last_screen_idx = coban_screen_undefined;
 
-void keyboard_post_init_kb(void) {
+void keyboard_post_init_user(void) {
 
     // Load eeprom
     coban_load_config();
@@ -39,21 +37,7 @@ void keyboard_post_init_kb(void) {
     // Init the display
     ui_init();
     last_key_press_timestamp = timer_read32();
-
-    // Load config
-    // change_screen(config.screen_idx);
-    // screen_time_set_format(
-    //     config.time_style_id,
-    //     config.time_format,
-    //     config.time_indicator,
-    //     config.date_format,
-    //     config.date_visibility
-    // );
-
-    // keyboard_post_init_user();
 }
-
-
 
 void housekeeping_task_user(void) {
     // Draw the display
@@ -65,7 +49,7 @@ void housekeeping_task_user(void) {
     }
 
     if (screen_boot_done == false) {
-        change_screen(config.screen_idx);
+        last_screen_idx = change_screen(config.screen_idx);
         screen_boot_done = true;
     }
 
@@ -87,11 +71,10 @@ void housekeeping_task_user(void) {
     if (current_idle_time_ms > config.screen_switch_layer_timeout*1000) {
         if (
             config.screen_switch_layer
-            && config.screen_idx != coban_screen_layer
-            && screen_turned_back == false
+            && layer_mode_activated == true
         ) {
-            change_screen(config.screen_idx);
-            screen_turned_back = true;
+            change_screen(last_screen_idx);
+            layer_mode_activated = false;
         }
     }
 }
@@ -112,9 +95,8 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         return true;
     }
 
-    // if (config.screen_idx == coban_screen_layer) {
-        screen_layers_set_indice(get_highest_layer(state));
-    // }
+    screen_layers_set_indice(get_highest_layer(state));
+
     return state;
 }
 
@@ -128,11 +110,11 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
     last_key_press_timestamp = timer_read32();
     if (
         config.screen_switch_layer
-        && config.screen_idx != coban_screen_layer
-        && screen_turned_back == true
+        && layer_mode_activated == false
     ) {
+        last_screen_idx = current_screen();
         change_screen(coban_screen_layer);
-        screen_turned_back = false;
+        layer_mode_activated = true;
     }
 
     if (!is_backlight_enabled()) {
@@ -143,63 +125,53 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         // screen_layers_set_key_code(keycode, record);
     // }
 
-    screen_render_set_key_code(keycode, record);
+    // screen_render_set_key_code(keycode, record);
 
     if (record->event.pressed) {
         switch (keycode) {
             case CB_SCREEN_NEXT: {
-                config.screen_idx = next_screen() & 0xff;
+                last_screen_idx = next_screen();
+                config.screen_idx = last_screen_idx;
                 coban_save_config();
                 break;
             }
             case CB_SCREEN_PREV: {
-                config.screen_idx = prev_screen() & 0xff;
+                last_screen_idx = prev_screen();
+                config.screen_idx = last_screen_idx;
                 coban_save_config();
                 break;
             }
             case CB_SCREEN_CLOCK: {
                 config.screen_idx = coban_screen_clock;
-                change_screen(config.screen_idx);
+                last_screen_idx = change_screen(coban_screen_clock);
                 coban_save_config();
                 break;
             }
-            // case CB_SCREEN_STATS: {
-            //     config.screen_idx = coban_screen_stats;
-            //     change_screen(config.screen_idx);
-            //     coban_save_config();
-            //     break;
-            // }
             case CB_SCREEN_ANIME: {
                 config.screen_idx = coban_screen_anime;
-                change_screen(config.screen_idx);
+                last_screen_idx = change_screen(coban_screen_anime);
                 coban_save_config();
                 break;
             }
             case CB_SCREEN_LAYER: {
                 config.screen_idx = coban_screen_layer;
-                change_screen(config.screen_idx);
+                last_screen_idx = change_screen(coban_screen_layer);
                 coban_save_config();
                 break;
             }
-            // case CB_SCREEN_RENDER: {
-            //     config.screen_idx = coban_screen_render;
-            //     change_screen(config.screen_idx);
-            //     coban_save_config();
-            //     break;
-            // }
             case CB_SCREEN_POMO: {
                 config.screen_idx = coban_screen_pomodoro;
-                change_screen(config.screen_idx);
+                last_screen_idx = change_screen(coban_screen_pomodoro);
                 coban_save_config();
             }
             case CB_POMO_START: {
                 screen_pomodoro_session_start();
-                change_screen(coban_screen_pomodoro);
+                last_screen_idx = change_screen(coban_screen_pomodoro);
                 break;
             }
             case CB_POMO_CANCEL: {
                 screen_pomodoro_session_cancel();
-                change_screen(coban_screen_pomodoro);
+                last_screen_idx = change_screen(coban_screen_pomodoro);
                 break;
             }
             default:

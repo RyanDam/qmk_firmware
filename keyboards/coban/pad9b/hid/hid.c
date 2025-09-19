@@ -48,11 +48,11 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_cpu_util: {
-            screen_hardware_stat_set_cpu(*command_data);
+            // screen_hardware_stat_set_cpu(*command_data);
             break;
         }
         case coban_cmd_id_set_gpu_util: {
-            screen_hardware_stat_set_gpu(*command_data);
+            // screen_hardware_stat_set_gpu(*command_data);
             break;
         }
         case coban_cmd_id_set_time_format: {
@@ -90,7 +90,9 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 
             config.gif_data_size = gif_datasize;
             gif_data_header.data_size = config.gif_data_size;
-            screen_animation_reload();
+            if (current_screen() == coban_screen_anime) {
+                screen_animation_reload();
+            }
             break;
         }
         case coban_cmd_id_set_pomo_config: {

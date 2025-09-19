@@ -207,6 +207,9 @@ void screen_render_set_key_code(uint16_t keycode, keyrecord_t *record) {
 }
 
 void screen_render_stop(void) {
+    if (screen_render == NULL) {
+        return;
+    }
     if (!render_running) {
         return;
     }
@@ -215,6 +218,9 @@ void screen_render_stop(void) {
 }
 
 void screen_render_reload(void) {
+    if (screen_render == NULL) {
+        return;
+    }
     if (render_running) {
         return;
     }

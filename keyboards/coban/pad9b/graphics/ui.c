@@ -37,6 +37,7 @@ lv_obj_t * screen_boot;
 
 const int screen_indexes[] = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
 const int num_avail_screen = 4;
+static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
 void ui_init(void) {
 
@@ -61,11 +62,11 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
-        screen_stats = screen_hardware_stat_init();
+        // screen_stats = screen_hardware_stat_init();
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
-        screen_render = screen_render_init();
+        // screen_render = screen_render_init();
         screen_pomodoro = screen_pomodoro_init();
 
         // change_screen(coban_screen_clock);
@@ -76,82 +77,96 @@ void ui_init(void) {
     backlight_enable();
 }
 
-int next_screen(void) {
+enum coban_screen_id current_screen(void) {
+    return ui_current_screen;
+}
+
+enum coban_screen_id next_screen(void) {
     int next_screen_idx = coban_screen_clock;
     for (int i = 0; i < num_avail_screen; i++) {
-        if (config.screen_idx == screen_indexes[i]) {
+        if (ui_current_screen == screen_indexes[i]) {
             next_screen_idx = screen_indexes[(i + 1) % num_avail_screen];
             break;
         }
     }
-    change_screen(next_screen_idx & 0xff);
-    return next_screen_idx;
+    return change_screen(next_screen_idx & 0xff);
 }
 
-int prev_screen(void) {
+enum coban_screen_id prev_screen(void) {
     int prev_screen_idx = coban_screen_clock;
     for (int i = 0; i < num_avail_screen; i++) {
-        if (config.screen_idx == screen_indexes[i]) {
+        if (ui_current_screen == screen_indexes[i]) {
             prev_screen_idx = screen_indexes[(i - 1 + num_avail_screen) % num_avail_screen];
             break;
         }
     }
-    change_screen(prev_screen_idx & 0xff);
-    return prev_screen_idx;
+    return change_screen(prev_screen_idx & 0xff);
 }
 
-void change_screen(uint8_t screen_idx) {
+enum coban_screen_id change_screen(uint8_t screen_idx) {
+    if (screen_idx == ui_current_screen) {
+        return ui_current_screen;
+    }
+
     switch (screen_idx) {
         case coban_screen_clock: {
             screen_animation_stop();
-            screen_render_stop();
+            // screen_render_stop();
             screen_pomodoro_stop();
             lv_scr_load(screen_clock);
             screen_time_reload();
+            ui_current_screen = coban_screen_clock;
             break;
         }
-        case coban_screen_stats: {
-            screen_animation_stop();
-            screen_render_stop();
-            screen_time_stop();
-            screen_pomodoro_stop();
-            lv_scr_load(screen_stats);
-            break;
-        }
+        // case coban_screen_stats: {
+        //     screen_animation_stop();
+        //     screen_render_stop();
+        //     screen_time_stop();
+        //     screen_pomodoro_stop();
+        //     lv_scr_load(screen_stats);
+        //     ui_current_screen = coban_screen_stats;
+        //     break;
+        // }
         case coban_screen_anime: {
-            screen_render_stop();
+            // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
             lv_scr_load(screen_anime);
             screen_animation_reload();
+            ui_current_screen = coban_screen_anime;
             break;
         }
         case coban_screen_layer: {
             screen_animation_stop();
-            screen_render_stop();
+            // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
             lv_scr_load(screen_layer);
+            ui_current_screen = coban_screen_layer;
             break;
         }
-        case coban_screen_render: {
-            screen_animation_stop();
-            screen_time_stop();
-            screen_pomodoro_stop();
-            lv_scr_load(screen_render);
-            screen_render_reload();
-            break;
-        }
+        // case coban_screen_render: {
+        //     screen_animation_stop();
+        //     screen_time_stop();
+        //     screen_pomodoro_stop();
+        //     lv_scr_load(screen_render);
+        //     screen_render_reload();
+        //     ui_current_screen = coban_screen_render;
+        //     break;
+        // }
         case coban_screen_pomodoro: {
             screen_animation_stop();
-            screen_render_stop();
+            // screen_render_stop();
             screen_time_stop();
             lv_scr_load(screen_pomodoro);
             screen_pomodoro_reload();
+            ui_current_screen = coban_screen_pomodoro;
+            break;
         }
         default:
             break;
     }
+    return ui_current_screen;
 }
 
 void ui_task(void) {
