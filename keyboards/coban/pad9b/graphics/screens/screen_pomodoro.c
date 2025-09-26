@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include "audio/audio.h"
 #include "graphics/screens/screen_pomodoro.h"
 #include "graphics/screens/styles.h"
 #include "graphics/lvgl_helpers.h"
@@ -49,8 +50,22 @@ static uint32_t pomo_total_session_duration_min;
 static int pomo_work_set_width;
 static int pomo_rest_set_width;
 static uint8_t pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
+static int quote_offset;
+
+
+#ifdef AUDIO_ENABLE
+#define SIMPLE_ALARM_SOUND Q__NOTE(_C6), Q__NOTE(_C6),
+#define SIMPLE_ALARM_LONG_SOUND Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6),
+float work_song[][2] = SONG(SIMPLE_ALARM_LONG_SOUND);
+float rest_song[][2] = SONG(SIMPLE_ALARM_LONG_SOUND);
+float cancel_song[][2] = SONG(SIMPLE_ALARM_SOUND);
+#endif
+
+char * get_current_quote(void);
 
 lv_obj_t * screen_pomodoro_init(void) {
+    quote_offset = rand();
+
     screen_pomodoro = lv_obj_create(NULL);
     lv_obj_add_style(screen_pomodoro, &style_screen, 0);
     // lv_obj_set_style_bg_color(screen_pomodoro, lv_color_hex(0xffff00), 0);
@@ -71,7 +86,7 @@ lv_obj_t * screen_pomodoro_init(void) {
     // lv_obj_set_style_bg_color(pomo_time_holder, lv_color_hex(0x0000ff), 0);
 
     pomo_time_status = lv_label_create(pomo_time_holder);
-    lv_label_set_text(pomo_time_status, "RESTING");
+    lv_label_set_text(pomo_time_status, get_current_quote());
     lv_obj_add_style(pomo_time_status, &style_text, 0);
 
     pomo_time_text = lv_label_create(pomo_time_holder);
@@ -160,6 +175,9 @@ void screen_pomodoro_ui_update(void) {
     lv_style_set_bg_color(&style_time_indice, lv_color_hex(0xffffff));
     lv_style_set_border_color(&style_time_indice, lv_color_hex(0xffffff));
 
+    if (pomo_indice != NULL) {
+        lv_obj_del(pomo_indice);
+    }
     pomo_indice = lv_obj_create(pomo_indice_holder);  // attach to active screen
     lv_obj_add_style(pomo_indice, &style_time_indice, 0);
     lv_obj_set_x(pomo_indice, 0);
@@ -200,10 +218,22 @@ void screen_pomodoro_session_start(void) {
     lv_obj_clear_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
     session_running = true;
+
+#ifdef AUDIO_ENABLE
+    stop_all_notes();
+    PLAY_SONG(work_song);
+#endif
 }
 
 void screen_pomodoro_session_cancel(void) {
     session_running = false;
+    lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
+
+#ifdef AUDIO_ENABLE
+    stop_all_notes();
+    PLAY_SONG(cancel_song);
+#endif
 }
 
 bool screen_pomodoro_session_running(void) {
@@ -212,18 +242,28 @@ bool screen_pomodoro_session_running(void) {
 
 void screen_pomodoro_session_complete(void) {
     session_running = false;
+    lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
 
-    // TODO: ring a session completion tone
+#ifdef AUDIO_ENABLE
+    stop_all_notes();
+    PLAY_SONG(rest_song);
+#endif
 }
 
 void screen_pomodoro_set_complete(uint8_t set_idx, bool is_work_set) {
     // TODO: ring a set completion tone
-    lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
 }
 
 void screen_pomodoro_set_start(uint8_t set_idx, bool is_work_set) {
-
+#ifdef AUDIO_ENABLE
+    stop_all_notes();
+    if (is_work_set) {
+        PLAY_SONG(work_song);
+    } else {
+        PLAY_SONG(rest_song);
+    }
+#endif
 }
 
 static void pomo_cb(lv_timer_t * timer) {
@@ -234,7 +274,7 @@ static void pomo_cb(lv_timer_t * timer) {
     if (!session_running) {
         // No pomo session yet
         lv_label_set_text(pomo_time_text, "--:--");
-        lv_label_set_text(pomo_time_status, "RESTING");
+        lv_label_set_text(pomo_time_status, get_current_quote());
         return;
     }
 
@@ -278,9 +318,9 @@ static void pomo_cb(lv_timer_t * timer) {
     uint8_t time_left_second = set_time_left_sec % 60;
     lv_label_set_text_fmt(pomo_time_text, "%02d:%02d", time_left_minute, time_left_second);
     if (set_idx % 2 == 0) {
-        lv_label_set_text(pomo_time_status, "FOCUS");
+        lv_label_set_text_fmt(pomo_time_status, "FOCUS #%d", (int)(set_idx/2) + 1);
     } else {
-        lv_label_set_text(pomo_time_status, "RELAX");
+        lv_label_set_text(pomo_time_status, get_current_quote());
     }
 
     float progress_percentage = ((float)elapsed_time_sec) / ((float)pomo_total_session_duration_min * 60);
@@ -330,4 +370,67 @@ void screen_pomodoro_reload(void) {
     } else {
         lv_timer_resume(pomo_timer);
     }
+}
+
+
+
+const char* quotes[] = {
+    "Dream big, start small",
+    "Progress, not perfection",
+    "Believe you can",
+    "Keep moving forward",
+    "Small steps, big change",
+    "Be your own hero",
+    "Grow through what happens",
+    "Choose courage over comfort",
+    "Create your own sunshine",
+    "Do it afraid",
+    "Stay hungry, stay foolish",
+    "Fall seven, rise eight",
+    "Live with no regrets",
+    "You are enough",
+    "Keep showing up",
+    "Hope is never lost",
+    "Hustle beats talent",
+    "Turn pain into power",
+    "Great things take time",
+    "Focus on the good",
+    "Start before you're ready",
+    "Keep the faith",
+    "Never stop learning",
+    "Own your story",
+    "Strength grows in struggle",
+    "Just keep swimming",
+    "Better days ahead",
+    "Fear less, live more",
+    "Light follows darkness",
+    "Make today count",
+    "Work hard, stay humble",
+    "Let your soul shine",
+    "Push past limits",
+    "Chase your passion",
+    "One day or day one",
+    "Trust the process",
+    "Bravery is contagious",
+    "Rise by lifting others",
+    "Failure fuels growth",
+    "Be the change",
+    "Courage creates miracles",
+    "Smile, breathe, believe",
+    "Stars need darkness",
+    "Your future needs you",
+    "Don't quit now",
+    "Consistency builds success",
+    "Choose joy daily",
+    "Storms don't last",
+    "Love conquers fear",
+    "Keep your fire alive"
+};
+
+const int quotes_count = sizeof(quotes) / sizeof(quotes[0]);
+
+char * get_current_quote(void) {
+    uint32_t current_time = timer_read32();
+    int quote_index = (((current_time / 1000 / 60 / 5) % quotes_count) + (quote_offset % quotes_count)) % quotes_count;
+    return (char *)quotes[quote_index];
 }

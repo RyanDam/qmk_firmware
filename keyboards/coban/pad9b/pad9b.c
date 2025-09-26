@@ -21,10 +21,6 @@ bool layer_mode_activated = true;
 bool screen_boot_done = false;
 enum coban_screen_id last_screen_idx = coban_screen_undefined;
 
-#ifdef AUDIO_ENABLE
-bool played_startup_song = false;
-#endif
-
 void keyboard_post_init_user(void) {
 
     // Load eeprom
@@ -37,10 +33,6 @@ void keyboard_post_init_user(void) {
     for (int i = 0; i < EEPROM_MAX_GIF_SIZE; i++) {
         gif_data[i] = *(pointer + i);
     }
-
-// #ifdef AUDIO_ENABLE
-//     audio_config.enable = 1;
-// #endif
 
     // Init the display
     ui_init();
@@ -56,14 +48,6 @@ void housekeeping_task_user(void) {
         return;
     }
 
-#ifdef AUDIO_ENABLE
-    if (played_startup_song == false) {
-        played_startup_song = true;
-        stop_all_notes();
-        PLAY_SONG(STARTUP_SOUND);
-    }
-#endif
-
     if (screen_boot_done == false) {
         last_screen_idx = change_screen(config.screen_idx);
         screen_boot_done = true;
@@ -76,6 +60,7 @@ void housekeeping_task_user(void) {
     if (
         idle_time_ms > 0 // 0 means disable idle timeout
         && current_idle_time_ms > idle_time_ms
+        && screen_pomodoro_session_running() == false // when pomodoro is running, dont turn screen off
     ) {
         if (is_backlight_enabled()) {
             backlight_disable();
@@ -118,16 +103,13 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
-#ifdef AUDIO_ENABLE
-
-#endif
+    last_key_press_timestamp = timer_read32();
 
     uint32_t current_timestamp = timer_read32();
     if (current_timestamp < KEYBOAD_BOOT_TIME) {
         return true;
     }
 
-    last_key_press_timestamp = timer_read32();
     if (
         config.screen_switch_layer
         && layer_mode_activated == false

@@ -18,7 +18,7 @@
 
 #include "quantum.h"
 
-#define NUMBER_KNOWN_KEYCODE 366
+#define NUMBER_KNOWN_KEYCODE 373
 typedef struct {
     char key_string[12];
     uint16_t keycode;
