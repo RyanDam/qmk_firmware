@@ -21,6 +21,10 @@ bool layer_mode_activated = true;
 bool screen_boot_done = false;
 enum coban_screen_id last_screen_idx = coban_screen_undefined;
 
+#ifdef AUDIO_ENABLE
+bool played_startup_song = false;
+#endif
+
 void keyboard_post_init_user(void) {
 
     // Load eeprom
@@ -33,6 +37,10 @@ void keyboard_post_init_user(void) {
     for (int i = 0; i < EEPROM_MAX_GIF_SIZE; i++) {
         gif_data[i] = *(pointer + i);
     }
+
+// #ifdef AUDIO_ENABLE
+//     audio_config.enable = 1;
+// #endif
 
     // Init the display
     ui_init();
@@ -47,6 +55,14 @@ void housekeeping_task_user(void) {
     if (current_timestamp < KEYBOAD_BOOT_TIME) {
         return;
     }
+
+#ifdef AUDIO_ENABLE
+    if (played_startup_song == false) {
+        played_startup_song = true;
+        stop_all_notes();
+        PLAY_SONG(STARTUP_SOUND);
+    }
+#endif
 
     if (screen_boot_done == false) {
         last_screen_idx = change_screen(config.screen_idx);
@@ -101,6 +117,10 @@ layer_state_t layer_state_set_user(layer_state_t state) {
 }
 
 bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+
+#ifdef AUDIO_ENABLE
+
+#endif
 
     uint32_t current_timestamp = timer_read32();
     if (current_timestamp < KEYBOAD_BOOT_TIME) {

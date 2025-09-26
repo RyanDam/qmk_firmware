@@ -34,8 +34,8 @@ const uint16_t PROGMEM keymaps[][MATRIX_ROWS][MATRIX_COLS] = {
     ),
     [3] = LAYOUT(
         TO(0),
-        QK_BACKLIGHT_DOWN, QK_BACKLIGHT_UP,   QK_BOOT,
-        KC_F1, KC_F2, KC_F3
+        QK_KB_1, QK_KB_0, QK_BOOT,
+        QK_KB_5, QK_KB_6, QK_KB_7
     ),
 };
 

@@ -44,8 +44,11 @@ void ui_init(void) {
     oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 2, 0);
 
     qp_init(oled, QP_ROTATION_270);
+
+#ifdef OLED_PART_REV_2
     qp_set_viewport_offsets(oled, 1, 26);
     // qp_set_viewport_offsets(oled, 0, 24);
+#endif //OLED_PART_REV_2
 
     if (qp_lvgl_attach(oled)) {
         lv_disp_t  *lv_display = lv_disp_get_default();
@@ -189,6 +192,7 @@ void ui_task(void) {
     // last_draw = last;
 }
 
+#ifdef OLED_PART_REV_2
 // inverse color for st7735
 bool qp_st7735_init(painter_device_t device, painter_rotation_t rotation) {
     // clang-format off
@@ -222,3 +226,4 @@ bool qp_st7735_init(painter_device_t device, painter_rotation_t rotation) {
 
     return true;
 }
+#endif // OLED_PART_REV_2

@@ -33,15 +33,20 @@
 #define OLED_DC_PIN GP1
 #define OLED_BKL_PIN GP0
 
-// Test platform config
-// #define OLED_CS_PIN GP6
-// #define OLED_RST_PIN GP4
-// #define OLED_DC_PIN GP5
-// #define OLED_BKL_PIN GP7
+// un-commend if compile for rev 0 test platform
+// #define OLED_PART_REV_2
 
 #ifdef BACKLIGHT_ENABLE
 #   define BACKLIGHT_PWM_DRIVER PWMD0
 #   define BACKLIGHT_PWM_CHANNEL RP2040_PWM_CHANNEL_A
+#endif
+
+#ifdef AUDIO_ENABLE
+#   define AUDIO_PIN GP25
+#   define AUDIO_PWM_DRIVER PWMD1
+#   define AUDIO_PWM_CHANNEL RP2040_PWM_CHANNEL_A
+#   define AUDIO_INIT_DELAY
+#   define AUDIO_CLICKY
 #endif
 
 #define QUANTUM_PAINTER_DISPLAY_TIMEOUT 0

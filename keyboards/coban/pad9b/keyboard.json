@@ -9,6 +9,7 @@
         ]
     },
     "features": {
+        "audio": true,
         "bootmagic": true,
         "encoder": true,
         "extrakey": true,
