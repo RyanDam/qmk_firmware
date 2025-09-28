@@ -20,6 +20,8 @@ lv_obj_t * screen_pomodoro_init(void);
 
 void screen_pomodoro_ui_update(void);
 
+void screen_pomodoro_set_time_style(uint8_t time_style);
+
 // Controller
 
 void screen_pomodoro_session_start(void);

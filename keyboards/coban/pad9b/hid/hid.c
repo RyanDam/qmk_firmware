@@ -62,6 +62,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             uint8_t date_format    = command_data[3];
             uint8_t date_visibility = command_data[4];
             screen_time_set_format(time_style, time_format, time_indicator, date_format, date_visibility);
+            screen_pomodoro_set_time_style(time_style);
             break;
         }
         case coban_cmd_id_set_gif_buffer: {

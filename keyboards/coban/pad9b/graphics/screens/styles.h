@@ -27,8 +27,6 @@ extern lv_style_t style_indice;
 extern lv_style_t style_text_time1;
 extern lv_style_t style_text_time2;
 extern lv_style_t style_text_time3;
-// extern lv_style_t style_text_time4;
-// extern lv_style_t style_text_time5;
 
 extern lv_style_t style_key;
 extern lv_style_t style_key_pressed;

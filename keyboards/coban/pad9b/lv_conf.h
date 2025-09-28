@@ -5,17 +5,20 @@
 
 #include_next <lv_conf.h>
 
-#undef LV_FONT_DEFAULT
-#define LV_FONT_DEFAULT &lv_font_montserrat_12
+// #undef LV_FONT_DEFAULT
+// #define LV_FONT_DEFAULT &barlow
 
 #undef LV_FONT_MONTSERRAT_12
-#define LV_FONT_MONTSERRAT_12 1
+#define LV_FONT_MONTSERRAT_12 0
 
 #undef LV_FONT_MONTSERRAT_16
-#define LV_FONT_MONTSERRAT_16 1
+#define LV_FONT_MONTSERRAT_16 0
 
 #undef LV_USE_GIF
 #define LV_USE_GIF 1
+
+#undef LV_TXT_ENC
+#define LV_TXT_ENC LV_TXT_ENC_UTF8
 
 // #ifdef MIN
 // #undef MIN

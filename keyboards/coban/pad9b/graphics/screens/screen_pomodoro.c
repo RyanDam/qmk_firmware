@@ -16,6 +16,7 @@
 
 #include "audio/audio.h"
 #include "graphics/screens/screen_pomodoro.h"
+#include "graphics/screens/screen_time.h"
 #include "graphics/screens/styles.h"
 #include "graphics/lvgl_helpers.h"
 
@@ -86,8 +87,12 @@ lv_obj_t * screen_pomodoro_init(void) {
     // lv_obj_set_style_bg_color(pomo_time_holder, lv_color_hex(0x0000ff), 0);
 
     pomo_time_status = lv_label_create(pomo_time_holder);
-    lv_label_set_text(pomo_time_status, get_current_quote());
+    // lv_label_set_text(pomo_time_status, get_current_quote());
+    lv_label_set_text(pomo_time_status, "Có chí thì nên");
     lv_obj_add_style(pomo_time_status, &style_text, 0);
+    lv_label_set_long_mode(pomo_time_status, LV_LABEL_LONG_WRAP);
+    lv_obj_set_width(pomo_time_status, SCREEN_WIDTH - 16);
+    lv_obj_set_style_text_align(pomo_time_status, LV_TEXT_ALIGN_CENTER, 0);
 
     pomo_time_text = lv_label_create(pomo_time_holder);
     lv_label_set_text(pomo_time_text, "--:--");
@@ -109,6 +114,7 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_obj_set_flex_align(pomo_progress_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 
     screen_pomodoro_ui_update();
+    screen_pomodoro_set_time_style(config.time_style_id);
 
     return screen_pomodoro;
 }
@@ -181,6 +187,7 @@ void screen_pomodoro_ui_update(void) {
     pomo_indice = lv_obj_create(pomo_indice_holder);  // attach to active screen
     lv_obj_add_style(pomo_indice, &style_time_indice, 0);
     lv_obj_set_x(pomo_indice, 0);
+    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
 
     // remove all progress views
     lv_obj_t * child = lv_obj_get_child(pomo_progress_holder, 0);
@@ -209,6 +216,26 @@ void screen_pomodoro_ui_update(void) {
     }
 
     // lv_label_set_text_fmt(pomo_time_status, "%03d\n%03d\n%03d", pomo_work_set_width, pomo_rest_set_width, pomo_total_set_num);
+}
+
+void screen_pomodoro_set_time_style(uint8_t time_style) {
+    config.time_style_id = time_style;
+
+    switch (config.time_style_id) {
+        case coban_time_style_2: {
+            lv_obj_add_style(pomo_time_text, &style_text_time2, 0);
+            break;
+        }
+        case coban_time_style_3: {
+            lv_obj_add_style(pomo_time_text, &style_text_time3, 0);
+            break;
+        }
+        case coban_time_style_1:
+        default: {
+            lv_obj_add_style(pomo_time_text, &style_text_time1, 0);
+            break;
+        }
+    }
 }
 
 void screen_pomodoro_session_start(void) {
@@ -375,59 +402,59 @@ void screen_pomodoro_reload(void) {
 
 
 const char* quotes[] = {
-    "Dream big, start small",
-    "Progress, not perfection",
-    "Believe you can",
-    "Keep moving forward",
-    "Small steps, big change",
-    "Be your own hero",
-    "Grow through what happens",
-    "Choose courage over comfort",
-    "Create your own sunshine",
-    "Do it afraid",
-    "Stay hungry, stay foolish",
-    "Fall seven, rise eight",
-    "Live with no regrets",
-    "You are enough",
-    "Keep showing up",
-    "Hope is never lost",
-    "Hustle beats talent",
-    "Turn pain into power",
-    "Great things take time",
-    "Focus on the good",
-    "Start before you're ready",
-    "Keep the faith",
-    "Never stop learning",
-    "Own your story",
-    "Strength grows in struggle",
-    "Just keep swimming",
-    "Better days ahead",
-    "Fear less, live more",
-    "Light follows darkness",
-    "Make today count",
-    "Work hard, stay humble",
-    "Let your soul shine",
-    "Push past limits",
-    "Chase your passion",
-    "One day or day one",
-    "Trust the process",
-    "Bravery is contagious",
-    "Rise by lifting others",
-    "Failure fuels growth",
-    "Be the change",
-    "Courage creates miracles",
-    "Smile, breathe, believe",
-    "Stars need darkness",
-    "Your future needs you",
-    "Don't quit now",
-    "Consistency builds success",
-    "Choose joy daily",
-    "Storms don't last",
-    "Love conquers fear",
-    "Keep your fire alive"
+    "Có công mài sắt, có ngày nên kim.",
+    "Kiến tha lâu cũng đầy tổ.",
+    "Người có chí thì nên.",
+    "Công thành chẳng quản lâu.",
+    "Một cây làm chẳng nên non, ba cây chụm lại nên hòn núi cao.",
+    "Học thầy không tày học bạn.",
+    "Đi một ngày đàng, học một sàng khôn.",
+    "Uống nước nhớ nguồn.",
+    "Ăn quả nhớ kẻ trồng cây.",
+    "Đói cho sạch, rách cho thơm.",
+    "Tốt gỗ hơn tốt nước sơn.",
+    "Thất bại là mẹ thành công.",
+    "Người ngay thì được trời phù hộ.",
+    "Biết người biết ta, trăm trận trăm thắng.",
+    "Đường đi khó không khó vì ngăn sông cách núi, mà khó vì lòng người ngại núi e sông.",
+    "Gần mực thì đen, gần đèn thì sáng.",
+    "Trời không phụ lòng người.",
+    "Một nghề thì sống, đống nghề thì chết.",
+    "Không thầy đố mày làm nên.",
+    "Học ăn, học nói, học gói, học mở.",
+    "Hữu chí cánh thành.",
+    "Lửa thử vàng, gian nan thử sức.",
+    "Thua keo này, bày keo khác.",
+    "Được mùa chớ phụ ngô khoai.",
+    "Giấy rách phải giữ lấy lề.",
+    "Đèn nhà ai nấy rạng.",
+    "Ở hiền gặp lành.",
+    "Có chí làm quan, có gan làm giàu.",
+    "Thời gian là vàng bạc.",
+    "Trời sinh voi, trời sinh cỏ.",
+    "Nước chảy đá mòn.",
+    "Cái khó ló cái khôn.",
+    "Cần cù bù thông minh.",
+    "Ăn vóc học hay.",
+    "Chim khôn kêu tiếng rảnh rang, người khôn nói tiếng dịu dàng dễ nghe.",
+    "Học một biết mười.",
+    "Đi cho biết đó biết đây, ở nhà với mẹ biết ngày nào khôn.",
+    "Có học mới nên khôn.",
+    "Ngọc kia chẳng giũa chẳng mài, cũng thành vô dụng cũng hoài ngọc đi.",
+    "Tre già măng mọc.",
+    "Khó khăn thử thách lòng người.",
+    "Công dã tràng biển Đông cũng cạn.",
+    "Không ai giàu ba họ, không ai khó ba đời.",
+    "Trăng mờ còn tỏ, người khó còn khôn.",
+    "Có chí thì nên.",
+    "Mưa dầm thấm lâu.",
+    "Học thầy một, học bạn mười.",
+    "Người có công thì trời chẳng phụ.",
+    "Khéo ăn thì no, khéo co thì ấm.",
+    "Điều lành đem lại điều hay."
 };
 
-const int quotes_count = sizeof(quotes) / sizeof(quotes[0]);
+const int quotes_count = 50;
 
 char * get_current_quote(void) {
     uint32_t current_time = timer_read32();

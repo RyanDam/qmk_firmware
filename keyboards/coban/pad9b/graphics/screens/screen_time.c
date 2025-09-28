@@ -164,14 +164,6 @@ void screen_time_set_time_style(uint8_t time_style) {
             lv_obj_add_style(time_text, &style_text_time3, 0);
             break;
         }
-        // case coban_time_style_4: {
-        //     lv_obj_add_style(time_text, &style_text_time4, 0);
-        //     break;
-        // }
-        // case coban_time_style_5: {
-        //     lv_obj_add_style(time_text, &style_text_time5, 0);
-        //     break;
-        // }
         case coban_time_style_1:
         default: {
             lv_obj_add_style(time_text, &style_text_time1, 0);

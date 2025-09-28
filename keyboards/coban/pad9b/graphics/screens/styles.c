@@ -16,11 +16,10 @@
 
 #include "graphics/screens/styles.h"
 
+LV_FONT_DECLARE(barlow)
 LV_FONT_DECLARE(inter)
 LV_FONT_DECLARE(bai_jamjuree)
-LV_FONT_DECLARE(delius)
-// LV_FONT_DECLARE(truculenta)
-// LV_FONT_DECLARE(vidaloka)
+LV_FONT_DECLARE(dm_serif)
 
 lv_style_t style_screen;
 lv_style_t style_container;
@@ -33,8 +32,6 @@ lv_style_t style_indice;
 lv_style_t style_text_time1;
 lv_style_t style_text_time2;
 lv_style_t style_text_time3;
-// lv_style_t style_text_time4;
-// lv_style_t style_text_time5;
 
 lv_style_t style_key;
 lv_style_t style_key_pressed;
@@ -73,10 +70,11 @@ void init_styles(void) {
     lv_style_set_pad_left(&style_text, 0);
     lv_style_set_pad_right(&style_text, 0);
     lv_style_set_text_color(&style_text, lv_color_hex(0xffffff));
+    lv_style_set_text_font(&style_text, &barlow);
 
     lv_style_init(&style_key);
-    lv_style_set_pad_top(&style_key, 3);
-    lv_style_set_pad_bottom(&style_key, 3);
+    lv_style_set_pad_top(&style_key, 0);
+    lv_style_set_pad_bottom(&style_key, 0);
     lv_style_set_pad_left(&style_key, 0);
     lv_style_set_pad_right(&style_key, 0);
     lv_style_set_border_width(&style_key, 1);
@@ -88,10 +86,11 @@ void init_styles(void) {
     lv_style_set_bg_opa(&style_key, LV_OPA_100);
     lv_style_set_border_color(&style_key, lv_color_hex(0x555555));
     lv_style_set_radius(&style_key, 5);
+    lv_style_set_text_font(&style_key, &barlow);
 
     lv_style_init(&style_key_pressed);
-    lv_style_set_pad_top(&style_key_pressed, 3);
-    lv_style_set_pad_bottom(&style_key_pressed, 3);
+    lv_style_set_pad_top(&style_key_pressed, 0);
+    lv_style_set_pad_bottom(&style_key_pressed, 0);
     lv_style_set_pad_left(&style_key_pressed, 0);
     lv_style_set_pad_right(&style_key_pressed, 0);
     lv_style_set_border_width(&style_key_pressed, 1);
@@ -103,6 +102,7 @@ void init_styles(void) {
     lv_style_set_bg_opa(&style_key_pressed, LV_OPA_100);
     lv_style_set_border_color(&style_key_pressed, lv_color_hex(0x555555));
     lv_style_set_radius(&style_key_pressed, 5);
+    lv_style_set_text_font(&style_key_pressed, &barlow);
 
     lv_style_init(&style_arc_main);
     lv_style_set_arc_color(&style_arc_main, lv_palette_main(LV_PALETTE_GREY));
@@ -138,21 +138,6 @@ void init_styles(void) {
     lv_style_set_pad_left(&style_text_time3, 0);
     lv_style_set_pad_right(&style_text_time3, 0);
     lv_style_set_text_color(&style_text_time3, lv_color_hex(0xffffff));
-    lv_style_set_text_font(&style_text_time3, &delius);
+    lv_style_set_text_font(&style_text_time3, &dm_serif);
 
-    // lv_style_init(&style_text_time4);
-    // lv_style_set_pad_top(&style_text_time4, 0);
-    // lv_style_set_pad_bottom(&style_text_time4, 0);
-    // lv_style_set_pad_left(&style_text_time4, 0);
-    // lv_style_set_pad_right(&style_text_time4, 0);
-    // lv_style_set_text_color(&style_text_time4, lv_color_hex(0xffffff));
-    // lv_style_set_text_font(&style_text_time4, &truculenta);
-
-    // lv_style_init(&style_text_time5);
-    // lv_style_set_pad_top(&style_text_time5, 0);
-    // lv_style_set_pad_bottom(&style_text_time5, 0);
-    // lv_style_set_pad_left(&style_text_time5, 0);
-    // lv_style_set_pad_right(&style_text_time5, 0);
-    // lv_style_set_text_color(&style_text_time5, lv_color_hex(0xffffff));
-    // lv_style_set_text_font(&style_text_time5, &vidaloka);
 }
