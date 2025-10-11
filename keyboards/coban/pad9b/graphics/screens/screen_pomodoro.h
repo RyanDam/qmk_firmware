@@ -16,6 +16,19 @@
 
 #include "qp_lvgl.h"
 
+enum coban_pomo_noti_mode_id {
+    coban_pomo_noti_mode_none   = 0x00,
+    coban_pomo_noti_mode_beep   = 0x01,
+    coban_pomo_noti_mode_light  = 0x02,
+    coban_pomo_noti_mode_both   = 0x03,
+};
+
+enum coban_pomo_noti_kind_id {
+    coban_pomo_noti_kind_work        = 0x01,
+    coban_pomo_noti_kind_rest        = 0x02,
+    coban_pomo_noti_kind_cancel      = 0x03,
+};
+
 lv_obj_t * screen_pomodoro_init(void);
 
 void screen_pomodoro_ui_update(void);

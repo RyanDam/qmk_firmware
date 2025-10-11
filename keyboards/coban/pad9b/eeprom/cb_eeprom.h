@@ -33,6 +33,7 @@ typedef struct _cb_config_t {
     uint8_t pomo_num_set;
     uint8_t pomo_work_duration;
     uint8_t pomo_rest_duration;
+    uint8_t pomo_noti_mode;
 
     // gif data
     uint32_t gif_data_size;

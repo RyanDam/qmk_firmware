@@ -40,6 +40,7 @@ void coban_init_config(void) {
     config.pomo_num_set = 4;
     config.pomo_work_duration = 25;
     config.pomo_rest_duration = 5;
+    config.pomo_noti_mode = coban_pomo_noti_mode_beep;
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 }

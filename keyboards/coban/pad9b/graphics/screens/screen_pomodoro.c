@@ -53,6 +53,13 @@ static int pomo_rest_set_width;
 static uint8_t pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
 static int quote_offset;
 
+// notify variables
+static uint32_t pomo_noti_start_timestamp = 0;
+static uint32_t pomo_noti_duration_ms = 3000;
+static bool pomo_noti_restored = false;
+// #ifdef RGB_MATRIX_ENABLE
+// static int last_rgb_matrix_effect;
+// #endif
 
 #ifdef AUDIO_ENABLE
 #define SIMPLE_ALARM_SOUND Q__NOTE(_C6), Q__NOTE(_C6),
@@ -238,6 +245,72 @@ void screen_pomodoro_set_time_style(uint8_t time_style) {
     }
 }
 
+void screen_pomodoro_do_notify(enum coban_pomo_noti_kind_id noti_kind_id) {
+    if (config.pomo_noti_mode == coban_pomo_noti_mode_beep || config.pomo_noti_mode == coban_pomo_noti_mode_both) {
+#ifdef AUDIO_ENABLE
+        stop_all_notes();
+        switch (noti_kind_id) {
+            case coban_pomo_noti_kind_work: {
+                PLAY_SONG(work_song);
+                break;
+            }
+            case coban_pomo_noti_kind_rest: {
+                PLAY_SONG(rest_song);
+                break;
+            }
+            case coban_pomo_noti_kind_cancel: {
+                PLAY_SONG(cancel_song);
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+#endif // AUDIO_ENABLE
+    }
+    if (config.pomo_noti_mode == coban_pomo_noti_mode_light || config.pomo_noti_mode == coban_pomo_noti_mode_both) {
+        pomo_noti_start_timestamp = timer_read32();
+        pomo_noti_restored = false;
+        switch (noti_kind_id) {
+            case coban_pomo_noti_kind_work: {
+                pomo_noti_duration_ms = 3000;
+                break;
+            }
+            case coban_pomo_noti_kind_rest: {
+                pomo_noti_duration_ms = 3000;
+                break;
+            }
+            case coban_pomo_noti_kind_cancel: {
+                pomo_noti_duration_ms = 800;
+                break;
+            }
+            default: {
+                break;
+            }
+        }
+#ifdef RGB_MATRIX_ENABLE
+        rgb_matrix_enable_noeeprom();
+        rgb_matrix_mode_noeeprom(RGB_MATRIX_CUSTOM_screen_pomo_noti_effect);
+#endif // RGB_MATRIX_ENABLE
+    }
+}
+
+void screen_pomodoro_notify_task(void) {
+    uint32_t current_timestamp = timer_read32();
+    uint32_t elapsed_time = current_timestamp - pomo_noti_start_timestamp;
+    bool is_finished = (elapsed_time >= pomo_noti_duration_ms);
+#ifdef RGB_MATRIX_ENABLE
+    if (is_finished) {
+        if (!pomo_noti_restored) {
+            rgb_matrix_reload_from_eeprom();
+            pomo_noti_restored = true;
+        }
+    } else {
+        // do nothing
+    }
+#endif // RGB_MATRIX_ENABLE
+}
+
 void screen_pomodoro_session_start(void) {
     session_start_timestamp = timer_read32();
     pomo_current_set_idx = 0;
@@ -246,10 +319,7 @@ void screen_pomodoro_session_start(void) {
     lv_obj_clear_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
     session_running = true;
 
-#ifdef AUDIO_ENABLE
-    stop_all_notes();
-    PLAY_SONG(work_song);
-#endif
+    screen_pomodoro_do_notify(coban_pomo_noti_kind_work);
 }
 
 void screen_pomodoro_session_cancel(void) {
@@ -257,10 +327,7 @@ void screen_pomodoro_session_cancel(void) {
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
 
-#ifdef AUDIO_ENABLE
-    stop_all_notes();
-    PLAY_SONG(cancel_song);
-#endif
+    screen_pomodoro_do_notify(coban_pomo_noti_kind_cancel);
 }
 
 bool screen_pomodoro_session_running(void) {
@@ -272,10 +339,7 @@ void screen_pomodoro_session_complete(void) {
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
     lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
 
-#ifdef AUDIO_ENABLE
-    stop_all_notes();
-    PLAY_SONG(rest_song);
-#endif
+    screen_pomodoro_do_notify(coban_pomo_noti_kind_rest);
 }
 
 void screen_pomodoro_set_complete(uint8_t set_idx, bool is_work_set) {
@@ -283,20 +347,19 @@ void screen_pomodoro_set_complete(uint8_t set_idx, bool is_work_set) {
 }
 
 void screen_pomodoro_set_start(uint8_t set_idx, bool is_work_set) {
-#ifdef AUDIO_ENABLE
-    stop_all_notes();
     if (is_work_set) {
-        PLAY_SONG(work_song);
+        screen_pomodoro_do_notify(coban_pomo_noti_kind_work);
     } else {
-        PLAY_SONG(rest_song);
+        screen_pomodoro_do_notify(coban_pomo_noti_kind_rest);
     }
-#endif
 }
 
 static void pomo_cb(lv_timer_t * timer) {
     if (!pomo_running) {
         return;
     }
+
+    screen_pomodoro_notify_task();
 
     if (!session_running) {
         // No pomo session yet
@@ -393,13 +456,11 @@ void screen_pomodoro_reload(void) {
     pomo_running = true;
     if (pomo_timer == NULL) {
         // 1 FPS
-        pomo_timer = lv_timer_create(pomo_cb, 1000, NULL);
+        pomo_timer = lv_timer_create(pomo_cb, 250, NULL);
     } else {
         lv_timer_resume(pomo_timer);
     }
 }
-
-
 
 const char* quotes[] = {
     "Có công mài sắt\ncó ngày nên kim",

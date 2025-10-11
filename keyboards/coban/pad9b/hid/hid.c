@@ -100,6 +100,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             config.pomo_num_set         = command_data[0];
             config.pomo_work_duration   = command_data[1];
             config.pomo_rest_duration   = command_data[2];
+            config.pomo_noti_mode       = command_data[3];
             screen_pomodoro_ui_update();
             break;
         }
@@ -176,7 +177,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 0) = 0xff & config.pomo_num_set;
             *(command_data + 1) = 0xff & config.pomo_work_duration;
             *(command_data + 2) = 0xff & config.pomo_rest_duration;
-
+            *(command_data + 3) = 0xff & config.pomo_noti_mode;
             break;
         }
         default:
