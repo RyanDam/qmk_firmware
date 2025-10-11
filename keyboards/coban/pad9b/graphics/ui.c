@@ -107,7 +107,8 @@ enum coban_screen_id prev_screen(void) {
 }
 
 enum coban_screen_id change_screen(uint8_t screen_idx) {
-    if (screen_idx == ui_current_screen) {
+    // animate screen need self refresh when loading new gif buffer
+    if (screen_idx == ui_current_screen && screen_idx != coban_screen_anime) {
         return ui_current_screen;
     }
 

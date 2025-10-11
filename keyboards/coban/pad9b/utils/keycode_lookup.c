@@ -54,10 +54,10 @@ lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"M7", 0x7707},
     {"M8", 0x7708},
     {"M9", 0x7709},
-    {"SPC L0", 0x402c}, //_QK_LAYER_TAP
-    {"SPC L1", 0x412c},
-    {"SPC L2", 0x422c},
-    {"SPC L3", 0x432c},
+    {"Spc0", 0x402c}, //_QK_LAYER_TAP
+    {"Spc1", 0x412c},
+    {"Spc2", 0x422c},
+    {"Spc3", 0x432c},
     {"MO(0)", 0x5220}, //_QK_MOMENTARY
     {"MO(1)", 0x5221},
     {"MO(2)", 0x5222},
