@@ -30,6 +30,7 @@ static bool pomo_running = false;
 #define CANVAS_POMO_WIDTH SCREEN_WIDTH
 #define CANVAS_POMO_HEIGHT 6
 static lv_obj_t * pomo_layout_holder = NULL;
+static lv_obj_t * pomo_bottom_holder = NULL;
 static lv_obj_t * pomo_progress_holder = NULL;
 static lv_obj_t * pomo_indice_holder = NULL;
 static lv_obj_t * pomo_indice = NULL;
@@ -76,22 +77,21 @@ lv_obj_t * screen_pomodoro_init(void) {
 
     screen_pomodoro = lv_obj_create(NULL);
     lv_obj_add_style(screen_pomodoro, &style_screen, 0);
-    // lv_obj_set_style_bg_color(screen_pomodoro, lv_color_hex(0xffff00), 0);
 
     pomo_layout_holder = lv_obj_create(screen_pomodoro);
     lv_obj_add_style(pomo_layout_holder, &style_container, 0);
-    // lv_obj_set_style_bg_color(pomo_layout_holder, lv_color_hex(0x00ff00), 0);
     lv_obj_center(pomo_layout_holder);
     use_flex_column(pomo_layout_holder);
     lv_obj_set_style_pad_row(pomo_layout_holder, 0, 0);
 
-    pomo_time_holder = lv_obj_create(pomo_layout_holder);  // attach to active screen
+    pomo_time_holder = lv_obj_create(pomo_layout_holder);
     lv_obj_add_style(pomo_time_holder, &style_container, 0);
-    lv_obj_set_size(pomo_time_holder, SCREEN_WIDTH, SCREEN_HEIGHT-CANVAS_POMO_HEIGHT*2);
+    lv_obj_set_size(pomo_time_holder, SCREEN_WIDTH, SCREEN_HEIGHT-CANVAS_POMO_HEIGHT);
     use_flex_column(pomo_time_holder);
-    lv_obj_set_style_pad_row(pomo_time_holder, 0, 0);
-    // lv_obj_set_style_bg_opa(pomo_time_holder, LV_OPA_100, 0);
-    // lv_obj_set_style_bg_color(pomo_time_holder, lv_color_hex(0x0000ff), 0);
+    lv_obj_set_style_pad_row(pomo_time_holder, 6, 0);
+    lv_obj_set_flex_align(pomo_time_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_AROUND);
+    // lv_obj_set_style_border_width(pomo_time_holder, 1, 0);
+    // lv_obj_set_style_border_color(pomo_time_holder, lv_color_hex(0xffffff), 0);
 
     pomo_time_status = lv_label_create(pomo_time_holder);
     // lv_label_set_text(pomo_time_status, get_current_quote());
@@ -100,23 +100,28 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_label_set_long_mode(pomo_time_status, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(pomo_time_status, SCREEN_WIDTH - 24);
     lv_obj_set_style_text_align(pomo_time_status, LV_TEXT_ALIGN_CENTER, 0);
+    // lv_obj_set_style_border_width(pomo_time_status, 1, 0);
+    // lv_obj_set_style_border_color(pomo_time_status, lv_color_hex(0xffffff), 0);
 
     pomo_time_text = lv_label_create(pomo_time_holder);
     lv_label_set_text(pomo_time_text, "--:--");
     lv_obj_add_style(pomo_time_text, &style_text_time1, 0);
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
+    // lv_obj_set_style_border_width(pomo_time_text, 1, 0);
+    // lv_obj_set_style_border_color(pomo_time_text, lv_color_hex(0xffffff), 0);
 
-    pomo_indice_holder = lv_obj_create(pomo_layout_holder);  // attach to active screen
+    pomo_bottom_holder = lv_obj_create(pomo_layout_holder);
+    lv_obj_add_style(pomo_bottom_holder, &style_container, 0);
+
+    pomo_indice_holder = lv_obj_create(pomo_bottom_holder);
     lv_obj_add_style(pomo_indice_holder, &style_container, 0);
     lv_obj_set_size(pomo_indice_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
     lv_obj_set_style_pad_column(pomo_indice_holder, 0, 0);
 
-    pomo_progress_holder = lv_obj_create(pomo_layout_holder);  // attach to active screen
+    pomo_progress_holder = lv_obj_create(pomo_bottom_holder);
     lv_obj_add_style(pomo_progress_holder, &style_container, 0);
     lv_obj_set_size(pomo_progress_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
     lv_obj_set_style_pad_column(pomo_progress_holder, 0, 0);
-    // lv_obj_set_style_bg_opa(pomo_progress_holder, LV_OPA_100, 0);
-    // lv_obj_set_style_bg_color(pomo_progress_holder, lv_color_hex(0xff0000), 0);
     use_flex_row(pomo_progress_holder);
     lv_obj_set_flex_align(pomo_progress_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
 

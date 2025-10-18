@@ -73,7 +73,7 @@ void init_styles(void) {
     lv_style_set_text_font(&style_text, &barlow);
 
     lv_style_init(&style_key);
-    lv_style_set_pad_top(&style_key, 0);
+    lv_style_set_pad_top(&style_key, 2);
     lv_style_set_pad_bottom(&style_key, 0);
     lv_style_set_pad_left(&style_key, 0);
     lv_style_set_pad_right(&style_key, 0);
