@@ -500,7 +500,7 @@ const char* quotes[] = {
     "Học đi đôi với hành",
     "Tre già măng mọc",
     "Khó khăn thử thách lòng người",
-    "Đói cho sạch, rách cho thơm",
+    "Đói cho sạch\nrách cho thơm",
     "Không ai giàu ba họ\nkhông ai khó ba đời",
     "Trăng mờ còn tỏ\nngười khó còn khôn",
     "Có chí thì nên",
@@ -510,7 +510,7 @@ const char* quotes[] = {
     "Khéo ăn thì no\nkhéo co thì ấm",
     "Điều lành đem lại điều hay",
     "Ghét của nào\ntrời trao của nấy",
-    "Không có gì khó\nchỉ sợ lòng không bền",
+    "Không có việc gì khó\nchỉ sợ lòng không bền",
     "Không làm sao nên",
     "Một điều nhịn\nchín điều lành"
 };
