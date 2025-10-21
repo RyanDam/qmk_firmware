@@ -113,17 +113,17 @@ lv_obj_t * screen_pomodoro_init(void) {
     pomo_bottom_holder = lv_obj_create(pomo_layout_holder);
     lv_obj_add_style(pomo_bottom_holder, &style_container, 0);
 
-    pomo_indice_holder = lv_obj_create(pomo_bottom_holder);
-    lv_obj_add_style(pomo_indice_holder, &style_container, 0);
-    lv_obj_set_size(pomo_indice_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
-    lv_obj_set_style_pad_column(pomo_indice_holder, 0, 0);
-
     pomo_progress_holder = lv_obj_create(pomo_bottom_holder);
     lv_obj_add_style(pomo_progress_holder, &style_container, 0);
     lv_obj_set_size(pomo_progress_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
     lv_obj_set_style_pad_column(pomo_progress_holder, 0, 0);
     use_flex_row(pomo_progress_holder);
     lv_obj_set_flex_align(pomo_progress_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+
+    pomo_indice_holder = lv_obj_create(pomo_bottom_holder);
+    lv_obj_add_style(pomo_indice_holder, &style_container, 0);
+    lv_obj_set_size(pomo_indice_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
+    lv_obj_set_style_pad_column(pomo_indice_holder, 0, 0);
 
     screen_pomodoro_ui_update();
     screen_pomodoro_set_time_style(config.time_style_id);
