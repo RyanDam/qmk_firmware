@@ -69,14 +69,13 @@ void housekeeping_task_user(void) {
     }
 
     // handle screen layer switch back
-    if (current_idle_time_ms > config.screen_switch_layer_timeout*1000) {
-        if (
-            config.screen_switch_layer
-            && layer_mode_activated == true
-        ) {
-            change_screen(last_screen_idx);
-            layer_mode_activated = false;
-        }
+    if (
+        config.screen_switch_layer
+        && current_idle_time_ms > config.screen_switch_layer_timeout*1000
+        && layer_mode_activated == true
+    ) {
+        change_screen(last_screen_idx);
+        layer_mode_activated = false;
     }
 }
 
@@ -110,15 +109,6 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         return true;
     }
 
-    if (
-        config.screen_switch_layer
-        && layer_mode_activated == false
-    ) {
-        last_screen_idx = current_screen();
-        change_screen(coban_screen_layer);
-        layer_mode_activated = true;
-    }
-
     if (!is_backlight_enabled()) {
         backlight_enable();
     }
@@ -129,57 +119,88 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     // screen_render_set_key_code(keycode, record);
 
+    enum coban_screen_id target_screen_idx = current_screen();
+    bool need_save_eeprom = false;
+    bool skip_layer_change = false;
+
     if (record->event.pressed) {
         switch (keycode) {
             case CB_SCREEN_NEXT: {
-                last_screen_idx = next_screen();
-                config.screen_idx = last_screen_idx;
-                coban_save_config();
+                target_screen_idx = next_screen(false);
+                need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_PREV: {
-                last_screen_idx = prev_screen();
-                config.screen_idx = last_screen_idx;
-                coban_save_config();
+                target_screen_idx = prev_screen(false);
+                need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_CLOCK: {
-                config.screen_idx = coban_screen_clock;
-                last_screen_idx = change_screen(coban_screen_clock);
-                coban_save_config();
+                target_screen_idx = coban_screen_clock;
+                need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_ANIME: {
-                config.screen_idx = coban_screen_anime;
-                last_screen_idx = change_screen(coban_screen_anime);
-                coban_save_config();
+                target_screen_idx = coban_screen_anime;
+                need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_LAYER: {
-                config.screen_idx = coban_screen_layer;
-                last_screen_idx = change_screen(coban_screen_layer);
-                coban_save_config();
+                target_screen_idx = coban_screen_layer;
+                need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_POMO: {
-                config.screen_idx = coban_screen_pomodoro;
-                last_screen_idx = change_screen(coban_screen_pomodoro);
-                coban_save_config();
+                target_screen_idx = coban_screen_pomodoro;
+                need_save_eeprom = true;
+                break;
             }
             case CB_POMO_START: {
                 screen_pomodoro_session_start();
-                last_screen_idx = change_screen(coban_screen_pomodoro);
+                target_screen_idx = coban_screen_pomodoro;
+                skip_layer_change = true;
                 break;
             }
             case CB_POMO_CANCEL: {
                 screen_pomodoro_session_cancel();
-                last_screen_idx = change_screen(coban_screen_pomodoro);
+                target_screen_idx = coban_screen_pomodoro;
+                skip_layer_change = true;
                 break;
             }
             default:
                 break;
         }
     }
+
+    if (target_screen_idx != current_screen()) {
+        // if current screen is different
+        // -> screen change request is detected
+        // -> prioritized screen change
+        change_screen(target_screen_idx);
+        if (layer_mode_activated) {
+            // current screen state switched to layer
+            // ensure we switch back to correct screen
+            last_screen_idx = target_screen_idx;
+            layer_mode_activated = false;
+        }
+    } else if (
+        record->event.pressed // only consider key press event to prevent duplicate screen switch
+        && config.screen_switch_layer
+        && layer_mode_activated == false
+        && current_screen() != coban_screen_layer
+        && !skip_layer_change
+    ) {
+        // Then check if layer switching is needed
+        last_screen_idx = current_screen();
+        change_screen(coban_screen_layer);
+        layer_mode_activated = true;
+    }
+
+    if (need_save_eeprom) {
+        config.screen_idx = target_screen_idx;
+        coban_save_config();
+    }
+
 
     return true;
 }

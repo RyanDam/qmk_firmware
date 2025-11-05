@@ -451,6 +451,12 @@ void screen_pomodoro_stop(void) {
     }
     pomo_running = false;
     lv_timer_pause(pomo_timer);
+
+    // also cancel any ongoing pomo notify
+    if (!pomo_noti_restored) {
+        rgb_matrix_reload_from_eeprom();
+        pomo_noti_restored = true;
+    }
 }
 
 void screen_pomodoro_reload(void) {

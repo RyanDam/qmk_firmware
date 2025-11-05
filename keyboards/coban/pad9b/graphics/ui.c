@@ -84,7 +84,7 @@ enum coban_screen_id current_screen(void) {
     return ui_current_screen;
 }
 
-enum coban_screen_id next_screen(void) {
+enum coban_screen_id next_screen(bool need_change_screen) {
     int next_screen_idx = coban_screen_clock;
     for (int i = 0; i < num_avail_screen; i++) {
         if (ui_current_screen == screen_indexes[i]) {
@@ -92,10 +92,13 @@ enum coban_screen_id next_screen(void) {
             break;
         }
     }
-    return change_screen(next_screen_idx & 0xff);
+    if (need_change_screen) {
+        return change_screen(next_screen_idx & 0xff);
+    }
+    return next_screen_idx & 0xff;
 }
 
-enum coban_screen_id prev_screen(void) {
+enum coban_screen_id prev_screen(bool need_change_screen) {
     int prev_screen_idx = coban_screen_clock;
     for (int i = 0; i < num_avail_screen; i++) {
         if (ui_current_screen == screen_indexes[i]) {
@@ -103,7 +106,10 @@ enum coban_screen_id prev_screen(void) {
             break;
         }
     }
-    return change_screen(prev_screen_idx & 0xff);
+    if (need_change_screen) {
+        return change_screen(prev_screen_idx & 0xff);
+    }
+    return prev_screen_idx & 0xff;
 }
 
 enum coban_screen_id change_screen(uint8_t screen_idx) {

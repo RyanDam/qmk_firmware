@@ -46,6 +46,6 @@ enum coban_screen_id current_screen(void);
 
 enum coban_screen_id change_screen(uint8_t screen_idx);
 
-enum coban_screen_id next_screen(void);
+enum coban_screen_id next_screen(bool need_change_screen);
 
-enum coban_screen_id prev_screen(void);
+enum coban_screen_id prev_screen(bool need_change_screen);

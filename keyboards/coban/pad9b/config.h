@@ -34,7 +34,7 @@
 #define OLED_BKL_PIN GP0
 
 // un-commend if compile for rev 0 test platform
-// #define OLED_PART_REV_2
+#define OLED_PART_REV_2
 
 #ifdef BACKLIGHT_ENABLE
 #   define BACKLIGHT_PWM_DRIVER PWMD0
