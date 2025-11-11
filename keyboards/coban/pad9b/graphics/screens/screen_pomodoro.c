@@ -14,6 +14,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#include <math.h>
 #include "audio/audio.h"
 #include "graphics/screens/screen_pomodoro.h"
 #include "graphics/screens/screen_time.h"
@@ -25,26 +26,18 @@
 static lv_obj_t *screen_pomodoro = NULL;
 static lv_timer_t *pomo_timer = NULL;
 static bool pomo_running = false;
+static enum coban_pomo_state pomo_state = coban_pomo_state_idle;
 
 /* Canvas buffer */
 #define CANVAS_POMO_WIDTH SCREEN_WIDTH
 #define CANVAS_POMO_HEIGHT 6
 static lv_obj_t * pomo_layout_holder = NULL;
-static lv_obj_t * pomo_bottom_holder = NULL;
-static lv_obj_t * pomo_progress_holder = NULL;
-static lv_obj_t * pomo_indice_holder = NULL;
-static lv_obj_t * pomo_indice = NULL;
+static lv_obj_t * pomo_progress_bar = NULL;
 static lv_obj_t * pomo_time_holder = NULL;
 static lv_obj_t * pomo_time_text = NULL;
 static lv_obj_t * pomo_time_status = NULL;
+static lv_obj_t * pomo_breath_indicator = NULL;
 
-static lv_style_t style_progress_work;
-static lv_style_t style_progress_rest;
-static lv_style_t style_progress_curr;
-static lv_style_t style_progress_past;
-static lv_style_t style_time_indice;
-
-static bool session_running = false;
 static uint32_t session_start_timestamp = 0;
 
 static int pomo_total_set_num;
@@ -53,6 +46,9 @@ static int pomo_work_set_width;
 static int pomo_rest_set_width;
 static uint8_t pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
 static int quote_offset;
+
+// animation variables
+static uint32_t pomo_breath_size = 60;
 
 // notify variables
 static uint32_t pomo_noti_start_timestamp = 0;
@@ -78,52 +74,56 @@ lv_obj_t * screen_pomodoro_init(void) {
     screen_pomodoro = lv_obj_create(NULL);
     lv_obj_add_style(screen_pomodoro, &style_screen, 0);
 
+    pomo_breath_indicator = lv_obj_create(screen_pomodoro);
+    lv_obj_add_style(pomo_breath_indicator, &style_container, 0);
+    lv_obj_center(pomo_breath_indicator);
+    lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_100, 0);
+    lv_obj_set_style_bg_color(pomo_breath_indicator, lv_color_hex(0x005639), 0);
+    lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
+    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size/2, 0);
+
     pomo_layout_holder = lv_obj_create(screen_pomodoro);
     lv_obj_add_style(pomo_layout_holder, &style_container, 0);
     lv_obj_center(pomo_layout_holder);
     use_flex_column(pomo_layout_holder);
     lv_obj_set_style_pad_row(pomo_layout_holder, 0, 0);
+    lv_obj_set_style_bg_opa(pomo_layout_holder, LV_OPA_TRANSP, 0);
 
+    // main time + status holder
     pomo_time_holder = lv_obj_create(pomo_layout_holder);
     lv_obj_add_style(pomo_time_holder, &style_container, 0);
     lv_obj_set_size(pomo_time_holder, SCREEN_WIDTH, SCREEN_HEIGHT-CANVAS_POMO_HEIGHT);
     use_flex_column(pomo_time_holder);
     lv_obj_set_style_pad_row(pomo_time_holder, 6, 0);
     lv_obj_set_flex_align(pomo_time_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_AROUND);
-    // lv_obj_set_style_border_width(pomo_time_holder, 1, 0);
-    // lv_obj_set_style_border_color(pomo_time_holder, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_bg_opa(pomo_time_holder, LV_OPA_TRANSP, 0);
 
     pomo_time_status = lv_label_create(pomo_time_holder);
-    // lv_label_set_text(pomo_time_status, get_current_quote());
     lv_label_set_text(pomo_time_status, "Có chí thì nên");
     lv_obj_add_style(pomo_time_status, &style_text, 0);
     lv_label_set_long_mode(pomo_time_status, LV_LABEL_LONG_WRAP);
     lv_obj_set_width(pomo_time_status, SCREEN_WIDTH - 24);
     lv_obj_set_style_text_align(pomo_time_status, LV_TEXT_ALIGN_CENTER, 0);
-    // lv_obj_set_style_border_width(pomo_time_status, 1, 0);
-    // lv_obj_set_style_border_color(pomo_time_status, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_bg_opa(pomo_time_status, LV_OPA_TRANSP, 0);
 
     pomo_time_text = lv_label_create(pomo_time_holder);
     lv_label_set_text(pomo_time_text, "--:--");
     lv_obj_add_style(pomo_time_text, &style_text_time1, 0);
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
-    // lv_obj_set_style_border_width(pomo_time_text, 1, 0);
-    // lv_obj_set_style_border_color(pomo_time_text, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_bg_opa(pomo_time_text, LV_OPA_TRANSP, 0);
 
-    pomo_bottom_holder = lv_obj_create(pomo_layout_holder);
-    lv_obj_add_style(pomo_bottom_holder, &style_container, 0);
+    // Progress holder
+    pomo_progress_bar = lv_bar_create(pomo_layout_holder);
+    lv_obj_add_style(pomo_progress_bar, &style_container, 0);
+    lv_obj_set_size(pomo_progress_bar, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
+    lv_obj_set_style_bg_color(pomo_progress_bar, lv_color_hex(0x252525), 0);
+    lv_obj_set_style_bg_opa(pomo_progress_bar, LV_OPA_100, 0);
+    lv_obj_set_style_bg_color(pomo_progress_bar, lv_color_hex(0x009664), LV_PART_INDICATOR);
+    lv_obj_set_style_bg_opa(pomo_progress_bar, LV_OPA_100, LV_PART_INDICATOR);
+    lv_bar_set_range(pomo_progress_bar, 0, 100);
+    lv_bar_set_value(pomo_progress_bar, 25, LV_ANIM_OFF);
+    lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
 
-    pomo_progress_holder = lv_obj_create(pomo_bottom_holder);
-    lv_obj_add_style(pomo_progress_holder, &style_container, 0);
-    lv_obj_set_size(pomo_progress_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
-    lv_obj_set_style_pad_column(pomo_progress_holder, 0, 0);
-    use_flex_row(pomo_progress_holder);
-    lv_obj_set_flex_align(pomo_progress_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-
-    pomo_indice_holder = lv_obj_create(pomo_bottom_holder);
-    lv_obj_add_style(pomo_indice_holder, &style_container, 0);
-    lv_obj_set_size(pomo_indice_holder, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
-    lv_obj_set_style_pad_column(pomo_indice_holder, 0, 0);
 
     screen_pomodoro_ui_update();
     screen_pomodoro_set_time_style(config.time_style_id);
@@ -132,10 +132,6 @@ lv_obj_t * screen_pomodoro_init(void) {
 }
 
 void screen_pomodoro_ui_update(void) {
-    if (pomo_progress_holder == NULL) {
-        return;
-    }
-
     if (config.pomo_num_set == 0) config.pomo_num_set = 4;
     if (config.pomo_work_duration == 0) config.pomo_work_duration = 25;
     if (config.pomo_rest_duration == 0) config.pomo_rest_duration = 5;
@@ -144,90 +140,6 @@ void screen_pomodoro_ui_update(void) {
     pomo_total_session_duration_min = config.pomo_work_duration * config.pomo_num_set + config.pomo_rest_duration * (config.pomo_num_set - 1);
     pomo_work_set_width = (int) (CANVAS_POMO_WIDTH * (((float) config.pomo_work_duration) / ((float) pomo_total_session_duration_min)));
     pomo_rest_set_width = (int) (CANVAS_POMO_WIDTH * (((float) config.pomo_rest_duration) / ((float) pomo_total_session_duration_min)));
-
-    lv_style_init(&style_progress_work);
-    lv_style_set_border_width(&style_progress_work, 1);
-    lv_style_set_width(&style_progress_work, pomo_work_set_width);
-    lv_style_set_height(&style_progress_work, CANVAS_POMO_HEIGHT);
-    lv_style_set_bg_opa(&style_progress_work, LV_OPA_100);
-    lv_style_set_bg_color(&style_progress_work, lv_color_hex(0x555555));
-    lv_style_set_border_color(&style_progress_work, lv_color_hex(0x555555));
-    lv_style_set_radius(&style_progress_work, 2);
-
-    lv_style_init(&style_progress_rest);
-    lv_style_set_border_width(&style_progress_rest, 1);
-    lv_style_set_width(&style_progress_rest, pomo_rest_set_width);
-    lv_style_set_height(&style_progress_rest, CANVAS_POMO_HEIGHT);
-    lv_style_set_bg_opa(&style_progress_rest, LV_OPA_100);
-    lv_style_set_bg_color(&style_progress_rest, lv_color_hex(0x252525));
-    lv_style_set_border_color(&style_progress_rest, lv_color_hex(0x252525));
-    lv_style_set_radius(&style_progress_rest, 2);
-
-    lv_style_init(&style_progress_curr);
-    lv_style_set_border_width(&style_progress_curr, 1);
-    lv_style_set_width(&style_progress_curr, pomo_work_set_width);
-    lv_style_set_height(&style_progress_curr, CANVAS_POMO_HEIGHT);
-    lv_style_set_bg_opa(&style_progress_curr, LV_OPA_100);
-    lv_style_set_bg_color(&style_progress_curr, lv_color_hex(0x0000dd));
-    lv_style_set_border_color(&style_progress_curr, lv_color_hex(0x0000dd));
-    lv_style_set_radius(&style_progress_curr, 2);
-
-    lv_style_init(&style_progress_past);
-    lv_style_set_border_width(&style_progress_past, 1);
-    lv_style_set_width(&style_progress_past, pomo_work_set_width);
-    lv_style_set_height(&style_progress_past, CANVAS_POMO_HEIGHT);
-    lv_style_set_bg_opa(&style_progress_past, LV_OPA_100);
-    lv_style_set_bg_color(&style_progress_past, lv_color_hex(0xdddd00));
-    lv_style_set_border_color(&style_progress_past, lv_color_hex(0xdddd00));
-    lv_style_set_radius(&style_progress_past, 2);
-
-    lv_style_init(&style_time_indice);
-    lv_style_set_pad_top(&style_time_indice, 0);
-    lv_style_set_pad_bottom(&style_time_indice, 0);
-    lv_style_set_pad_left(&style_time_indice, 0);
-    lv_style_set_pad_right(&style_time_indice, 0);
-    lv_style_set_border_width(&style_time_indice, 1);
-    lv_style_set_width(&style_time_indice, 4);
-    lv_style_set_height(&style_time_indice, CANVAS_POMO_HEIGHT);
-    lv_style_set_bg_opa(&style_time_indice, LV_OPA_100);
-    lv_style_set_bg_color(&style_time_indice, lv_color_hex(0xffffff));
-    lv_style_set_border_color(&style_time_indice, lv_color_hex(0xffffff));
-
-    if (pomo_indice != NULL) {
-        lv_obj_del(pomo_indice);
-    }
-    pomo_indice = lv_obj_create(pomo_indice_holder);  // attach to active screen
-    lv_obj_add_style(pomo_indice, &style_time_indice, 0);
-    lv_obj_set_x(pomo_indice, 0);
-    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
-
-    // remove all progress views
-    lv_obj_t * child = lv_obj_get_child(pomo_progress_holder, 0);
-    while(child) {
-        lv_obj_del(child);
-        child = lv_obj_get_child(pomo_progress_holder, 0);
-    }
-
-    // calculate and add new progress view
-    int idx = 0;
-    int width = pomo_work_set_width;
-    lv_style_t * style;
-    for (idx = 0; idx < pomo_total_set_num; idx++) {
-        if (idx % 2 == 0) {
-            // work set
-            style = &style_progress_work;
-            width = pomo_work_set_width;
-        } else {
-            // rest set
-            style = &style_progress_rest;
-            width = pomo_rest_set_width;
-        }
-        lv_obj_t *pomo_progress_block = lv_obj_create(pomo_progress_holder);
-        lv_obj_add_style(pomo_progress_block, style, 0);
-        lv_obj_set_style_width(pomo_progress_block, width, 0);
-    }
-
-    // lv_label_set_text_fmt(pomo_time_status, "%03d\n%03d\n%03d", pomo_work_set_width, pomo_rest_set_width, pomo_total_set_num);
 }
 
 void screen_pomodoro_set_time_style(uint8_t time_style) {
@@ -319,30 +231,33 @@ void screen_pomodoro_notify_task(void) {
 void screen_pomodoro_session_start(void) {
     session_start_timestamp = timer_read32();
     pomo_current_set_idx = 0;
-    lv_obj_set_x(pomo_indice, 0);
+    // lv_obj_set_x(pomo_indice, 0);
     lv_obj_clear_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_clear_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
-    session_running = true;
+    lv_obj_clear_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(pomo_breath_indicator, LV_OBJ_FLAG_HIDDEN);
+    pomo_state = coban_pomo_state_work;
 
     screen_pomodoro_do_notify(coban_pomo_noti_kind_work);
 }
 
 void screen_pomodoro_session_cancel(void) {
-    session_running = false;
+    pomo_state = coban_pomo_state_idle;
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(pomo_breath_indicator, LV_OBJ_FLAG_HIDDEN);
 
     screen_pomodoro_do_notify(coban_pomo_noti_kind_cancel);
 }
 
 bool screen_pomodoro_session_running(void) {
-    return session_running;
+    return pomo_state != coban_pomo_state_idle;
 }
 
 void screen_pomodoro_session_complete(void) {
-    session_running = false;
+    pomo_state = coban_pomo_state_idle;
     lv_obj_add_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
-    lv_obj_add_flag(pomo_indice, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
+    lv_obj_clear_flag(pomo_breath_indicator, LV_OBJ_FLAG_HIDDEN);
 
     screen_pomodoro_do_notify(coban_pomo_noti_kind_rest);
 }
@@ -353,9 +268,55 @@ void screen_pomodoro_set_complete(uint8_t set_idx, bool is_work_set) {
 
 void screen_pomodoro_set_start(uint8_t set_idx, bool is_work_set) {
     if (is_work_set) {
+        pomo_state = coban_pomo_state_work;
+        lv_obj_add_flag(pomo_breath_indicator, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_clear_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
         screen_pomodoro_do_notify(coban_pomo_noti_kind_work);
-    } else {
+    } else { // rest set
+        pomo_state = coban_pomo_state_rest;
+        lv_obj_clear_flag(pomo_breath_indicator, LV_OBJ_FLAG_HIDDEN);
+        lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
         screen_pomodoro_do_notify(coban_pomo_noti_kind_rest);
+    }
+}
+
+static inline double smoothstep(double x) {
+    // Clamp 0..1
+    if (x < 0.0) return 0.0;
+    if (x > 1.0) return 1.0;
+    return x * x * (3.0 - 2.0 * x);
+}
+
+// Continuous breathing waveform
+double breathing_wave(double t, double T_in, double T_hold, double T_out, double T_hold2) {
+    double T = T_in + T_hold + T_out + T_hold2;
+    double phase = fmod(t, T);
+
+    // Inhale phase
+    if (phase < T_in) {
+        double x = phase / T_in;
+        // Smooth -1 -> +1
+        return -1.0 + 2.0 * smoothstep(x);
+    }
+
+    // Hold at top (smooth transition from inhale)
+    else if (phase < T_in + T_hold) {
+        double x = (phase - T_in) / T_hold;
+        // Stay near +1 but slightly smooth at edges
+        return 1.0 - 0.02 * (1.0 - cos(M_PI * x)); // tiny oscillation for realism
+    }
+
+    // Exhale phase
+    else if (phase < T_in + T_hold + T_out) {
+        double x = (phase - T_in - T_hold) / T_out;
+        // Smooth +1 -> -1
+        return 1.0 - 2.0 * smoothstep(x);
+    }
+
+    // Hold at bottom (smooth transition from exhale)
+    else {
+        double x = (phase - T_in - T_hold - T_out) / T_hold2;
+        return -1.0 + 0.02 * (1.0 - cos(M_PI * x));
     }
 }
 
@@ -366,16 +327,23 @@ static void pomo_cb(lv_timer_t * timer) {
 
     screen_pomodoro_notify_task();
 
-    if (!session_running) {
+    uint32_t current_timestamp = timer_read32();
+
+    // calculate breath cycle state
+    float breath_progress_percentage = (breathing_wave((float)current_timestamp/1000, 3, 0.5, 3, 0.5) + 1 ) / 2; // from 0 to 1
+    pomo_breath_size = (uint32_t) (breath_progress_percentage * (64-28) + 28);  // map to 28 - 64
+    lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
+    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size/2, 0);
+
+    if (pomo_state == coban_pomo_state_idle) {
         // No pomo session yet
         lv_label_set_text(pomo_time_text, "--:--");
         lv_label_set_text(pomo_time_status, get_current_quote());
         return;
     }
 
-    uint32_t current_timestamp = timer_read32();
-    uint32_t elapsed_time_sec = (current_timestamp - session_start_timestamp)/1000;
 
+    uint32_t elapsed_time_sec = (current_timestamp - session_start_timestamp)/1000;
     if (elapsed_time_sec >= pomo_total_session_duration_min * 60) {
         // session is completed
         screen_pomodoro_session_complete();
@@ -385,6 +353,7 @@ static void pomo_cb(lv_timer_t * timer) {
     // Calculate the current stat
     uint32_t set_time_start_sec = 0;
     uint32_t set_time_left_sec = 0;
+    uint32_t set_time_total_sec = 0;
     uint8_t set_idx = 0;
     for (int idx = 0; idx < pomo_total_set_num; idx++) {
         uint32_t set_duration_sec = (idx % 2 == 0 ? config.pomo_work_duration : config.pomo_rest_duration)*60;
@@ -394,6 +363,7 @@ static void pomo_cb(lv_timer_t * timer) {
             // this is the current set
             set_idx = idx;
             set_time_left_sec = set_duration_sec - (elapsed_time_sec - set_time_start_sec);
+            set_time_total_sec = set_duration_sec;
         }
 
         // advance set parameter;
@@ -418,34 +388,16 @@ static void pomo_cb(lv_timer_t * timer) {
         lv_label_set_text(pomo_time_status, get_current_quote());
     }
 
-    float progress_percentage = ((float)elapsed_time_sec) / ((float)pomo_total_session_duration_min * 60);
-    int indice_x = SCREEN_WIDTH*progress_percentage;
-    lv_obj_set_x(pomo_indice, indice_x);
-
-    // // update progress block UI
-    // for (int idx = 0; idx < pomo_total_set_num; idx++) {
-    //     uint32_t set_width = idx % 2 == 0 ? pomo_work_set_width : pomo_rest_set_width;
-    //     // render
-    //     lv_obj_t * progress_block = lv_obj_get_child(pomo_progress_holder, idx);
-    //     if (idx == pomo_current_set_idx) {
-    //         // current block
-    //         lv_obj_add_style(progress_block, &style_progress_curr, 0);
-    //     } else if (idx < pomo_current_set_idx) {
-    //         // previous block
-    //         lv_obj_add_style(progress_block, &style_progress_past, 0);
-    //     } else if (idx % 2 == 0) {
-    //         // work set
-    //         lv_obj_add_style(progress_block, &style_progress_work, 0);
-    //     } else {
-    //         // rest set
-    //         lv_obj_add_style(progress_block, &style_progress_rest, 0);
-    //     }
-    //     lv_obj_set_style_width(progress_block, set_width, 0);
-    // }
+    float set_progress_percentage = 1.0 - (((float)set_time_left_sec) / ((float)set_time_total_sec));
+    lv_bar_set_value(pomo_progress_bar, (int32_t) (set_progress_percentage * 100), false);
 }
 
 void screen_pomodoro_stop(void) {
     if (screen_pomodoro == NULL) return;
+    // if (screen_pomodoro_session_running()) {
+    //     // if pomodoro session is already running, keep timer running
+    //     return;
+    // }
     if (!pomo_running) {
         return;
     }
@@ -467,7 +419,7 @@ void screen_pomodoro_reload(void) {
     pomo_running = true;
     if (pomo_timer == NULL) {
         // 1 FPS
-        pomo_timer = lv_timer_create(pomo_cb, 250, NULL);
+        pomo_timer = lv_timer_create(pomo_cb, 100, NULL);
     } else {
         lv_timer_resume(pomo_timer);
     }
