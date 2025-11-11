@@ -23,8 +23,8 @@
 #include "graphics/resources/bangle.c"
 
 static lv_obj_t *screen_render = NULL;
-static lv_timer_t *render_timer = NULL;
-static bool render_running = false;
+// static lv_timer_t *render_timer = NULL;
+bool render_running = false;
 
 /* Render resource */
 static Matrix projectionMatrix;
@@ -94,7 +94,7 @@ void screen_resource_init(void) {
     animation_init_set(&object_height_scale, 2.0f, 0.5f, 2.0f, 0.5f, 0.5f, timer_read32());
 }
 
-static void anim_cb(lv_timer_t * timer) {
+void render_cb(lv_timer_t * timer) {
     if (!render_running) {
         return;
     }
@@ -214,7 +214,6 @@ void screen_render_stop(void) {
         return;
     }
     render_running = false;
-    lv_timer_pause(render_timer);
 }
 
 void screen_render_reload(void) {
@@ -225,10 +224,4 @@ void screen_render_reload(void) {
         return;
     }
     render_running = true;
-    if (render_timer == NULL) {
-        // 16 FPS, 1000/16 = 62.5
-        render_timer = lv_timer_create(anim_cb, 62, NULL);
-    } else {
-        lv_timer_resume(render_timer);
-    }
 }

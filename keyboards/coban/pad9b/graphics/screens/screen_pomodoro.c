@@ -24,8 +24,8 @@
 #include "eeprom/cb_eeprom.h"
 
 static lv_obj_t *screen_pomodoro = NULL;
-static lv_timer_t *pomo_timer = NULL;
-static bool pomo_running = false;
+// static lv_timer_t *pomo_timer = NULL;
+bool pomo_running = false;
 static enum coban_pomo_state pomo_state = coban_pomo_state_idle;
 
 /* Canvas buffer */
@@ -320,7 +320,7 @@ double breathing_wave(double t, double T_in, double T_hold, double T_out, double
     }
 }
 
-static void pomo_cb(lv_timer_t * timer) {
+void pomo_cb(lv_timer_t * timer) {
     if (!pomo_running) {
         return;
     }
@@ -394,16 +394,14 @@ static void pomo_cb(lv_timer_t * timer) {
 
 void screen_pomodoro_stop(void) {
     if (screen_pomodoro == NULL) return;
-    // if (screen_pomodoro_session_running()) {
-    //     // if pomodoro session is already running, keep timer running
-    //     return;
-    // }
+    if (screen_pomodoro_session_running()) {
+        // if pomodoro session is already running, keep timer running
+        return;
+    }
     if (!pomo_running) {
         return;
     }
     pomo_running = false;
-    lv_timer_pause(pomo_timer);
-
     // also cancel any ongoing pomo notify
     if (!pomo_noti_restored) {
         rgb_matrix_reload_from_eeprom();
@@ -417,12 +415,6 @@ void screen_pomodoro_reload(void) {
         return;
     }
     pomo_running = true;
-    if (pomo_timer == NULL) {
-        // 1 FPS
-        pomo_timer = lv_timer_create(pomo_cb, 100, NULL);
-    } else {
-        lv_timer_resume(pomo_timer);
-    }
 }
 
 const char* quotes[] = {

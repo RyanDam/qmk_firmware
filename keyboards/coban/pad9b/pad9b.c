@@ -21,6 +21,13 @@ bool layer_mode_activated = true;
 bool screen_boot_done = false;
 enum coban_screen_id last_screen_idx = coban_screen_undefined;
 
+// key event task state
+bool _key_event_detected = false;
+enum coban_screen_id _target_screen_idx = -1;
+bool _need_save_eeprom = false;
+bool _skip_layer_change = false;
+
+
 void keyboard_post_init_user(void) {
 
     // Load eeprom
@@ -68,6 +75,37 @@ void housekeeping_task_user(void) {
         return;
     }
 
+    if (_key_event_detected) {
+        _key_event_detected = false;
+        if (_target_screen_idx != current_screen()) {
+            // if current screen is different
+            // -> screen change request is detected
+            // -> prioritized screen change
+            change_screen(_target_screen_idx);
+            if (layer_mode_activated) {
+                // current screen state switched to layer
+                // ensure we switch back to correct screen
+                last_screen_idx = _target_screen_idx;
+                layer_mode_activated = false;
+            }
+        } else if (
+            config.screen_switch_layer
+            && layer_mode_activated == false
+            && current_screen() != coban_screen_layer
+            && !_skip_layer_change
+        ) {
+            // Then check if layer switching is needed
+            last_screen_idx = current_screen();
+            change_screen(coban_screen_layer);
+            layer_mode_activated = true;
+        }
+
+        if (_need_save_eeprom) {
+            config.screen_idx = _target_screen_idx;
+            coban_save_config();
+        }
+    }
+
     // handle screen layer switch back
     if (
         config.screen_switch_layer
@@ -94,77 +132,77 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     if (current_timestamp < KEYBOAD_BOOT_TIME) {
         return true;
     }
-
     screen_layers_set_indice(get_highest_layer(state));
-
     return state;
 }
 
-bool process_record_user(uint16_t keycode, keyrecord_t *record) {
+void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     last_key_press_timestamp = timer_read32();
 
     uint32_t current_timestamp = timer_read32();
     if (current_timestamp < KEYBOAD_BOOT_TIME) {
-        return true;
+        return;
     }
 
     if (!is_backlight_enabled()) {
         backlight_enable();
     }
 
-    // if (config.screen_idx == coban_screen_layer) {
-        // screen_layers_set_key_code(keycode, record);
+    enum coban_screen_id current_screen_idx = current_screen();
+    // if (current_screen_idx == coban_screen_layer) {
+    //     screen_layers_set_key_code(keycode, record);
     // }
-
     // screen_render_set_key_code(keycode, record);
 
-    enum coban_screen_id target_screen_idx = current_screen();
-    bool need_save_eeprom = false;
-    bool skip_layer_change = false;
+    // reset state
+    _target_screen_idx = current_screen_idx;
+    _need_save_eeprom = false;
+    _skip_layer_change = false;
 
     if (record->event.pressed) {
+        _key_event_detected = true;
         switch (keycode) {
             case CB_SCREEN_NEXT: {
-                target_screen_idx = next_screen(false);
-                need_save_eeprom = true;
+                _target_screen_idx = next_screen(false);
+                _need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_PREV: {
-                target_screen_idx = prev_screen(false);
-                need_save_eeprom = true;
+                _target_screen_idx = prev_screen(false);
+                _need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_CLOCK: {
-                target_screen_idx = coban_screen_clock;
-                need_save_eeprom = true;
+                _target_screen_idx = coban_screen_clock;
+                _need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_ANIME: {
-                target_screen_idx = coban_screen_anime;
-                need_save_eeprom = true;
+                _target_screen_idx = coban_screen_anime;
+                _need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_LAYER: {
-                target_screen_idx = coban_screen_layer;
-                need_save_eeprom = true;
+                _target_screen_idx = coban_screen_layer;
+                _need_save_eeprom = true;
                 break;
             }
             case CB_SCREEN_POMO: {
-                target_screen_idx = coban_screen_pomodoro;
-                need_save_eeprom = true;
+                _target_screen_idx = coban_screen_pomodoro;
+                _need_save_eeprom = true;
                 break;
             }
             case CB_POMO_START: {
                 screen_pomodoro_session_start();
-                target_screen_idx = coban_screen_pomodoro;
-                skip_layer_change = true;
+                _target_screen_idx = coban_screen_pomodoro;
+                _skip_layer_change = true;
                 break;
             }
             case CB_POMO_CANCEL: {
                 screen_pomodoro_session_cancel();
-                target_screen_idx = coban_screen_pomodoro;
-                skip_layer_change = true;
+                _target_screen_idx = coban_screen_pomodoro;
+                _skip_layer_change = true;
                 break;
             }
             default:
@@ -172,37 +210,7 @@ bool process_record_user(uint16_t keycode, keyrecord_t *record) {
         }
     }
 
-    if (target_screen_idx != current_screen()) {
-        // if current screen is different
-        // -> screen change request is detected
-        // -> prioritized screen change
-        change_screen(target_screen_idx);
-        if (layer_mode_activated) {
-            // current screen state switched to layer
-            // ensure we switch back to correct screen
-            last_screen_idx = target_screen_idx;
-            layer_mode_activated = false;
-        }
-    } else if (
-        record->event.pressed // only consider key press event to prevent duplicate screen switch
-        && config.screen_switch_layer
-        && layer_mode_activated == false
-        && current_screen() != coban_screen_layer
-        && !skip_layer_change
-    ) {
-        // Then check if layer switching is needed
-        last_screen_idx = current_screen();
-        change_screen(coban_screen_layer);
-        layer_mode_activated = true;
-    }
-
-    if (need_save_eeprom) {
-        config.screen_idx = target_screen_idx;
-        coban_save_config();
-    }
-
-
-    return true;
+    return;
 }
 
 #endif //QUANTUM_PAINTER_ENABLE

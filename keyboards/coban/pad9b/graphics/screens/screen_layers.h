@@ -16,8 +16,16 @@
 
 #include "qp_lvgl.h"
 
+extern bool layers_running;
+
+void layers_cb(lv_timer_t * timer);
+
 lv_obj_t * screen_layers_init(void);
 
 void screen_layers_set_indice(uint8_t layer_idx);
 
 void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record);
+
+void screen_layers_stop(void);
+
+void screen_layers_reload(void);

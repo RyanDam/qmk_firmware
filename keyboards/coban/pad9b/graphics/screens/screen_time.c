@@ -30,8 +30,8 @@ static lv_obj_t *datetime_holder;
 
 static uint32_t last_sync_chip_timestamp = 0;
 static time_t synced_timestamp = 0;
-static bool render_running = false;
-static lv_timer_t *render_timer = NULL;
+bool timer_running = false;
+// static lv_timer_t *render_timer = NULL;
 
 lv_obj_t * screen_time_init(void) {
     screen_time = lv_obj_create(NULL);
@@ -228,8 +228,8 @@ void screen_time_set_date_visibility(uint8_t date_visibility) {
     }
 }
 
-static void time_cb(lv_timer_t * timer) {
-    if (!render_running) {
+void timer_cb(lv_timer_t * timer) {
+    if (!timer_running) {
         return;
     }
 
@@ -255,22 +255,15 @@ static void time_cb(lv_timer_t * timer) {
 }
 
 void screen_time_stop(void) {
-    if (!render_running) {
+    if (!timer_running) {
         return;
     }
-    render_running = false;
-    lv_timer_pause(render_timer);
+    timer_running = false;
 }
 
 void screen_time_reload(void) {
-    if (render_running) {
+    if (timer_running) {
         return;
     }
-    render_running = true;
-    if (render_timer == NULL) {
-        // 1 FPS
-        render_timer = lv_timer_create(time_cb, 1000, NULL);
-    } else {
-        lv_timer_resume(render_timer);
-    }
+    timer_running = true;
 }

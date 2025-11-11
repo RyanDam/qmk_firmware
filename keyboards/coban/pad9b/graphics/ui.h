@@ -40,7 +40,9 @@ enum coban_screen_id {
 
 void ui_init(void);
 
-void ui_task(void);
+void screen_ui_stop(void);
+
+void screen_ui_reload(void);
 
 enum coban_screen_id current_screen(void);
 

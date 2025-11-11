@@ -21,6 +21,9 @@
 #include "utils/keycode_lookup.h"
 
 static lv_obj_t *screen_layers = NULL;
+bool layers_running = false;
+static bool key_matrix_changed = false;
+static bool key_layer_changed = false;
 
 static lv_obj_t *holder_layer1;
 static lv_obj_t *holder_layer2;
@@ -35,8 +38,8 @@ static lv_obj_t *holder_layer_indices;
 static lv_obj_t *indices[4];
 static lv_obj_t *keys[MATRIX_ROWS*MATRIX_COLS];
 static uint16_t key_codes[MATRIX_ROWS*MATRIX_COLS];
-
-// static uint8_t last_layer_idx = 0;
+static bool key_presses[MATRIX_ROWS*MATRIX_COLS];
+static uint8_t current_layer_idx;
 
 void _update_layer_keycode(uint8_t layer_idx);
 
@@ -132,7 +135,13 @@ lv_obj_t * screen_layers_init(void) {
     lv_obj_add_style(keys[6], &style_key, 0);
     // lv_obj_set_width(key_6, lv_pct(33));
 
-    screen_layers_set_indice(0);
+
+    current_layer_idx = 0;
+    for (int idx=0; idx < MATRIX_ROWS*MATRIX_COLS; idx++) {
+        key_presses[idx] = false;
+    }
+    screen_layers_set_indice(current_layer_idx);
+
 
     return screen_layers;
 }
@@ -152,30 +161,59 @@ void _update_layer_keycode(uint8_t layer_idx) {
 }
 
 void screen_layers_set_indice(uint8_t layer_idx) {
-
-    if (screen_layers == NULL) {
-        // screen is not initiated
-        return;
-    }
-
-    for (uint8_t l=0; l<4; l++) {
-        if (l == layer_idx) {
-            lv_obj_set_style_bg_opa(indices[l], LV_OPA_100, 0);
-        } else {
-            lv_obj_set_style_bg_opa(indices[l], LV_OPA_0, 0);
-        }
-    }
-
+    current_layer_idx = layer_idx;
     _update_layer_keycode(layer_idx);
+    key_layer_changed = true;
 }
 
 void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record) {
     for (int idx=0; idx < MATRIX_ROWS*MATRIX_COLS; idx++) {
         if (key_codes[idx] != keycode) continue;
-        if (record->event.pressed) {
-            lv_obj_add_style(keys[idx], &style_key_pressed, 0);
-        } else {
-            lv_obj_add_style(keys[idx], &style_key, 0);
+        key_presses[idx] = record->event.pressed;
+    }
+    key_matrix_changed = true;
+}
+
+void layers_cb(lv_timer_t * timer) {
+    if (!layers_running) return;
+
+    if (key_layer_changed) {
+        key_layer_changed = false;
+        // update layer indicator
+        for (uint8_t l=0; l<4; l++) {
+            if (l == current_layer_idx) {
+                lv_obj_set_style_bg_opa(indices[l], LV_OPA_100, 0);
+            } else {
+                lv_obj_set_style_bg_opa(indices[l], LV_OPA_0, 0);
+            }
         }
     }
+
+    if (key_matrix_changed) {
+        key_matrix_changed = false;
+        // update key press state
+        for (int idx=0; idx < MATRIX_ROWS*MATRIX_COLS; idx++) {
+            if (key_presses[idx]) {
+                lv_obj_add_style(keys[idx], &style_key_pressed, 0);
+            } else {
+                lv_obj_add_style(keys[idx], &style_key, 0);
+            }
+        }
+    }
+}
+
+void screen_layers_stop(void) {
+    if (screen_layers == NULL) return;
+    if (!layers_running) {
+        return;
+    }
+    layers_running = false;
+}
+
+void screen_layers_reload(void) {
+    if (screen_layers == NULL) return;
+    if (layers_running) {
+        return;
+    }
+    layers_running = true;
 }

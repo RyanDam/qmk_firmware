@@ -39,6 +39,9 @@ const int screen_indexes[] = {coban_screen_clock, coban_screen_anime, coban_scre
 const int num_avail_screen = 4;
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
+static lv_timer_t *ui_timer = NULL;
+static bool ui_timmer_running = false;
+
 void ui_init(void) {
 
     oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 2, 0);
@@ -47,7 +50,6 @@ void ui_init(void) {
 
 #ifdef OLED_PART_REV_2
     qp_set_viewport_offsets(oled, 1, 26);
-    // qp_set_viewport_offsets(oled, 0, 24);
 #endif //OLED_PART_REV_2
 
     if (qp_lvgl_attach(oled)) {
@@ -56,11 +58,6 @@ void ui_init(void) {
         lv_disp_set_theme(lv_display, lv_theme);
 
         init_styles();
-
-        // screen_stats = NULL;
-        // screen_clock = NULL;
-        // screen_anime = NULL;
-        // screen_layer = NULL;
 
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
@@ -72,12 +69,10 @@ void ui_init(void) {
         // screen_render = screen_render_init();
         screen_pomodoro = screen_pomodoro_init();
 
-        // change_screen(coban_screen_clock);
     }
 
-    // render_bangle_init(oled);
-
     backlight_enable();
+    screen_ui_reload();
 }
 
 enum coban_screen_id current_screen(void) {
@@ -123,6 +118,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             screen_animation_stop();
             // screen_render_stop();
             screen_pomodoro_stop();
+            screen_layers_stop();
             lv_scr_load(screen_clock);
             screen_time_reload();
             ui_current_screen = coban_screen_clock;
@@ -133,6 +129,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         //     screen_render_stop();
         //     screen_time_stop();
         //     screen_pomodoro_stop();
+        //     screen_layers_stop();
         //     lv_scr_load(screen_stats);
         //     ui_current_screen = coban_screen_stats;
         //     break;
@@ -141,6 +138,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
+            screen_layers_stop();
             lv_scr_load(screen_anime);
             screen_animation_reload();
             ui_current_screen = coban_screen_anime;
@@ -152,6 +150,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             screen_time_stop();
             screen_pomodoro_stop();
             lv_scr_load(screen_layer);
+            screen_layers_reload();
             ui_current_screen = coban_screen_layer;
             break;
         }
@@ -159,6 +158,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         //     screen_animation_stop();
         //     screen_time_stop();
         //     screen_pomodoro_stop();
+        //     screen_layers_stop();
         //     lv_scr_load(screen_render);
         //     screen_render_reload();
         //     ui_current_screen = coban_screen_render;
@@ -168,6 +168,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             screen_animation_stop();
             // screen_render_stop();
             screen_time_stop();
+            screen_layers_stop();
             lv_scr_load(screen_pomodoro);
             screen_pomodoro_reload();
             ui_current_screen = coban_screen_pomodoro;
@@ -179,24 +180,46 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
     return ui_current_screen;
 }
 
-void ui_task(void) {
+static void ui_cb(lv_timer_t * timer)  {
+    if (!ui_timmer_running) {
+        return;
+    }
 
-    // static uint32_t last_draw = 0;
-    // uint32_t        now       = timer_read32();
-    // if (TIMER_DIFF_32(now, last_draw) < SCREEN_REFRESH_GAP_MS) // Throttle to 30fps
-    //     return;
+    if (timer_running) {
+        timer_cb(timer);
+    }
 
-    // // clean screan
-    // qp_rect(oled, 0, 0, SCREEN_WIDTH, SCREEN_HEIGHT, 0, 0, 0, true);
+    // if (render_running) {
+    //     render_cb(timer);
+    // }
 
-    // render_bangle_task(oled);
+    if (pomo_running) {
+        pomo_cb(timer);
+    }
 
-    // uint32_t last       = timer_read32();
-    // // uint32_t total_draw = TIMER_DIFF_32(last, now);
-    // // sprintf(c, "%ld ms", total_draw);
-    // // qp_drawtext(oled, 5, 5, font, c);
+    if (layers_running) {
+        layers_cb(timer);
+    }
+}
 
-    // last_draw = last;
+void screen_ui_stop(void) {
+    if (!ui_timmer_running) {
+        return;
+    }
+    ui_timmer_running = false;
+    lv_timer_pause(ui_timer);
+}
+
+void screen_ui_reload(void) {
+    if (ui_timmer_running) {
+        return;
+    }
+    ui_timmer_running = true;
+    if (ui_timer == NULL) {
+        ui_timer = lv_timer_create(ui_cb, 100, NULL);
+    } else {
+        lv_timer_resume(ui_timer);
+    }
 }
 
 #ifdef OLED_PART_REV_2

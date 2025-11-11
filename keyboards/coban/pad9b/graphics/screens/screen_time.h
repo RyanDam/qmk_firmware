@@ -45,6 +45,10 @@ enum coban_date_visibility_id {
     coban_date_visibility_invisible = 0x01
 };
 
+extern bool timer_running;
+
+void timer_cb(lv_timer_t * timer);
+
 lv_obj_t * screen_time_init(void);
 
 void screen_time_stop(void);

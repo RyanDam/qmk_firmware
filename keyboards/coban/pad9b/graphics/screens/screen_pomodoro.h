@@ -35,6 +35,10 @@ enum coban_pomo_state {
     coban_pomo_state_rest       = 0x02,
 };
 
+extern bool pomo_running;
+
+void pomo_cb(lv_timer_t * timer);
+
 lv_obj_t * screen_pomodoro_init(void);
 
 void screen_pomodoro_ui_update(void);
