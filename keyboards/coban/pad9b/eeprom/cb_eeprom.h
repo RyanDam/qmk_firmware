@@ -22,6 +22,9 @@ typedef struct _cb_config_t {
     uint8_t screen_switch_layer_timeout; // in sec, switch back to original screen if not have key event
     uint8_t screen_idle_timeout; // in minute, turn off screen if not have key event
 
+    uint8_t layer_switch_default;
+    uint8_t layer_switch_default_timeout;
+
     // datetime format
     uint8_t time_style_id;
     uint8_t time_format;

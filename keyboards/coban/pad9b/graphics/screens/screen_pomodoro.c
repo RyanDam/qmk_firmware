@@ -89,6 +89,7 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_obj_set_style_pad_row(pomo_layout_holder, 0, 0);
     lv_obj_set_style_bg_opa(pomo_layout_holder, LV_OPA_TRANSP, 0);
 
+
     // main time + status holder
     pomo_time_holder = lv_obj_create(pomo_layout_holder);
     lv_obj_add_style(pomo_time_holder, &style_container, 0);
@@ -102,7 +103,7 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_label_set_text(pomo_time_status, "Có chí thì nên");
     lv_obj_add_style(pomo_time_status, &style_text, 0);
     lv_label_set_long_mode(pomo_time_status, LV_LABEL_LONG_WRAP);
-    lv_obj_set_width(pomo_time_status, SCREEN_WIDTH - 24);
+    lv_obj_set_width(pomo_time_status, SCREEN_WIDTH - 16);
     lv_obj_set_style_text_align(pomo_time_status, LV_TEXT_ALIGN_CENTER, 0);
     lv_obj_set_style_bg_opa(pomo_time_status, LV_OPA_TRANSP, 0);
 
@@ -402,6 +403,7 @@ void screen_pomodoro_stop(void) {
         return;
     }
     pomo_running = false;
+
     // also cancel any ongoing pomo notify
     if (!pomo_noti_restored) {
         rgb_matrix_reload_from_eeprom();
@@ -419,51 +421,51 @@ void screen_pomodoro_reload(void) {
 
 const char* quotes[] = {
     "Có công mài sắt\ncó ngày nên kim",
-    "Kiến tha lâu cũng đầy tổ",
+    "Kiến tha lâu\ncũng đầy tổ",
     "Có chí thì nên",
-    "Công thành chẳng quản lâu",
+    "Công thành\nchẳng quản lâu",
     "Học thầy không tày học bạn",
     "Đi một ngày đàng\nhọc một sàng khôn",
-    "Uống nước nhớ nguồn",
-    "Ăn quả nhớ kẻ trồng cây",
+    "Uống nước\nnhớ nguồn",
+    "Ăn quả\nnhớ kẻ trồng cây",
     "Đói cho sạch\nrách cho thơm",
-    "Tốt gỗ hơn tốt nước sơn",
-    "Thất bại là mẹ thành công",
-    "Cây ngay không lo chết đứng",
+    "Tốt gỗ\nhơn tốt nước sơn",
+    "Thất bại\nlà mẹ thành công",
+    "Cây ngay\nkhông lo chết đứng",
     "Biết người biết ta\ntrăm trận trăm thắng",
     "Gần mực thì đen\ngần đèn thì sáng",
     "Chân cứng đá mềm",
     "Tiền nào của nấy",
-    "Không thầy đố mày làm nên",
+    "Không thầy\nđố mày làm nên",
     "Học ăn, học nói\nhọc gói, học mở",
-    "Hữu chí cánh thành",
+    "Hữu chí\ncánh thành",
     "Lửa thử vàng\ngian nan thử sức",
     "Thua keo này\nta bày keo khác",
     "Được mùa chớ phụ ngô khoai",
-    "Giấy rách phải giữ lấy lề",
+    "Giấy rách\nphải giữ lấy lề",
     "Đèn nhà ai nấy rạng",
     "Ở hiền gặp lành",
     "Có chí làm quan\ncó gan làm giàu",
     "Còn nước, còn tát",
     "Trời sinh voi\ntrời sinh cỏ",
     "Nước chảy đá mòn",
-    "Cái khó ló cái khôn",
-    "Cần cù bù thông minh",
+    "Cái khó\nló cái khôn",
+    "Cần cù\nbù thông minh",
     "Ăn vóc học hay",
     "Học một biết mười",
     "Góp gió thành bão",
     "Học đi đôi với hành",
     "Tre già măng mọc",
-    "Khó khăn thử thách lòng người",
+    "Khó khăn\nthử thách lòng người",
     "Đói cho sạch\nrách cho thơm",
     "Không ai giàu ba họ\nkhông ai khó ba đời",
     "Trăng mờ còn tỏ\nngười khó còn khôn",
     "Có chí thì nên",
     "Mưa dầm thấm lâu",
-    "Học thầy không tày học bạn",
+    "Học thầy\nkhông tày học bạn",
     "Giận quá mất khôn",
     "Khéo ăn thì no\nkhéo co thì ấm",
-    "Điều lành đem lại điều hay",
+    "Điều lành\nđem lại điều hay",
     "Ghét của nào\ntrời trao của nấy",
     "Không có việc gì khó\nchỉ sợ lòng không bền",
     "Không làm sao nên",

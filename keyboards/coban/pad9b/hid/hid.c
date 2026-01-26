@@ -65,6 +65,11 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             screen_pomodoro_set_time_style(time_style);
             break;
         }
+        case coban_cmd_id_set_layer: {
+            config.layer_switch_default = command_data[0];
+            config.layer_switch_default_timeout = command_data[1];
+            break;
+        }
         case coban_cmd_id_set_gif_buffer: {
             // first, stop animation to prevent crash because of data writing
             screen_animation_stop();
@@ -136,6 +141,10 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 3) = 0xff & config.date_format;
             *(command_data + 4) = 0xff & config.date_visibility;
             break;
+        }
+        case coban_cmd_id_set_layer: {
+            *(command_data + 0) = 0xff & config.layer_switch_default;
+            *(command_data + 1) = 0xff & config.layer_switch_default_timeout;
         }
         case coban_cmd_id_set_gif_buffer: {
             uint8_t offset_1 = command_data[0];

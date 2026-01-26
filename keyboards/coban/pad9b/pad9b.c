@@ -21,6 +21,8 @@ bool layer_mode_activated = true;
 bool screen_boot_done = false;
 enum coban_screen_id last_screen_idx = coban_screen_undefined;
 
+uint8_t _current_keyboard_layer_idx = 0;
+
 // key event task state
 bool _key_event_detected = false;
 enum coban_screen_id _target_screen_idx = -1;
@@ -72,10 +74,24 @@ void housekeeping_task_user(void) {
         if (is_backlight_enabled()) {
             backlight_disable();
         }
-        return;
+        // return;
     }
 
-    if (_key_event_detected) {
+    // handle layer logic
+    bool need_show_layer_change = false;
+    if (
+        config.layer_switch_default
+        && current_idle_time_ms >= config.layer_switch_default_timeout*1000
+        && _current_keyboard_layer_idx != 0 // default layer is 0
+    ) {
+        layer_clear(); // reset to default layer
+        // show layer change
+        // need_show_layer_change = true;
+        // _skip_layer_change = false;
+        // last_key_press_timestamp = timer_read32();
+    }
+
+    if (_key_event_detected || need_show_layer_change) {
         _key_event_detected = false;
         if (_target_screen_idx != current_screen()) {
             // if current screen is different
@@ -104,6 +120,7 @@ void housekeeping_task_user(void) {
             config.screen_idx = _target_screen_idx;
             coban_save_config();
         }
+
     }
 
     // handle screen layer switch back
@@ -132,7 +149,8 @@ layer_state_t layer_state_set_user(layer_state_t state) {
     if (current_timestamp < KEYBOAD_BOOT_TIME) {
         return true;
     }
-    screen_layers_set_indice(get_highest_layer(state));
+    _current_keyboard_layer_idx = get_highest_layer(state);
+    screen_layers_set_indice(_current_keyboard_layer_idx);
     return state;
 }
 

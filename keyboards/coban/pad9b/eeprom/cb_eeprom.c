@@ -31,6 +31,9 @@ void coban_init_config(void) {
     config.screen_switch_layer_timeout = 5;
     config.screen_idle_timeout = 15;
 
+    config.layer_switch_default = 1;
+    config.layer_switch_default_timeout = 60; // in sec, switch back to default layer if not have key event
+
     config.time_style_id = coban_time_style_1;
     config.time_format = coban_time_format_24h;
     config.time_indicator = coban_time_indicator_default;
