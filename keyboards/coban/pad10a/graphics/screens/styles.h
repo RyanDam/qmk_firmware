@@ -29,6 +29,7 @@ extern lv_style_t style_text_time2;
 extern lv_style_t style_text_time3;
 
 extern lv_style_t style_key;
+extern lv_style_t style_key_trans;
 extern lv_style_t style_key_pressed;
 
 void init_styles(void);
