@@ -17,6 +17,7 @@ SRC += utils/keycode_lookup.c
 SRC += graphics/screens/styles.c
 # SRC += graphics/screens/screen_hardware_stats.c
 SRC += graphics/screens/screen_time.c
+SRC += hardware/ds1302.c
 SRC += graphics/screens/screen_animation.c
 SRC += graphics/screens/screen_layers.c
 SRC += graphics/screens/screen_boot.c

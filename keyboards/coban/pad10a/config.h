@@ -72,3 +72,9 @@
 
 #define TAP_CODE_DELAY 10
 #define KEYBOAD_BOOT_TIME 1000
+
+// DS1302 RTC Configuration
+#define DS1302_ENABLE
+#define DS1302_PIN_RESET    13
+#define DS1302_PIN_SDA      14
+#define DS1302_PIN_SCK      15

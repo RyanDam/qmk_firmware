@@ -42,6 +42,18 @@ void keyboard_post_init_user(void) {
         gif_data[i] = *(pointer + i);
     }
 
+#ifdef DS1302_ENABLE
+    // Initialize DS1302 RTC
+    ds1302_init();
+    ds1302_start_clock();
+
+    // Read time from RTC and sync to clock screen
+    ds1302_datetime_t rtc_time;
+    if (ds1302_read_datetime(&rtc_time)) {
+        screen_time_sync_datetime(rtc_time.hour, rtc_time.minute, rtc_time.second, rtc_time.day, rtc_time.month, rtc_time.year - 2000);
+    }
+#endif
+
     // Init the display
     ui_init();
     last_key_press_timestamp = timer_read32();
