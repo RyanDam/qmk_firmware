@@ -147,9 +147,8 @@ void screen_time_sync_datetime(uint8_t hour, uint8_t minute, uint8_t second, uin
 
 #ifdef DS1302_ENABLE
     // Update RTC chip with accurate time from HID
-    if (!rtc_initialized) {
+    if (!ds1302_initialized) {
         ds1302_init();
-        rtc_initialized = true;
     }
 
     ds1302_datetime_t rtc_time;

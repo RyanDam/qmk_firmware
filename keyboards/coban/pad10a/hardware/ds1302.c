@@ -20,6 +20,8 @@
 
 #    include "hardware/ds1302.h"
 
+bool ds1302_initialized = false;
+
 // Private function prototypes
 static void    ds1302_clock_toggle(void);
 static void    ds1302_write_bit(bool value);
@@ -49,6 +51,8 @@ bool ds1302_init(void) {
     ds1302_write_byte(DS1302_REG_CTRL | DS1302_WRITE_BIT);
     ds1302_write_byte(0x00);
     ds1302_end_tx();
+
+    ds1302_initialized = true;
 
     return true;
 }

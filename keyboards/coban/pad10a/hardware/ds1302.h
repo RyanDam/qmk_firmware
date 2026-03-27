@@ -50,6 +50,8 @@ typedef struct {
     uint8_t year;
 } ds1302_datetime_t;
 
+extern bool ds1302_initialized;
+
 bool ds1302_init(void);
 bool ds1302_read_datetime(ds1302_datetime_t *datetime);
 bool ds1302_write_datetime(const ds1302_datetime_t *datetime);
