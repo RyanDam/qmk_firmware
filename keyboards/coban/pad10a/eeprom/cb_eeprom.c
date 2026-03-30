@@ -25,25 +25,26 @@ _Static_assert(sizeof(cb_config) == EEPROM_CB_CONFIG_SIZE, "Mismatch in keyboard
 cb_config config;
 
 void coban_init_config(void) {
-    config.screen_idx = coban_screen_clock;
-    config.screen_brightness = 127;
-    config.screen_switch_layer = 1;
+    config.screen_idx                  = coban_screen_clock;
+    config.screen_brightness           = 127;
+    config.screen_switch_layer         = 1;
     config.screen_switch_layer_timeout = 5;
-    config.screen_idle_timeout = 15;
+    config.screen_idle_timeout         = 15;
 
-    config.layer_switch_default = 1;
+    config.layer_switch_default         = 1;
     config.layer_switch_default_timeout = 60; // in sec, switch back to default layer if not have key event
 
-    config.time_style_id = coban_time_style_1;
-    config.time_format = coban_time_format_24h;
-    config.time_indicator = coban_time_indicator_default;
-    config.date_format = coban_date_format_ddmmyyyy;
+    config.time_style_id   = coban_time_style_1;
+    config.time_format     = coban_time_format_24h;
+    config.time_indicator  = coban_time_indicator_default;
+    config.date_format     = coban_date_format_ddmmyyyy;
     config.date_visibility = coban_date_visibility_visible;
 
-    config.pomo_num_set = 4;
+    config.pomo_num_set       = 4;
     config.pomo_work_duration = 25;
     config.pomo_rest_duration = 5;
-    config.pomo_noti_mode = coban_pomo_noti_mode_beep;
+    config.pomo_noti_mode     = coban_pomo_noti_mode_beep;
+    config.audio_volume       = 0; // quiet
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 }

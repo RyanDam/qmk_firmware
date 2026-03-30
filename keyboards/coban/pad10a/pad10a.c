@@ -5,11 +5,12 @@
 #    include "graphics/ui.h"
 #    include "hid/hid.h"
 #    include "eeprom/cb_eeprom.h"
+#    include "utils/audio_volume.h"
 #    include "hardware/flash.h"
 
-#ifdef DS1302_ENABLE
-    #include "hardware/ds1302.h"
-#endif // DS1302_ENABLE
+#    ifdef DS1302_ENABLE
+#        include "hardware/ds1302.h"
+#    endif // DS1302_ENABLE
 
 #    define CB_SCREEN_NEXT QK_KB_0
 #    define CB_SCREEN_PREV QK_KB_1
@@ -21,7 +22,7 @@
 #    define CB_POMO_CANCEL QK_KB_7
 
 uint32_t             last_key_press_timestamp = 0;
-bool                 layer_mode_activated     = true;
+bool                 layer_mode_activated     = false;
 bool                 screen_boot_done         = false;
 enum coban_screen_id last_screen_idx          = coban_screen_undefined;
 
@@ -36,6 +37,8 @@ bool                 _skip_layer_change  = false;
 void keyboard_post_init_user(void) {
     // Load eeprom
     coban_load_config();
+    // Setup audio volume from EEPROM
+    audio_volume_set(config.audio_volume);
     // Load gif data
     gif_data_header.data_size = EEPROM_MAX_GIF_SIZE;
     // gif_data_header.data_size = 29524;

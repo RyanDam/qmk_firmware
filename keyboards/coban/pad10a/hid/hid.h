@@ -17,36 +17,32 @@
 #include "raw_hid.h"
 
 enum coban_command_id { // via start at 0x00, currently end at 0x15
-    coban_cmd_id_start           = 0x50,
-    coban_cmd_id_set_screen      = 0x51,
-    coban_cmd_id_set_time        = 0x52,
-    coban_cmd_id_set_cpu_util    = 0x53,
-    coban_cmd_id_set_gpu_util    = 0x54,
-    coban_cmd_id_set_time_format = 0x55,
-    coban_cmd_id_set_gif_buffer  = 0x56,
-    coban_cmd_id_set_gif_size    = 0x57,
-    coban_cmd_id_set_gif_flash   = 0x58,
-    coban_cmd_id_set_pomo_config = 0x59,
-    coban_cmd_id_set_layer       = 0x60,
+    coban_cmd_id_start            = 0x50,
+    coban_cmd_id_set_screen       = 0x51,
+    coban_cmd_id_set_time         = 0x52,
+    coban_cmd_id_set_cpu_util     = 0x53,
+    coban_cmd_id_set_gpu_util     = 0x54,
+    coban_cmd_id_set_time_format  = 0x55,
+    coban_cmd_id_set_gif_buffer   = 0x56,
+    coban_cmd_id_set_gif_size     = 0x57,
+    coban_cmd_id_set_gif_flash    = 0x58,
+    coban_cmd_id_set_pomo_config  = 0x59,
+    coban_cmd_id_set_layer        = 0x60,
+    coban_cmd_id_set_audio_volume = 0x61,
 
-    coban_cmd_id_save_eeprom     = 0x96,
-    coban_cmd_id_save_gif_data   = 0x97,
+    coban_cmd_id_save_eeprom   = 0x96,
+    coban_cmd_id_save_gif_data = 0x97,
 
-    coban_cmd_id_reboot_board    = 0x98,
-    coban_cmd_id_reset_board     = 0x99
+    coban_cmd_id_reboot_board = 0x98,
+    coban_cmd_id_reset_board  = 0x99
 };
 
 #ifndef VIA_ENABLE
 
-enum via_command_id {
-    id_custom_set_value       = 0x07,
-    id_custom_get_value       = 0x08,
-    id_custom_save            = 0x09,
-    id_unhandled              = 0xff
-};
+enum via_command_id { id_custom_set_value = 0x07, id_custom_get_value = 0x08, id_custom_save = 0x09, id_unhandled = 0xff };
 
 enum via_channel_id {
-    id_custom_channel         = 0x00,
+    id_custom_channel = 0x00,
 };
 
 #endif // VIA_ENABLE

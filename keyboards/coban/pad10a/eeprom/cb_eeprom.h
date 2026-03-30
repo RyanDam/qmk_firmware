@@ -16,11 +16,11 @@
 #include <stdint.h>
 
 typedef struct _cb_config_t {
-    uint8_t screen_idx; // default screen
-    uint8_t screen_brightness; //
-    uint8_t screen_switch_layer; // 1, switch to layer when key event
+    uint8_t screen_idx;                  // default screen
+    uint8_t screen_brightness;           //
+    uint8_t screen_switch_layer;         // 1, switch to layer when key event
     uint8_t screen_switch_layer_timeout; // in sec, switch back to original screen if not have key event
-    uint8_t screen_idle_timeout; // in minute, turn off screen if not have key event
+    uint8_t screen_idle_timeout;         // in minute, turn off screen if not have key event
 
     uint8_t layer_switch_default;
     uint8_t layer_switch_default_timeout;
@@ -37,6 +37,9 @@ typedef struct _cb_config_t {
     uint8_t pomo_work_duration;
     uint8_t pomo_rest_duration;
     uint8_t pomo_noti_mode;
+
+    // audio volume
+    uint8_t audio_volume;
 
     // gif data
     uint32_t gif_data_size;

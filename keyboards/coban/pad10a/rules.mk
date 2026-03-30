@@ -23,6 +23,7 @@ SRC += graphics/screens/screen_layers.c
 SRC += graphics/screens/screen_boot.c
 # SRC += graphics/screens/screen_render.c
 SRC += graphics/screens/screen_pomodoro.c
+SRC += utils/audio_volume.c
 
 SRC += graphics/fonts/barlow.c
 SRC += graphics/fonts/inter.c
