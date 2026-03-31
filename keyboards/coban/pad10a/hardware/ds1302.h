@@ -21,6 +21,8 @@
 #ifdef DS1302_ENABLE
 
 // DS1302 Register addresses
+// datasheet: https://www.lcsc.com/datasheet/C42411640.pdf
+// reference: https://github.com/odeevee/DS1302_CircuitPython/blob/master/ds1302.py
 #define DS1302_REG_SECOND   0x80
 #define DS1302_REG_MINUTE   0x82
 #define DS1302_REG_HOUR     0x84
@@ -35,11 +37,6 @@
 #define DS1302_WRITE_BIT    0x00
 #define DS1302_MULTI_BIT    0x80
 
-// BCD to decimal conversion
-#define DS1302_BCD_TO_DEC(bcd) (((bcd) >> 4) * 10 + ((bcd) & 0x0F))
-// Decimal to BCD conversion
-#define DS1302_DEC_TO_BCD(dec) (((dec) / 10) << 4 | ((dec) % 10))
-
 typedef struct {
     uint8_t second;
     uint8_t minute;
@@ -47,7 +44,7 @@ typedef struct {
     uint8_t weekday;
     uint8_t day;
     uint8_t month;
-    uint8_t year;
+    uint8_t year; // year is 0->99 (minus 2000)
 } ds1302_datetime_t;
 
 extern bool ds1302_initialized;
@@ -55,8 +52,5 @@ extern bool ds1302_initialized;
 bool ds1302_init(void);
 bool ds1302_read_datetime(ds1302_datetime_t *datetime);
 bool ds1302_write_datetime(const ds1302_datetime_t *datetime);
-bool ds1302_is_clock_running(void);
-void ds1302_start_clock(void);
-void ds1302_stop_clock(void);
 
 #endif // DS1302_ENABLE

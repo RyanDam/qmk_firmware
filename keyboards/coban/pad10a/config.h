@@ -30,11 +30,9 @@
 #define OLED_RST_PIN GP4
 #define OLED_DC_PIN GP1
 #define OLED_BKL_PIN GP0
-#define OLED_DC_PIN GP1
-#define OLED_BKL_PIN GP0
 
 // un-commend if compile for rev 0 test platform
-// #define OLED_PART_REV_2
+#define OLED_PART_REV_2
 #define OLED_SCREEN_ROTATE_180 1
 
 #ifdef BACKLIGHT_ENABLE
@@ -75,6 +73,6 @@
 
 // DS1302 RTC Configuration
 #define DS1302_ENABLE
-#define DS1302_PIN_RESET 13
-#define DS1302_PIN_SDA 14
-#define DS1302_PIN_SCK 15
+#define DS1302_PIN_RESET    GP13
+#define DS1302_PIN_SDA      GP14
+#define DS1302_PIN_SCK      GP15

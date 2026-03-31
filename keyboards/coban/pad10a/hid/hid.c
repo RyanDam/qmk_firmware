@@ -22,7 +22,9 @@
 #include "utils/audio_volume.h"
 #include "hardware/flash.h"
 #include <hardware/sync.h>
-
+#ifdef DS1302_ENABLE
+#    include "hardware/ds1302.h"
+#endif // DS1302_ENABLE
 #define GIF_TRANSFER_BLOCK_SIZE 25
 
 void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
@@ -46,6 +48,18 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             uint8_t month  = command_data[4];
             uint8_t year   = command_data[5];
             screen_time_sync_datetime(hour, minute, second, day, month, year);
+#           ifdef DS1302_ENABLE
+            // sync datetime to ds1302 chip
+            ds1302_datetime_t rtc_time;
+            rtc_time.second = second;
+            rtc_time.minute = minute;
+            rtc_time.hour = hour;
+            rtc_time.weekday = 0;
+            rtc_time.day = day;
+            rtc_time.month = month;
+            rtc_time.year = year;
+            ds1302_write_datetime(&rtc_time);
+#           endif
             break;
         }
         case coban_cmd_id_set_cpu_util: {

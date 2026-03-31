@@ -144,22 +144,6 @@ void screen_time_sync_datetime(uint8_t hour, uint8_t minute, uint8_t second, uin
 
     // Convert to timestamp
     synced_timestamp = mktime(&t);
-
-#ifdef DS1302_ENABLE
-    // Update RTC chip with accurate time from HID
-    if (!ds1302_initialized) {
-        ds1302_init();
-    }
-
-    ds1302_datetime_t rtc_time;
-    rtc_time.second = second;
-    rtc_time.minute = minute;
-    rtc_time.hour   = hour;
-    rtc_time.day    = day;
-    rtc_time.month  = month;
-    rtc_time.year   = year;
-    ds1302_write_datetime(&rtc_time);
-#endif
 }
 
 void screen_time_set_format(uint8_t time_style, uint8_t time_format, uint8_t time_indicator, uint8_t date_format, uint8_t date_visibility) {
