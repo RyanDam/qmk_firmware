@@ -142,6 +142,13 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             reset_keyboard();
             break;
         }
+        case coban_cmd_id_reset_layer_ui: {
+            uint8_t target_layer_idx = command_data[0];
+            uint8_t current_layer_idx = screen_layers_get_current_layer_idx();
+            if (target_layer_idx == current_layer_idx) {
+                screen_layers_set_indice(target_layer_idx);
+            }
+        }
         default:
             break;
     }

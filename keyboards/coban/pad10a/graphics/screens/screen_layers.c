@@ -127,6 +127,10 @@ void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record) {
     key_matrix_changed = true;
 }
 
+uint8_t screen_layers_get_current_layer_idx(void) {
+    return current_layer_idx;
+}
+
 void layers_cb(lv_timer_t *timer) {
     if (!layers_running) return;
 

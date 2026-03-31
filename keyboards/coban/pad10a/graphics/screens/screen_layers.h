@@ -24,6 +24,8 @@ lv_obj_t * screen_layers_init(void);
 
 void screen_layers_set_indice(uint8_t layer_idx);
 
+uint8_t screen_layers_get_current_layer_idx(void);
+
 void screen_layers_set_key_code(uint16_t keycode, keyrecord_t *record);
 
 void screen_layers_stop(void);
