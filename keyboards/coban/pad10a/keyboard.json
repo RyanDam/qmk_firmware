@@ -18,6 +18,13 @@
         "rgb_matrix": true,
         "backlight": true
     },
+    "audio": {
+        "driver": "pwm_hardware",
+        "default": {
+            "on": true,
+            "clicky": false
+        }
+    },
     "matrix_pins": {
         "cols": ["GP18", "GP16", "GP11", "GP10"],
         "rows": ["GP19", "GP17", "GP12"]

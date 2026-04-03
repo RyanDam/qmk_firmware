@@ -19,6 +19,20 @@
 #define num_keycodes ARRAY_SIZE(lookup_table)
 static char UNKNOWN_KEYCODE[] = "?";
 
+#define CB_ICON_UP          "\xEF\x81\xA2"
+#define CB_ICON_DOWN        "\xEF\x81\xA3"
+#define CB_ICON_LEFT        "\xEF\x81\xA0"
+#define CB_ICON_RIGHT       "\xEF\x81\xA1"
+#define CB_ICON_CARET_DOWN  "\xEF\x83\x97"
+
+#define CB_ICON_PLAY        "\xEF\x81\x8B"
+#define CB_ICON_VOL_DOWN    "\xEF\x80\xA7"
+#define CB_ICON_VOL_UP      "\xEF\x80\xA8"
+#define CB_ICON_VOL_MUTE    "\xEF\x9A\xA9"
+#define CB_ICON_MEDIA_NEXT  "\xEF\x81\x8E"
+#define CB_ICON_MEDIA_PREV  "\xEF\x81\x8A"
+#define CB_ICON_MEDIA_PAUSE "\xEF\x81\x8C"
+
 int cmp(const void *v1, const void *v2) {
     const lookup_table_t *c1 = v1;
     const lookup_table_t *c2 = v2;
@@ -119,7 +133,7 @@ lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"DF(8)", 0x5248},
     {"DF(9)", 0x5249},
     {" ", KC_NO},
-    {" ", KC_TRNS},
+    {CB_ICON_CARET_DOWN, KC_TRNS},
     {"A", KC_A},
     {"B", KC_B},
     {"C", KC_C},
@@ -191,14 +205,14 @@ lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"Pause", KC_PAUS},
     {"Inst", KC_INS},
     {"Home", KC_HOME},
-    {"PUp", KC_PGUP},
+    {"Pg " CB_ICON_UP, KC_PGUP},
     {"Del", KC_DEL},
     {"End", KC_END},
-    {"PDw", KC_PGDN},
-    {"Rgt", KC_RGHT},
-    {"Lft", KC_LEFT},
-    {"Dwn", KC_DOWN},
-    {"Up", KC_UP},
+    {"Pg " CB_ICON_DOWN, KC_PGDN},
+    {CB_ICON_RIGHT, KC_RGHT},
+    {CB_ICON_LEFT, KC_LEFT},
+    {CB_ICON_DOWN, KC_DOWN},
+    {CB_ICON_UP, KC_UP},
     {"NLock", KC_NUM},
     {"/", KC_PSLS},
     {"*", KC_PAST},
@@ -280,13 +294,13 @@ lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"Pwr", KC_PWR},
     {"Sleep", KC_SLEP},
     {"Wake", KC_WAKE},
-    {"Mute", KC_MUTE},
-    {"Vol+", KC_VOLU},
-    {"Vol-", KC_VOLD},
-    {"Next", KC_MNXT},
-    {"Prev", KC_MPRV},
-    {"Stop", KC_MSTP},
-    {"Play", KC_MPLY},
+    {CB_ICON_VOL_MUTE, KC_MUTE},
+    {CB_ICON_VOL_UP, KC_VOLU},
+    {CB_ICON_VOL_DOWN, KC_VOLD},
+    {CB_ICON_MEDIA_NEXT, KC_MNXT},
+    {CB_ICON_MEDIA_PREV, KC_MPRV},
+    {CB_ICON_MEDIA_PAUSE, KC_MSTP},
+    {CB_ICON_PLAY, KC_MPLY},
     {"MSel", KC_MSEL},
     {"Ejct", KC_EJCT},
     {"Mail", KC_MAIL},
@@ -343,8 +357,8 @@ lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE] = {
     {"?", KC_QUES},
     {"BlOn", BL_ON},
     {"BlOff", BL_OFF},
-    {"BlDow", BL_DOWN},
-    {"BlUp", BL_UP},
+    {"Bl -", BL_DOWN},
+    {"Bl +", BL_UP},
     {"BlTog", BL_TOGG},
     {"BlStep", BL_STEP},
     {"BlBRTG", BL_BRTG},

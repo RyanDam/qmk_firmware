@@ -29,5 +29,6 @@ SRC += graphics/fonts/barlow.c
 SRC += graphics/fonts/inter.c
 SRC += graphics/fonts/bai_jamjuree.c
 SRC += graphics/fonts/dm_serif.c
+SRC += graphics/fonts/icons.c
 
 OPT_DEFS = -O2

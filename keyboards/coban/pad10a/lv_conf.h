@@ -80,6 +80,8 @@
 #define LV_USE_FONT_SUBPX 1
 #define LV_FONT_SUBPX_BGR 0
 
+#define LV_FONT_CUSTOM_DECLARE
+
 // #ifdef MIN
 // #undef MIN
 // #endif

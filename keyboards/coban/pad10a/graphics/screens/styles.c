@@ -20,6 +20,7 @@ LV_FONT_DECLARE(barlow)
 LV_FONT_DECLARE(inter)
 LV_FONT_DECLARE(bai_jamjuree)
 LV_FONT_DECLARE(dm_serif)
+LV_FONT_DECLARE(icons)
 
 lv_style_t style_screen;
 lv_style_t style_container;

@@ -30,6 +30,8 @@ a ă â b c d đ e ê g h i k l m n o ô ơ p q r s t u ư v x y w f z
 
 #if BARLOW
 
+LV_FONT_DECLARE(icons)
+
 /*-----------------
  *    BITMAPS
  *----------------*/
@@ -1723,7 +1725,7 @@ lv_font_t barlow = {
     // .static_bitmap = 0,
     .dsc = &font_dsc,          /*The custom font data. Will be accessed by `get_glyph_bitmap/dsc` */
 #if LV_VERSION_CHECK(8, 2, 0) || LVGL_VERSION_MAJOR >= 9
-    .fallback = NULL,
+    .fallback = &icons,
 #endif
     .user_data = NULL,
 };
