@@ -15,6 +15,7 @@
  */
 
 #include "keycode_lookup.h"
+#include "eeprom/cb_eeprom.h"
 
 #define num_keycodes ARRAY_SIZE(lookup_table)
 static char UNKNOWN_KEYCODE[] = "?";
@@ -40,8 +41,39 @@ int cmp(const void *v1, const void *v2) {
     return (c1->keycode - c2->keycode);
 }
 
+char *get_macro_name(uint8_t macro_index) {
+    if (macro_index >= 16) {
+        return UNKNOWN_KEYCODE;
+    }
+
+    // Check if custom name is set (first char is non-zero)
+    if (config.macro_names[macro_index][0] != 0) {
+        static char custom_name[7];
+        for (int i = 0; i < 6; i++) {
+            custom_name[i] = config.macro_names[macro_index][i];
+        }
+        custom_name[6] = '\0';
+        return custom_name;
+    }
+
+    // Return default name from lookup table
+    for (int i = 0; i < NUMBER_KNOWN_KEYCODE; i++) {
+        if (lookup_table[i].keycode == (QK_MACRO_0 + macro_index)) {
+            return lookup_table[i].key_string;
+        }
+    }
+
+    return UNKNOWN_KEYCODE;
+}
+
 char *translate_keycode_to_string(uint16_t code) {
     char *return_p;
+
+    // Check if this is a macro keycode (QK_MACRO_0 to QK_MACRO_15)
+    if (code >= QK_MACRO_0 && code <= QK_MACRO_15) {
+        uint8_t macro_index = code - QK_MACRO_0;
+        return get_macro_name(macro_index);
+    }
 
     for (int i = 0; i < NUMBER_KNOWN_KEYCODE; i++) {
         if (lookup_table[i].keycode == code) {

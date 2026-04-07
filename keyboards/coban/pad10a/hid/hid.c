@@ -48,18 +48,18 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             uint8_t month  = command_data[4];
             uint8_t year   = command_data[5];
             screen_time_sync_datetime(hour, minute, second, day, month, year);
-#           ifdef DS1302_ENABLE
+#ifdef DS1302_ENABLE
             // sync datetime to ds1302 chip
             ds1302_datetime_t rtc_time;
-            rtc_time.second = second;
-            rtc_time.minute = minute;
-            rtc_time.hour = hour;
+            rtc_time.second  = second;
+            rtc_time.minute  = minute;
+            rtc_time.hour    = hour;
             rtc_time.weekday = 0;
-            rtc_time.day = day;
-            rtc_time.month = month;
-            rtc_time.year = year;
+            rtc_time.day     = day;
+            rtc_time.month   = month;
+            rtc_time.year    = year;
             ds1302_write_datetime(&rtc_time);
-#           endif
+#endif
             break;
         }
         case coban_cmd_id_set_cpu_util: {
@@ -134,6 +134,16 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             coban_save_config();
             break;
         }
+        case coban_cmd_id_set_macro_name: {
+            uint8_t macro_idx = command_data[0];
+            if (macro_idx < 16) {
+                for (int i = 0; i < 6; i++) {
+                    config.macro_names[macro_idx][i] = command_data[i + 1];
+                }
+                coban_save_config();
+            }
+            break;
+        }
         case coban_cmd_id_reboot_board: {
             soft_reset_keyboard();
             break;
@@ -143,7 +153,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_reset_layer_ui: {
-            uint8_t target_layer_idx = command_data[0];
+            uint8_t target_layer_idx  = command_data[0];
             uint8_t current_layer_idx = screen_layers_get_current_layer_idx();
             if (target_layer_idx == current_layer_idx) {
                 screen_layers_set_indice(target_layer_idx);
@@ -223,6 +233,15 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
         }
         case coban_cmd_id_set_audio_volume: {
             *(command_data + 0) = 0xff & config.audio_volume;
+            break;
+        }
+        case coban_cmd_id_set_macro_name: {
+            uint8_t macro_idx = command_data[0];
+            if (macro_idx < 16) {
+                for (int i = 0; i < 6; i++) {
+                    *(command_data + i + 1) = config.macro_names[macro_idx][i];
+                }
+            }
             break;
         }
         default:

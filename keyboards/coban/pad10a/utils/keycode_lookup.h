@@ -25,5 +25,6 @@ typedef struct {
 } lookup_table_t;
 
 char* translate_keycode_to_string(uint16_t code);
+char* get_macro_name(uint8_t macro_index);
 
 extern lookup_table_t lookup_table[NUMBER_KNOWN_KEYCODE];

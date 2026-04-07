@@ -43,6 +43,9 @@ typedef struct _cb_config_t {
 
     // gif data
     uint32_t gif_data_size;
+
+    // macro names (16 macros, 6 chars each)
+    uint8_t macro_names[16][6];
 } cb_config;
 
 extern cb_config config;

@@ -47,6 +47,13 @@ void coban_init_config(void) {
     config.audio_volume       = 0; // quiet
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
+
+    // Initialize macro names to empty (all zeros)
+    for (int i = 0; i < 16; i++) {
+        for (int j = 0; j < 6; j++) {
+            config.macro_names[i][j] = 0;
+        }
+    }
 }
 
 void coban_save_config(void) {

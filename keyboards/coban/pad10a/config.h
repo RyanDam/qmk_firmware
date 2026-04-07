@@ -59,7 +59,7 @@
 
 #define QP_LVGL_TASK_PERIOD 41
 
-#define EEPROM_CB_CONFIG_SIZE 24
+#define EEPROM_CB_CONFIG_SIZE 120
 #define VIA_EEPROM_CUSTOM_CONFIG_SIZE EEPROM_CB_CONFIG_SIZE
 
 // https://www.makermatrix.com/blog/read-and-write-data-with-the-pi-pico-onboard-flash/
@@ -71,6 +71,6 @@
 
 // DS1302 RTC Configuration
 #define DS1302_ENABLE
-#define DS1302_PIN_RESET    GP13
-#define DS1302_PIN_SDA      GP14
-#define DS1302_PIN_SCK      GP15
+#define DS1302_PIN_RESET GP13
+#define DS1302_PIN_SDA GP14
+#define DS1302_PIN_SCK GP15
