@@ -70,3 +70,5 @@ void screen_time_set_time_indicator(uint8_t time_indicator);
 void screen_time_set_date_format(uint8_t date_format);
 
 void screen_time_set_date_visibility(uint8_t date_visibility);
+
+uint32_t screen_time_get_current_time32(void);

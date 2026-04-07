@@ -270,3 +270,9 @@ void screen_time_reload(void) {
     }
     timer_running = true;
 }
+
+uint32_t screen_time_get_current_time32(void) {
+    uint32_t current_chip_timestamp_delta_sec = (timer_read32() - last_sync_chip_timestamp)/1000;
+    uint32_t shifted_sync_timestamp = synced_timestamp + current_chip_timestamp_delta_sec;
+    return shifted_sync_timestamp;
+}

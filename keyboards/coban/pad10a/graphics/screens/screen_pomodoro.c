@@ -475,7 +475,7 @@ const char* quotes[] = {
 const int quotes_count = 50;
 
 char * get_current_quote(void) {
-    uint32_t current_time = timer_read32();
+    uint32_t current_time = screen_time_get_current_time32();
     int quote_index = (((current_time / 1000 / 60 / 5) % quotes_count) + (quote_offset % quotes_count)) % quotes_count;
     return (char *)quotes[quote_index];
 }

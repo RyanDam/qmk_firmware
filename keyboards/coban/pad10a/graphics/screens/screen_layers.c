@@ -140,7 +140,7 @@ void layers_cb(lv_timer_t *timer) {
             if (l == current_layer_idx) {
                 lv_obj_set_style_bg_opa(indices[l], LV_OPA_100, 0);
             } else {
-                lv_obj_set_style_bg_opa(indices[l], LV_OPA_0, 0);
+                lv_obj_set_style_bg_opa(indices[l], LV_OPA_10, 0);
             }
         }
     }
