@@ -28,6 +28,8 @@ lv_style_t style_text;
 lv_style_t style_arc_main;
 lv_style_t style_arc_positive;
 lv_style_t style_arc_knob;
+lv_style_t style_bar_main;
+lv_style_t style_bar_positive;
 lv_style_t style_indice;
 
 lv_style_t style_text_time1;
@@ -124,7 +126,8 @@ void init_styles(void) {
     lv_style_set_text_font(&style_key_pressed, &barlow);
 
     lv_style_init(&style_arc_main);
-    lv_style_set_arc_color(&style_arc_main, lv_palette_main(LV_PALETTE_GREY));
+    lv_style_set_arc_color(&style_arc_main, lv_color_hex(0xffffff));
+    lv_style_set_arc_opa(&style_arc_main, LV_OPA_10);
     lv_style_set_arc_width(&style_arc_main, 4);
 
     lv_style_init(&style_arc_positive);
@@ -134,6 +137,16 @@ void init_styles(void) {
     lv_style_init(&style_arc_knob);
     lv_style_set_arc_color(&style_arc_knob, lv_palette_main(LV_PALETTE_BLUE));
     lv_style_set_arc_width(&style_arc_knob, 6);
+
+    lv_style_init(&style_bar_main);
+    lv_style_set_bg_color(&style_bar_main, lv_color_hex(0xffffff));
+    lv_style_set_bg_opa(&style_bar_main, LV_OPA_10);
+    lv_style_set_radius(&style_bar_main, 3);
+
+    lv_style_init(&style_bar_positive);
+    lv_style_set_bg_color(&style_bar_positive, lv_palette_main(LV_PALETTE_BLUE));
+    lv_style_set_bg_opa(&style_bar_positive, LV_OPA_100);
+    lv_style_set_radius(&style_bar_positive, 3);
 
     lv_style_init(&style_text_time1);
     lv_style_set_pad_top(&style_text_time1, 0);
@@ -158,5 +171,4 @@ void init_styles(void) {
     lv_style_set_pad_right(&style_text_time3, 0);
     lv_style_set_text_color(&style_text_time3, lv_color_hex(0xffffff));
     lv_style_set_text_font(&style_text_time3, &dm_serif);
-
 }

@@ -46,6 +46,10 @@ typedef struct _cb_config_t {
 
     // macro names (16 macros, 6 chars each)
     uint8_t macro_names[16][6];
+
+    // stats screen config
+    uint8_t stats_layout_id;
+    uint8_t stats_data_ids[4];
 } cb_config;
 
 extern cb_config config;

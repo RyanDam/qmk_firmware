@@ -59,7 +59,7 @@
 
 #define QP_LVGL_TASK_PERIOD 41
 
-#define EEPROM_CB_CONFIG_SIZE 120
+#define EEPROM_CB_CONFIG_SIZE 128
 #define VIA_EEPROM_CUSTOM_CONFIG_SIZE EEPROM_CB_CONFIG_SIZE
 
 // https://www.makermatrix.com/blog/read-and-write-data-with-the-pi-pico-onboard-flash/

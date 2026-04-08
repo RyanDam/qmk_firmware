@@ -22,6 +22,8 @@ extern lv_style_t style_text;
 extern lv_style_t style_arc_main;
 extern lv_style_t style_arc_positive;
 extern lv_style_t style_arc_knob;
+extern lv_style_t style_bar_main;
+extern lv_style_t style_bar_positive;
 extern lv_style_t style_indice;
 
 extern lv_style_t style_text_time1;

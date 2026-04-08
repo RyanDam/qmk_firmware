@@ -62,12 +62,26 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 #endif
             break;
         }
-        case coban_cmd_id_set_cpu_util: {
-            // screen_hardware_stat_set_cpu(*command_data);
+        case coban_cmd_id_set_stats_config: {
+            config.stats_layout_id = command_data[0];
+            for (int i = 0; i < 4; i++) {
+                config.stats_data_ids[i] = command_data[1 + i];
+            }
+            screen_hardware_stat_set_layout(config.stats_layout_id);
+            coban_save_config();
             break;
         }
-        case coban_cmd_id_set_gpu_util: {
-            // screen_hardware_stat_set_gpu(*command_data);
+        case coban_cmd_id_set_stats_data: {
+            for (int i = 0; i < 4; i++) {
+                uint8_t data_id = command_data[i * 6 + 0];
+                if (data_id == coban_stats_data_none) {
+                    continue;
+                }
+                uint16_t max_value = command_data[i * 6 + 1] | (command_data[i * 6 + 2] << 8);
+                uint8_t  unit_id   = command_data[i * 6 + 3];
+                uint16_t value     = command_data[i * 6 + 4] | (command_data[i * 6 + 5] << 8);
+                screen_hardware_stat_set_data(data_id, value, max_value, unit_id);
+            }
             break;
         }
         case coban_cmd_id_set_time_format: {
@@ -187,6 +201,14 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
         case coban_cmd_id_set_layer: {
             *(command_data + 0) = 0xff & config.layer_switch_default;
             *(command_data + 1) = 0xff & config.layer_switch_default_timeout;
+            break;
+        }
+        case coban_cmd_id_set_stats_config: {
+            *(command_data + 0) = 0xff & config.stats_layout_id;
+            for (int i = 0; i < 4; i++) {
+                *(command_data + 1 + i) = 0xff & config.stats_data_ids[i];
+            }
+            break;
         }
         case coban_cmd_id_set_gif_buffer: {
             uint8_t  offset_1 = command_data[0];

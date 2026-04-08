@@ -17,97 +17,321 @@
 #include "graphics/screens/screen_hardware_stats.h"
 #include "graphics/lvgl_helpers.h"
 #include "graphics/screens/styles.h"
+#include "eeprom/cb_eeprom.h"
+#include <string.h>
 
-static lv_obj_t *screen_home = NULL;
-static lv_obj_t *cpu_arc;
-static lv_obj_t *cpu_text;
-static lv_obj_t *gpu_arc;
-static lv_obj_t *gpu_text;
+#define STAT_BAR_COL_PAD 6
+#define STATS_SLOT_COUNT 4
 
-lv_obj_t * screen_hardware_stat_init(void) {
-    screen_home = lv_obj_create(NULL);
-    lv_obj_add_style(screen_home, &style_screen, 0);
-    use_flex_column(screen_home);
+static lv_obj_t          *screen_home                 = NULL;
+static lv_obj_t          *mods                        = NULL;
+static lv_obj_t          *layout_2x1_holder           = NULL;
+static lv_obj_t          *layout_2x2_holder           = NULL;
+static coban_stats_data_t stat_data[STATS_SLOT_COUNT] = {{0}};
+static uint8_t            current_layout              = coban_stats_layout_2x1;
 
-    lv_obj_t *mods = lv_obj_create(screen_home);
-    lv_obj_add_style(mods, &style_container, 0);
-    use_flex_column(mods);
+typedef struct {
+    lv_obj_t *label;
+    lv_obj_t *value;
+    lv_obj_t *arc;
+} arc_ui_t;
 
-    // label_render_time = lv_label_create(mods);
-    // lv_label_set_text(label_render_time, "COBAN STATIONERY");
-    // lv_obj_add_style(label_render_time, &style_text, 0);
+typedef struct {
+    lv_obj_t *label;
+    lv_obj_t *value;
+    lv_obj_t *bar;
+} bar_ui_t;
 
-    lv_obj_t *stats_holder = lv_obj_create(mods);
-    lv_obj_add_style(stats_holder, &style_container, 0);
-    use_flex_row(stats_holder);
+static arc_ui_t arc_ui[2]                = {{NULL}};
+static bar_ui_t bar_ui[STATS_SLOT_COUNT] = {{NULL}};
 
-    // CPU
-    lv_obj_t *cpu_stat_holder = lv_obj_create(stats_holder);
-    lv_obj_add_style(cpu_stat_holder, &style_container, 0);
-    use_flex_column(cpu_stat_holder);
-    lv_obj_set_style_pad_row(cpu_stat_holder, -8, 0);
+static const char *get_data_name(uint8_t data_id) {
+    switch (data_id) {
+        case coban_stats_data_cpu_util:
+            return "CPU";
+        case coban_stats_data_cpu_temp:
+            return "CPU";
+        case coban_stats_data_ram:
+            return "RAM";
+        case coban_stats_data_gpu_util:
+            return "GPU";
+        case coban_stats_data_gpu_temp:
+            return "GPU";
+        default:
+            return "";
+    }
+}
 
-    lv_obj_t *cpu_arc_holder = lv_obj_create(cpu_stat_holder);
-    lv_obj_add_style(cpu_arc_holder, &style_container, 0);
+static const char *get_unit_symbol(uint8_t unit_id) {
+    switch (unit_id) {
+        case coban_stats_unit_percent:
+            return "%";
+        case coban_stats_unit_celsius:
+            return "°C";
+        case coban_stats_unit_fahrenheit:
+            return "°F";
+        case coban_stats_unit_megabytes:
+            return "MB";
+        case coban_stats_unit_gigabytes:
+            return "GB";
+        case coban_stats_unit_terabytes:
+            return "TB";
+        default:
+            return "";
+    }
+}
 
-    cpu_arc = lv_arc_create(cpu_arc_holder);
-    lv_obj_set_size(cpu_arc, 64, 64);
-    lv_obj_add_style(cpu_arc, &style_arc_main, LV_PART_MAIN);
-    lv_obj_add_style(cpu_arc, &style_arc_positive, LV_PART_INDICATOR);
-    lv_obj_remove_style(cpu_arc, NULL, LV_PART_KNOB);
-    lv_arc_set_rotation(cpu_arc, 135);
-    lv_arc_set_bg_angles(cpu_arc, 0, 270);
-    lv_arc_set_value(cpu_arc, 45);
-    lv_obj_center(cpu_arc);
+static lv_obj_t *create_arc_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id) {
+    lv_obj_t *holder = lv_obj_create(parent);
+    lv_obj_add_style(holder, &style_container, 0);
+    use_flex_column(holder);
+    lv_obj_set_style_pad_row(holder, -8, 0);
 
-    cpu_text = lv_label_create(cpu_arc_holder);
-    lv_label_set_text(cpu_text, "--C");
-    lv_obj_add_style(cpu_text, &style_text, 0);
-    lv_obj_center(cpu_text);
-    resize_font(cpu_text, 16);
+    lv_obj_t *indicator_holder = lv_obj_create(holder);
+    lv_obj_add_style(indicator_holder, &style_container, 0);
 
-    lv_obj_t *cpu_name  = lv_label_create(cpu_stat_holder);
-    lv_label_set_text(cpu_name, "CPU");
-    lv_obj_add_style(cpu_name, &style_text, 0);
+    arc_ui[index].arc = lv_arc_create(indicator_holder);
+    lv_obj_set_size(arc_ui[index].arc, 64, 64);
+    lv_obj_add_style(arc_ui[index].arc, &style_arc_main, LV_PART_MAIN);
+    lv_obj_add_style(arc_ui[index].arc, &style_arc_positive, LV_PART_INDICATOR);
+    lv_obj_remove_style(arc_ui[index].arc, NULL, LV_PART_KNOB);
+    lv_arc_set_rotation(arc_ui[index].arc, 135);
+    lv_arc_set_bg_angles(arc_ui[index].arc, 0, 270);
+    lv_arc_set_value(arc_ui[index].arc, 0);
+    lv_obj_center(arc_ui[index].arc);
 
-    // GPU
-    lv_obj_t *gpu_stat_holder = lv_obj_create(stats_holder);
-    lv_obj_add_style(gpu_stat_holder, &style_container, 0);
-    use_flex_column(gpu_stat_holder);
-    lv_obj_set_style_pad_row(gpu_stat_holder, -8, 0);
+    arc_ui[index].value = lv_label_create(indicator_holder);
+    lv_label_set_text(arc_ui[index].value, "--");
+    lv_obj_add_style(arc_ui[index].value, &style_text, 0);
+    lv_obj_center(arc_ui[index].value);
 
-    lv_obj_t *gpu_arc_holder = lv_obj_create(gpu_stat_holder);
-    lv_obj_add_style(gpu_arc_holder, &style_container, 0);
+    arc_ui[index].label = lv_label_create(holder);
+    lv_label_set_text(arc_ui[index].label, get_data_name(data_id));
+    lv_obj_add_style(arc_ui[index].label, &style_text, 0);
+    lv_obj_center(arc_ui[index].label);
 
-    gpu_arc = lv_arc_create(gpu_arc_holder);
-    lv_obj_set_size(gpu_arc, 64, 64);
-    lv_obj_add_style(gpu_arc, &style_arc_main, LV_PART_MAIN);
-    lv_obj_add_style(gpu_arc, &style_arc_positive, LV_PART_INDICATOR);
-    lv_obj_remove_style(gpu_arc, NULL, LV_PART_KNOB);
-    lv_arc_set_rotation(gpu_arc, 135);
-    lv_arc_set_bg_angles(gpu_arc, 0, 270);
-    lv_arc_set_value(gpu_arc, 45);
-    lv_obj_center(gpu_arc);
+    return holder;
+}
 
-    gpu_text = lv_label_create(gpu_arc_holder);
-    lv_label_set_text(gpu_text, "--%");
-    lv_obj_add_style(gpu_text, &style_text, 0);
-    lv_obj_center(gpu_text);
-    resize_font(gpu_text, 16);
+static lv_obj_t *create_bar_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id) {
+    lv_obj_t *holder = lv_obj_create(parent);
+    lv_obj_add_style(holder, &style_container, 0);
+    use_flex_column(holder);
+    lv_obj_set_style_pad_all(holder, 0, 0);
+    lv_obj_set_size(holder, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT / 2);
 
-    lv_obj_t *gpu_name  = lv_label_create(gpu_stat_holder);
-    lv_label_set_text(gpu_name, "GPU");
-    lv_obj_add_style(gpu_name, &style_text, 0);
+    lv_obj_t *text_row = lv_obj_create(holder);
+    lv_obj_add_style(text_row, &style_container, 0);
+    use_flex_row(text_row);
+    lv_obj_set_flex_align(text_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_size(text_row, LV_PCT(100), SCREEN_HEIGHT / 4);
+
+    bar_ui[index].label = lv_label_create(text_row);
+    lv_label_set_text(bar_ui[index].label, get_data_name(data_id));
+    lv_obj_add_style(bar_ui[index].label, &style_text, 0);
+
+    bar_ui[index].value = lv_label_create(text_row);
+    lv_label_set_text(bar_ui[index].value, "--");
+    lv_obj_add_style(bar_ui[index].value, &style_text, 0);
+
+    lv_obj_t *bar_row = lv_obj_create(holder);
+    lv_obj_add_style(bar_row, &style_container, 0);
+    use_flex_row(bar_row);
+    lv_obj_set_flex_align(bar_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+    lv_obj_set_size(bar_row, LV_PCT(100), SCREEN_HEIGHT / 4);
+
+    bar_ui[index].bar = lv_bar_create(bar_row);
+    lv_obj_set_size(bar_ui[index].bar, LV_PCT(100), SCREEN_HEIGHT / 4);
+    lv_obj_add_style(bar_ui[index].bar, &style_bar_main, LV_PART_MAIN);
+    lv_obj_add_style(bar_ui[index].bar, &style_bar_positive, LV_PART_INDICATOR);
+    lv_bar_set_range(bar_ui[index].bar, 0, 100);
+    lv_bar_set_value(bar_ui[index].bar, 0, LV_ANIM_OFF);
+
+    return holder;
+}
+
+static void update_arc_display(uint8_t index, uint8_t data_index) {
+    if (arc_ui[index].label == NULL || arc_ui[index].arc == NULL || arc_ui[index].value == NULL) {
+        return;
+    }
+
+    const char *unit_symbol = get_unit_symbol(stat_data[data_index].unit_id);
+
+    if (stat_data[data_index].max_value > 0) {
+        uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
+        lv_arc_set_value(arc_ui[index].arc, (int16_t)percentage);
+        lv_label_set_text_fmt(arc_ui[index].value, "%d%s", stat_data[data_index].value, unit_symbol);
+        lv_label_set_text_fmt(arc_ui[index].label, "%s", get_data_name(data_index));
+    } else {
+        lv_arc_set_value(arc_ui[index].arc, 0);
+        lv_label_set_text_fmt(arc_ui[index].value, "--%s", unit_symbol);
+        lv_label_set_text_fmt(arc_ui[index].label, "%s", get_data_name(data_index));
+    }
+}
+
+static void update_bar_display(uint8_t index, uint8_t data_index) {
+    if (bar_ui[index].label == NULL || bar_ui[index].value == NULL || bar_ui[index].bar == NULL) {
+        return;
+    }
+
+    const char *unit_symbol = get_unit_symbol(stat_data[data_index].unit_id);
+
+    if (stat_data[data_index].max_value > 0) {
+        uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
+        lv_bar_set_value(bar_ui[index].bar, percentage, LV_ANIM_OFF);
+        lv_label_set_text_fmt(bar_ui[index].value, "%d%s", stat_data[data_index].value, unit_symbol);
+        lv_label_set_text_fmt(bar_ui[index].label, "%s", get_data_name(data_index));
+    } else {
+        lv_bar_set_value(bar_ui[index].bar, 0, LV_ANIM_OFF);
+        lv_label_set_text_fmt(bar_ui[index].value, "--%s", unit_symbol);
+        lv_label_set_text_fmt(bar_ui[index].label, "%s", get_data_name(data_index));
+    }
+}
+
+static void build_layout_2x1(void) {
+    if (layout_2x1_holder == NULL) {
+        layout_2x1_holder = lv_obj_create(mods);
+        lv_obj_add_style(layout_2x1_holder, &style_container, 0);
+        use_flex_row(layout_2x1_holder);
+        lv_obj_set_flex_align(layout_2x1_holder, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+
+        for (uint8_t i = 0; i < 2; i++) {
+            uint8_t data_id = config.stats_data_ids[i];
+            create_arc_ui(i, layout_2x1_holder, data_id);
+        }
+    }
+}
+
+static void build_layout_2x2(void) {
+    if (layout_2x2_holder == NULL) {
+        layout_2x2_holder = lv_obj_create(mods);
+        lv_obj_add_style(layout_2x2_holder, &style_container, 0);
+        use_flex_column(layout_2x2_holder);
+        lv_obj_set_style_pad_all(layout_2x2_holder, 0, 0);
+        lv_obj_set_size(layout_2x2_holder, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        lv_obj_t *row1 = lv_obj_create(layout_2x2_holder);
+        lv_obj_add_style(row1, &style_container, 0);
+        use_flex_row(row1);
+        lv_obj_set_flex_align(row1, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_all(row1, 0, 0);
+        lv_obj_set_style_pad_column(row1, STAT_BAR_COL_PAD, 0);
+
+        lv_obj_t *row2 = lv_obj_create(layout_2x2_holder);
+        lv_obj_add_style(row2, &style_container, 0);
+        use_flex_row(row2);
+        lv_obj_set_flex_align(row2, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_all(row2, 0, 0);
+        lv_obj_set_style_pad_column(row2, STAT_BAR_COL_PAD, 0);
+
+        for (uint8_t i = 0; i < 2; i++) {
+            uint8_t data_id = config.stats_data_ids[i];
+            create_bar_ui(i, row1, data_id);
+        }
+        for (uint8_t i = 2; i < STATS_SLOT_COUNT; i++) {
+            uint8_t data_id = config.stats_data_ids[i];
+            create_bar_ui(i, row2, data_id);
+        }
+    }
+}
+
+static void update_all_displays(void) {
+    if (current_layout == coban_stats_layout_2x1) {
+        for (uint8_t i = 0; i < 2; i++) {
+            uint8_t data_id = config.stats_data_ids[i];
+            if (data_id != coban_stats_data_none && data_id < STATS_SLOT_COUNT) {
+                update_arc_display(i, data_id);
+            }
+        }
+    } else if (current_layout == coban_stats_layout_2x2) {
+        for (uint8_t i = 0; i < STATS_SLOT_COUNT; i++) {
+            uint8_t data_id = config.stats_data_ids[i];
+            if (data_id != coban_stats_data_none && data_id < STATS_SLOT_COUNT) {
+                update_bar_display(i, data_id);
+            }
+        }
+    }
+}
+
+lv_obj_t *screen_hardware_stat_init(void) {
+    if (screen_home == NULL) {
+        screen_home = lv_obj_create(NULL);
+        lv_obj_add_style(screen_home, &style_screen, 0);
+        use_flex_column(screen_home);
+
+        mods = lv_obj_create(screen_home);
+        lv_obj_add_style(mods, &style_container, 0);
+        use_flex_column(mods);
+
+        build_layout_2x1();
+        build_layout_2x2();
+    }
+
+    current_layout = config.stats_layout_id;
+
+    if (layout_2x1_holder != NULL) {
+        if (current_layout != coban_stats_layout_2x1) {
+            lv_obj_add_flag(layout_2x1_holder, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_clear_flag(layout_2x1_holder, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    if (layout_2x2_holder != NULL) {
+        if (current_layout != coban_stats_layout_2x2) {
+            lv_obj_add_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_clear_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+
+    update_all_displays();
 
     return screen_home;
 }
 
-void screen_hardware_stat_set_cpu(uint8_t value) {
-    lv_label_set_text_fmt(cpu_text, "%dC", value);
-    lv_arc_set_value(cpu_arc, (int16_t)value);
+void screen_hardware_stat_set_data(uint8_t data_id, uint16_t value, uint16_t max_value, uint8_t unit_id) {
+    if (data_id >= STATS_SLOT_COUNT) {
+        return;
+    }
+
+    stat_data[data_id].value     = value;
+    stat_data[data_id].max_value = max_value;
+    stat_data[data_id].unit_id   = unit_id;
+
+    update_all_displays();
 }
 
-void screen_hardware_stat_set_gpu(uint8_t value) {
-    lv_label_set_text_fmt(gpu_text, "%d%%", value);
-    lv_arc_set_value(gpu_arc, (int16_t)value);
+void screen_hardware_stat_set_layout(uint8_t layout_id) {
+    if (layout_id != current_layout) {
+        current_layout = layout_id;
+        if (layout_2x1_holder != NULL) {
+            if (current_layout != coban_stats_layout_2x1) {
+                lv_obj_add_flag(layout_2x1_holder, LV_OBJ_FLAG_HIDDEN);
+            } else {
+                lv_obj_clear_flag(layout_2x1_holder, LV_OBJ_FLAG_HIDDEN);
+            }
+        }
+        if (layout_2x2_holder != NULL) {
+            if (current_layout != coban_stats_layout_2x2) {
+                lv_obj_add_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
+            } else {
+                lv_obj_clear_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
+            }
+        }
+        update_all_displays();
+    }
+}
+
+void screen_hardware_stat_reload(void) {
+    if (layout_2x1_holder != NULL) {
+        lv_obj_del(layout_2x1_holder);
+        layout_2x1_holder = NULL;
+    }
+    if (layout_2x2_holder != NULL) {
+        lv_obj_del(layout_2x2_holder);
+        layout_2x2_holder = NULL;
+    }
+    memset(arc_ui, 0, sizeof(arc_ui));
+    memset(bar_ui, 0, sizeof(bar_ui));
+    screen_hardware_stat_init();
 }

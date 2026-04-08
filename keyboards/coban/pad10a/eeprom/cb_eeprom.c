@@ -44,15 +44,20 @@ void coban_init_config(void) {
     config.pomo_work_duration = 25;
     config.pomo_rest_duration = 5;
     config.pomo_noti_mode     = coban_pomo_noti_mode_beep;
-    config.audio_volume       = 0; // quiet
+
+    config.audio_volume = 0;
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 
-    // Initialize macro names to empty (all zeros)
     for (int i = 0; i < 16; i++) {
         for (int j = 0; j < 6; j++) {
             config.macro_names[i][j] = 0;
         }
+    }
+
+    config.stats_layout_id = 0x00;
+    for (int i = 0; i < 4; i++) {
+        config.stats_data_ids[i] = 0x00;
     }
 }
 

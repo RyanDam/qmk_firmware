@@ -27,30 +27,29 @@
 
 static painter_device_t oled;
 
-lv_obj_t * screen_clock;
-lv_obj_t * screen_stats;
-lv_obj_t * screen_anime;
-lv_obj_t * screen_layer;
-lv_obj_t * screen_render;
-lv_obj_t * screen_pomodoro;
-lv_obj_t * screen_boot;
+lv_obj_t *screen_clock;
+lv_obj_t *screen_stats;
+lv_obj_t *screen_anime;
+lv_obj_t *screen_layer;
+lv_obj_t *screen_render;
+lv_obj_t *screen_pomodoro;
+lv_obj_t *screen_boot;
 
-const int screen_indexes[] = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
-const int num_avail_screen = 4;
+const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro, coban_screen_stats};
+const int                   num_avail_screen  = 5;
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
-static lv_timer_t *ui_timer = NULL;
-static bool ui_timmer_running = false;
+static lv_timer_t *ui_timer          = NULL;
+static bool        ui_timmer_running = false;
 
 void ui_init(void) {
-
     oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 2, 0);
 
     qp_init(oled, QP_ROTATION_270);
 
 #ifdef OLED_PART_REV_2
     qp_set_viewport_offsets(oled, 1, 26);
-#endif //OLED_PART_REV_2
+#endif // OLED_PART_REV_2
 
     if (qp_lvgl_attach(oled)) {
         lv_disp_t  *lv_display = lv_disp_get_default();
@@ -62,13 +61,12 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
-        // screen_stats = screen_hardware_stat_init();
+        screen_stats = screen_hardware_stat_init();
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
         // screen_render = screen_render_init();
         screen_pomodoro = screen_pomodoro_init();
-
     }
 
     backlight_enable();
@@ -124,16 +122,16 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_clock;
             break;
         }
-        // case coban_screen_stats: {
-        //     screen_animation_stop();
-        //     screen_render_stop();
-        //     screen_time_stop();
-        //     screen_pomodoro_stop();
-        //     screen_layers_stop();
-        //     lv_scr_load(screen_stats);
-        //     ui_current_screen = coban_screen_stats;
-        //     break;
-        // }
+        case coban_screen_stats: {
+            screen_animation_stop();
+            // screen_render_stop();
+            screen_time_stop();
+            screen_pomodoro_stop();
+            screen_layers_stop();
+            lv_scr_load(screen_stats);
+            ui_current_screen = coban_screen_stats;
+            break;
+        }
         case coban_screen_anime: {
             // screen_render_stop();
             screen_time_stop();
@@ -180,7 +178,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
     return ui_current_screen;
 }
 
-static void ui_cb(lv_timer_t * timer)  {
+static void ui_cb(lv_timer_t *timer) {
     if (!ui_timmer_running) {
         return;
     }
@@ -250,9 +248,9 @@ bool qp_st7735_init(painter_device_t device, painter_rotation_t rotation) {
     };
     qp_comms_command_databyte(device, ST77XX_SET_MADCTL, madctl[rotation]);
 
-// #ifndef ST7735_NO_AUTOMATIC_VIEWPORT_OFFSETS
-//     st7735_automatic_viewport_offsets(device, rotation);
-// #endif // ST7735_NO_AUTOMATIC_VIEWPORT_OFFSETS
+    // #ifndef ST7735_NO_AUTOMATIC_VIEWPORT_OFFSETS
+    //     st7735_automatic_viewport_offsets(device, rotation);
+    // #endif // ST7735_NO_AUTOMATIC_VIEWPORT_OFFSETS
 
     return true;
 }

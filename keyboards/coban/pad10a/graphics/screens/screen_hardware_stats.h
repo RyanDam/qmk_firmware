@@ -14,10 +14,43 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "qp_lvgl.h"
 
-lv_obj_t * screen_hardware_stat_init(void);
+enum coban_stats_layout_id { coban_stats_layout_2x1 = 0x00, coban_stats_layout_2x2 = 0x01 };
 
-void screen_hardware_stat_set_cpu(uint8_t value);
+#define STATS_DATA_COUNT 6
 
-void screen_hardware_stat_set_gpu(uint8_t value);
+enum coban_stats_data_id {
+    coban_stats_data_none     = 0x00,
+    coban_stats_data_cpu_util = 0x01,
+    coban_stats_data_cpu_temp = 0x02,
+    coban_stats_data_ram      = 0x03,
+    coban_stats_data_gpu_util = 0x04,
+    coban_stats_data_gpu_temp = 0x05,
+};
+
+enum coban_stats_unit_id {
+    coban_stats_unit_none       = 0x00,
+    coban_stats_unit_percent    = 0x01,
+    coban_stats_unit_celsius    = 0x02,
+    coban_stats_unit_fahrenheit = 0x03,
+    coban_stats_unit_megabytes  = 0x04,
+    coban_stats_unit_gigabytes  = 0x05,
+    coban_stats_unit_terabytes  = 0x06,
+};
+
+typedef struct {
+    uint16_t value;
+    uint16_t max_value;
+    uint8_t  unit_id;
+} coban_stats_data_t;
+
+lv_obj_t *screen_hardware_stat_init(void);
+
+void screen_hardware_stat_set_data(uint8_t data_id, uint16_t value, uint16_t max_value, uint8_t unit_id);
+
+void screen_hardware_stat_set_layout(uint8_t layout_id);
+
+// void screen_hardware_stat_reload(void);
