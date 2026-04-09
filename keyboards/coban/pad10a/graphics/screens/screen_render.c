@@ -27,14 +27,14 @@ static lv_obj_t *screen_render = NULL;
 bool render_running = false;
 
 /* Render resource */
-static Matrix projectionMatrix;
-static Matrix cameraMatrix;
-static Vector cam_pos, cam_at, cam_up;
+static Matrix   projectionMatrix;
+static Matrix   cameraMatrix;
+static Vector   cam_pos, cam_at, cam_up;
 static uint32_t last_time_tick = 0;
 
 /* Camera parameter - polar coordinate */
-static const float cam_radius = 5.0f;
-static float cam_radian = 0;
+static const float cam_radius       = 5.0f;
+static float       cam_radian       = 0;
 static const float cam_moving_speed = 10.0f; // degree per sec
 
 /* Object modifier */
@@ -44,7 +44,7 @@ static AnimationValue object_height_scale;
 #define CANVAS_RENDER_WIDTH SCREEN_WIDTH
 #define CANVAS_RENDER_HEIGHT SCREEN_HEIGHT
 static lv_color_t canvas_render_buf[LV_IMG_BUF_SIZE_INDEXED_2BIT(CANVAS_RENDER_WIDTH, CANVAS_RENDER_HEIGHT)];
-static lv_obj_t * canvas_render;
+static lv_obj_t  *canvas_render;
 static lv_color_t color_render_background;
 static lv_color_t color_render_midground;
 static lv_color_t color_render_foreground;
@@ -54,11 +54,11 @@ static lv_color_t color_render_foreground;
 
 void screen_resource_init(void);
 
-lv_obj_t * screen_render_init(void) {
+lv_obj_t *screen_render_init(void) {
     screen_render = lv_obj_create(NULL);
     lv_obj_add_style(screen_render, &style_screen, 0);
 
-    canvas_render = lv_canvas_create(screen_render);  // attach to active screen
+    canvas_render = lv_canvas_create(screen_render); // attach to active screen
     lv_canvas_set_buffer(canvas_render, canvas_render_buf, CANVAS_RENDER_WIDTH, CANVAS_RENDER_HEIGHT, LV_IMG_CF_INDEXED_2BIT);
     lv_canvas_set_palette(canvas_render, 0, lv_color_hex(0x000000));
     lv_canvas_set_palette(canvas_render, 1, lv_color_hex(0xaaaaaa));
@@ -66,7 +66,7 @@ lv_obj_t * screen_render_init(void) {
     lv_obj_center(canvas_render); // place in middle
 
     color_render_background.full = 0;
-    color_render_midground.full = 1;
+    color_render_midground.full  = 1;
     color_render_foreground.full = 2;
     lv_canvas_fill_bg(canvas_render, color_render_background, LV_OPA_COVER);
 
@@ -94,7 +94,7 @@ void screen_resource_init(void) {
     animation_init_set(&object_height_scale, 2.0f, 0.5f, 2.0f, 0.5f, 0.5f, timer_read32());
 }
 
-void render_cb(lv_timer_t * timer) {
+void render_cb(lv_timer_t *timer) {
     if (!render_running) {
         return;
     }
@@ -102,7 +102,7 @@ void render_cb(lv_timer_t * timer) {
     lv_canvas_fill_bg(canvas_render, color_render_background, LV_OPA_COVER);
 
     uint32_t delta_time = timer_read32() - last_time_tick;
-    last_time_tick = timer_read32(); // update time tick
+    last_time_tick      = timer_read32(); // update time tick
 
     //////////////////////
     // Animation update //
@@ -118,12 +118,12 @@ void render_cb(lv_timer_t * timer) {
 
     // the camera should rotate cam_moving_speed degree per sec
     // delta_time is in ms, so we need to convert it to seconds
-    cam_radian += cam_moving_speed * M_PI/180 * delta_time / 1000;
-    cam_radian -= ((int)(cam_radian/(2*M_PI))) * (2*M_PI);
+    cam_radian += cam_moving_speed * M_PI / 180 * delta_time / 1000;
+    cam_radian -= ((int)(cam_radian / (2 * M_PI))) * (2 * M_PI);
 
     // update camera position
-    float cx = cam_radius*sin(cam_radian);
-    float cy = cam_radius*cos(cam_radian);
+    float cx = cam_radius * sin(cam_radian);
+    float cy = cam_radius * cos(cam_radian);
     vector_fill4(&cam_pos, cx, cy, 0.5, 0);
     build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
 
@@ -131,9 +131,9 @@ void render_cb(lv_timer_t * timer) {
     // Rendering start //
     /////////////////////
 
-    Vector p, pProj;
-    int nx, ny, lx, ly, sx, sy, sz;
-    int min_x = 999, min_y = 999, max_x = 0, max_y = 0;
+    Vector     p, pProj;
+    int        nx, ny, lx, ly, sx, sy, sz;
+    int        min_x = 999, min_y = 999, max_x = 0, max_y = 0;
     lv_point_t line_points[] = {
         {0, 0},
         {0, 0},
@@ -152,21 +152,21 @@ void render_cb(lv_timer_t * timer) {
     // starting point
     vector_fill4(&p, bangle_mem[0], bangle_mem[1], bangle_mem[2] * object_height_scale.current, 1);
     project(&p, &cameraMatrix, &projectionMatrix, &pProj);
-    sx = lx = (int)((pProj.x+1)*CANVAS_RENDER_WIDTH/2);
-    sy = ly = (int)((pProj.y+1)*CANVAS_RENDER_HEIGHT/2);
-    sz = pProj.z;
+    sx = lx = (int)((pProj.x + 1) * CANVAS_RENDER_WIDTH / 2);
+    sy = ly = (int)((pProj.y + 1) * CANVAS_RENDER_HEIGHT / 2);
+    sz      = pProj.z;
 
     if (lx < min_x) min_x = lx;
     if (ly < min_y) min_y = ly;
     if (lx > max_x) max_x = lx;
     if (ly > max_y) max_y = ly;
 
-    for (int i = 3; i < bangle_mem_point*3; i+=3) {
+    for (int i = 3; i < bangle_mem_point * 3; i += 3) {
         vector_fill4(&p, bangle_mem[i], bangle_mem[i + 1], bangle_mem[i + 2] * object_height_scale.current, 1);
         project(&p, &cameraMatrix, &projectionMatrix, &pProj);
 
-        nx = (int)((pProj.x+1)*CANVAS_RENDER_WIDTH/2);
-        ny = (int)((pProj.y+1)*CANVAS_RENDER_HEIGHT/2);
+        nx = (int)((pProj.x + 1) * CANVAS_RENDER_WIDTH / 2);
+        ny = (int)((pProj.y + 1) * CANVAS_RENDER_HEIGHT / 2);
 
         line_points[0].x = lx;
         line_points[0].y = ly;
@@ -202,7 +202,7 @@ void screen_render_set_key_code(uint16_t keycode, keyrecord_t *record) {
         return;
     }
     if (record->event.pressed) {
-        animation_set_target(&object_height_scale, object_height_scale.target + object_height_scale.delta_speed*10);
+        animation_set_target(&object_height_scale, object_height_scale.target + object_height_scale.delta_speed * 10);
     }
 }
 

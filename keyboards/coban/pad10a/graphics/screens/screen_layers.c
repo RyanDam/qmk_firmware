@@ -69,7 +69,6 @@ lv_obj_t *screen_layers_init(void) {
             } else {
                 lv_obj_add_style(keys[idx], &style_key, 0);
             }
-
         }
     }
 
@@ -96,14 +95,14 @@ lv_obj_t *screen_layers_init(void) {
 }
 
 void _update_layer_keycode(uint8_t layer_idx) {
-    for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
-        if (idx == 1 || idx == 2) {
-            lv_obj_add_style(keys[idx], &style_key_trans, 0);
-        } else {
-            lv_obj_add_style(keys[idx], &style_key, 0);
-        }
-        // lv_obj_add_style(keys[idx], &style_key, 0);
-    }
+    // for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
+    //     lv_obj_remove_style_all(keys[idx]);
+    //     if (idx == 1 || idx == 2) {
+    //         lv_obj_add_style(keys[idx], &style_key_trans, 0);
+    //     } else {
+    //         lv_obj_add_style(keys[idx], &style_key, 0);
+    //     }
+    // }
     for (int r = 0; r < MATRIX_ROWS; r++) {
         for (int c = 0; c < MATRIX_COLS; c++) {
             uint16_t keycode = dynamic_keymap_get_keycode(layer_idx, r, c);
@@ -147,13 +146,14 @@ void layers_cb(lv_timer_t *timer) {
 
     if (key_matrix_changed) {
         key_matrix_changed = false;
-        for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
-            if (key_presses[idx]) {
-                lv_obj_add_style(keys[idx], &style_key_pressed, 0);
-            } else {
-                lv_obj_add_style(keys[idx], &style_key, 0);
-            }
-        }
+        // for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
+        //     lv_obj_remove_style_all(keys[idx]);
+        //     if (key_presses[idx]) {
+        //         lv_obj_add_style(keys[idx], &style_key_pressed, 0);
+        //     } else {
+        //         lv_obj_add_style(keys[idx], &style_key, 0);
+        //     }
+        // }
     }
 }
 

@@ -4,8 +4,8 @@
 
 Small macro keyboard with 6 hotswapable button and a EC11 rotary encoder
 
-* Keyboard Maintainer: [RyanDam](https://github.com/RyanDam)  
-* Hardware Supported: Coban Pad 9B
+- Keyboard Maintainer: [RyanDam](https://github.com/RyanDam)
+- Hardware Supported: Coban Pad 9B
 
 Make example for this keyboard (after setting up your build environment):
 
@@ -21,4 +21,4 @@ See the [build environment setup](https://docs.qmk.fm/#/getting_started_build_to
 
 Enter the bootloader:
 
-* **boot button**: Hold the BOOT button on the back of the PCB while plug in usb cable
+- **boot button**: Hold the BOOT button on the back of the PCB while plug in usb cable

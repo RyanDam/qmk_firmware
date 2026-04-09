@@ -4,11 +4,11 @@
 #define FLOAT_ABSOLUTE_DELTA 0.0001f
 
 void animation_init_set(AnimationValue *set, float max, float min, float delta_speed, float current, float target, uint32_t last_time_tick) {
-    set->max = max;
-    set->min = min;
-    set->delta_speed = delta_speed;
-    set->current = current;
-    set->target = target;
+    set->max            = max;
+    set->min            = min;
+    set->delta_speed    = delta_speed;
+    set->current        = current;
+    set->target         = target;
     set->last_time_tick = last_time_tick;
 }
 
@@ -29,7 +29,7 @@ void animation_update(AnimationValue *set, uint32_t current_time) {
 
     if (fabsf(set->current - set->target) < FLOAT_ABSOLUTE_DELTA) return;
 
-    float new_change = set->delta_speed * delta_time/1000;
+    float new_change = set->delta_speed * delta_time / 1000;
     new_change *= set->target > set->current ? 1 : -1; // Inclusive zero
 
     if (set->current + new_change > set->max) {

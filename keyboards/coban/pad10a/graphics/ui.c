@@ -27,13 +27,13 @@
 
 static painter_device_t oled;
 
-lv_obj_t *screen_clock;
-// lv_obj_t *screen_stats;
-lv_obj_t *screen_anime;
-lv_obj_t *screen_layer;
-lv_obj_t *screen_render;
-lv_obj_t *screen_pomodoro;
-lv_obj_t *screen_boot;
+lv_obj_t *screen_clock = NULL;
+// lv_obj_t *screen_stats = NULL;
+lv_obj_t *screen_anime    = NULL;
+lv_obj_t *screen_layer    = NULL;
+lv_obj_t *screen_render   = NULL;
+lv_obj_t *screen_pomodoro = NULL;
+lv_obj_t *screen_boot     = NULL;
 
 const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
 const int                   num_avail_screen  = 4;
@@ -43,7 +43,7 @@ static lv_timer_t *ui_timer          = NULL;
 static bool        ui_timmer_running = false;
 
 void ui_init(void) {
-    oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 2, 0);
+    oled = qp_st7735_make_spi_device(SCREEN_HEIGHT, SCREEN_WIDTH, OLED_CS_PIN, OLED_DC_PIN, OLED_RST_PIN, 1, 0);
 
     qp_init(oled, QP_ROTATION_270);
 
@@ -175,6 +175,12 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         default:
             break;
     }
+
+    // if (screen_boot != NULL) {
+    //     // save memory after the boot sequence is complete
+    //     lv_obj_del(screen_boot);
+    // }
+
     return ui_current_screen;
 }
 

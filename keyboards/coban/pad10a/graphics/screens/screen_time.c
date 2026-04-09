@@ -30,13 +30,12 @@ static lv_obj_t *date_text;
 static lv_obj_t *time_holder;
 static lv_obj_t *datetime_holder;
 
-
 static uint32_t last_sync_chip_timestamp = 0;
-static time_t synced_timestamp = 0;
-bool timer_running = false;
+static time_t   synced_timestamp         = 0;
+bool            timer_running            = false;
 // static lv_timer_t *render_timer = NULL;
 
-lv_obj_t * screen_time_init(void) {
+lv_obj_t *screen_time_init(void) {
     screen_time = lv_obj_create(NULL);
     lv_obj_add_style(screen_time, &style_screen, 0);
     use_flex_column(screen_time);
@@ -62,23 +61,16 @@ lv_obj_t * screen_time_init(void) {
     indicator_text = lv_label_create(time_holder);
     lv_label_set_text(indicator_text, "--");
 
-    screen_time_set_format(
-        config.time_style_id,
-        config.time_format,
-        config.time_indicator,
-        config.date_format,
-        config.date_visibility
-    );
+    screen_time_set_format(config.time_style_id, config.time_format, config.time_indicator, config.date_format, config.date_visibility);
 
     return screen_time;
 }
 
 void screen_time_set_time(uint8_t hour, uint8_t minute) {
-
     if (time_text != NULL) {
         switch (config.time_format) {
             case coban_time_format_12h: {
-                lv_label_set_text_fmt(time_text, "%02d:%02d", hour%12, minute);
+                lv_label_set_text_fmt(time_text, "%02d:%02d", hour % 12, minute);
                 break;
             }
             case coban_time_format_24h:
@@ -122,7 +114,7 @@ void screen_time_set_date(uint8_t day, uint8_t month, uint8_t year) {
             break;
         }
         case coban_date_format_ddmmyyyy:
-        default:{
+        default: {
             lv_label_set_text_fmt(date_text, "%02d / %02d / 2%03d", day, month, year);
             break;
         }
@@ -135,12 +127,12 @@ void screen_time_sync_datetime(uint8_t hour, uint8_t minute, uint8_t second, uin
     struct tm t = {0};
 
     // Set your specific date/time
-    t.tm_year = year + 2000;  // year since 1900
-    t.tm_mon  = month - 1;    // month (0–11, so September = 8)
-    t.tm_mday = day;          // day of the month (1–31)
-    t.tm_hour = hour;         // hours (0–23)
-    t.tm_min  = minute;       // minutes (0–59)
-    t.tm_sec  = second;       // seconds (0–59)
+    t.tm_year = year + 2000; // year since 1900
+    t.tm_mon  = month - 1;   // month (0–11, so September = 8)
+    t.tm_mday = day;         // day of the month (1–31)
+    t.tm_hour = hour;        // hours (0–23)
+    t.tm_min  = minute;      // minutes (0–59)
+    t.tm_sec  = second;      // seconds (0–59)
 
     // Convert to timestamp
     synced_timestamp = mktime(&t);
@@ -157,6 +149,8 @@ void screen_time_set_format(uint8_t time_style, uint8_t time_format, uint8_t tim
 
 void screen_time_set_time_style(uint8_t time_style) {
     config.time_style_id = time_style;
+
+    lv_obj_remove_style_all(time_text);
 
     switch (config.time_style_id) {
         case coban_time_style_2: {
@@ -231,7 +225,7 @@ void screen_time_set_date_visibility(uint8_t date_visibility) {
     }
 }
 
-void timer_cb(lv_timer_t * timer) {
+void timer_cb(lv_timer_t *timer) {
     if (!timer_running) {
         return;
     }
@@ -241,17 +235,17 @@ void timer_cb(lv_timer_t * timer) {
         return;
     }
 
-    uint32_t current_chip_timestamp_delta_sec = (timer_read32() - last_sync_chip_timestamp)/1000;
-    time_t shifted_sync_timestamp = synced_timestamp + current_chip_timestamp_delta_sec;
+    uint32_t current_chip_timestamp_delta_sec = (timer_read32() - last_sync_chip_timestamp) / 1000;
+    time_t   shifted_sync_timestamp           = synced_timestamp + current_chip_timestamp_delta_sec;
 
     struct tm *t;
     // Convert timestamp to local time
-    t = localtime(&shifted_sync_timestamp);
+    t              = localtime(&shifted_sync_timestamp);
     uint8_t minute = t->tm_min;
-    uint8_t hour = t->tm_hour;
-    uint8_t day = t->tm_mday;
-    uint8_t month = t->tm_mon + 1;
-    uint8_t year = t->tm_year - 2000;
+    uint8_t hour   = t->tm_hour;
+    uint8_t day    = t->tm_mday;
+    uint8_t month  = t->tm_mon + 1;
+    uint8_t year   = t->tm_year - 2000;
 
     screen_time_set_date(day, month, year);
     screen_time_set_time(hour, minute);
@@ -272,7 +266,7 @@ void screen_time_reload(void) {
 }
 
 uint32_t screen_time_get_current_time32(void) {
-    uint32_t current_chip_timestamp_delta_sec = (timer_read32() - last_sync_chip_timestamp)/1000;
-    uint32_t shifted_sync_timestamp = synced_timestamp + current_chip_timestamp_delta_sec;
+    uint32_t current_chip_timestamp_delta_sec = (timer_read32() - last_sync_chip_timestamp) / 1000;
+    uint32_t shifted_sync_timestamp           = synced_timestamp + current_chip_timestamp_delta_sec;
     return shifted_sync_timestamp;
 }

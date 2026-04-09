@@ -26,14 +26,11 @@ enum coban_time_style_id {
     coban_time_style_5 = 0x04,
 };
 
-enum coban_time_format_id {
-    coban_time_format_12h = 0x00,
-    coban_time_format_24h = 0x01
-};
+enum coban_time_format_id { coban_time_format_12h = 0x00, coban_time_format_24h = 0x01 };
 
 enum coban_time_indicator_id {
     coban_time_indicator_default = 0x00,
-    coban_time_indicator_ampm = 0x01,
+    coban_time_indicator_ampm    = 0x01,
 };
 
 enum coban_date_format_id {
@@ -42,16 +39,13 @@ enum coban_date_format_id {
     coban_date_format_yyyymmdd = 0x02,
 };
 
-enum coban_date_visibility_id {
-    coban_date_visibility_visible = 0x00,
-    coban_date_visibility_invisible = 0x01
-};
+enum coban_date_visibility_id { coban_date_visibility_visible = 0x00, coban_date_visibility_invisible = 0x01 };
 
 extern bool timer_running;
 
-void timer_cb(lv_timer_t * timer);
+void timer_cb(lv_timer_t *timer);
 
-lv_obj_t * screen_time_init(void);
+lv_obj_t *screen_time_init(void);
 
 void screen_time_stop(void);
 

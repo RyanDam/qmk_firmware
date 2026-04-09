@@ -21,12 +21,12 @@
 static Matrix projectionMatrix;
 static Matrix cameraMatrix;
 static Vector cam_pos, cam_at, cam_up;
-static float counter = 0;
+static float  counter = 0;
 
 void render_bangle_init(painter_device_t device) {
     // init camera matrix
     vector_fill4(&cam_pos, 0, 5, 0.5, 0);
-                  vector_fill4(&cam_at, 0, 0, 0, 0);
+    vector_fill4(&cam_at, 0, 0, 0, 0);
     vector_fill4(&cam_up, 0, 0, 1, 0);
     build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
 
@@ -48,31 +48,30 @@ void render_bangle_init(painter_device_t device) {
 }
 
 void render_bangle_task(painter_device_t device) {
-
     // buid camera position
-    float cx = 5*sin(counter);
-    float cy = 5*cos(counter);
+    float cx = 5 * sin(counter);
+    float cy = 5 * cos(counter);
     vector_fill4(&cam_pos, cx, cy, 0.5, 0);
     build_camera_matrix(&cam_pos, &cam_at, &cam_up, &cameraMatrix);
-    counter += M_PI/200;
+    counter += M_PI / 200;
 
     // render bangle
     Vector p, pProj;
-    int nx, ny, lx, ly, sx, sy;
+    int    nx, ny, lx, ly, sx, sy;
     // starting point
     vector_fill4(&p, bangle_mem[0], bangle_mem[1], bangle_mem[2], 1);
     project(&p, &cameraMatrix, &projectionMatrix, &pProj);
-    lx = (int)((pProj.x+1)*SCREEN_WIDTH/2);
-    ly = (int)((pProj.y+1)*SCREEN_HEIGHT/2);
+    lx = (int)((pProj.x + 1) * SCREEN_WIDTH / 2);
+    ly = (int)((pProj.y + 1) * SCREEN_HEIGHT / 2);
     sx = lx;
     sy = ly;
 
-    for (int i = 3; i < bangle_mem_point*3; i+=3) {
+    for (int i = 3; i < bangle_mem_point * 3; i += 3) {
         vector_fill4(&p, bangle_mem[i], bangle_mem[i + 1], bangle_mem[i + 2], 1);
         project(&p, &cameraMatrix, &projectionMatrix, &pProj);
 
-        nx = (int)((pProj.x+1)*SCREEN_WIDTH/2);
-        ny = (int)((pProj.y+1)*SCREEN_HEIGHT/2);
+        nx = (int)((pProj.x + 1) * SCREEN_WIDTH / 2);
+        ny = (int)((pProj.y + 1) * SCREEN_HEIGHT / 2);
 
         if (pProj.z > -4) {
             qp_line(device, lx, ly, nx, ny, 0, 0, 255);

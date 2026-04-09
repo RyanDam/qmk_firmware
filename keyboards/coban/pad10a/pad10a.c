@@ -91,10 +91,6 @@ void housekeeping_task_user(void) {
         // return;
     }
 
-    if (screen_layers_get_current_layer_idx() != _current_keyboard_layer_idx) {
-        screen_layers_set_indice(_current_keyboard_layer_idx);
-    }
-
     // handle layer logic
     bool need_show_layer_change = false;
     if (config.layer_switch_default && current_idle_time_ms >= config.layer_switch_default_timeout * 1000 && _current_keyboard_layer_idx != 0 // default layer is 0
@@ -155,7 +151,7 @@ layer_state_t layer_state_set_user(layer_state_t state) {
         return true;
     }
     _current_keyboard_layer_idx = get_highest_layer(state);
-    // screen_layers_set_indice(_current_keyboard_layer_idx); // processs in housekeeping task
+    screen_layers_set_indice(_current_keyboard_layer_idx); // processs in housekeeping task
     return state;
 }
 

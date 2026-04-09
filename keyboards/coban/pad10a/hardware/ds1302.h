@@ -23,19 +23,19 @@
 // DS1302 Register addresses
 // datasheet: https://www.lcsc.com/datasheet/C42411640.pdf
 // reference: https://github.com/odeevee/DS1302_CircuitPython/blob/master/ds1302.py
-#define DS1302_REG_SECOND   0x80
-#define DS1302_REG_MINUTE   0x82
-#define DS1302_REG_HOUR     0x84
-#define DS1302_REG_DAY      0x86
-#define DS1302_REG_MONTH    0x88
-#define DS1302_REG_WEEKDAY  0x8A
-#define DS1302_REG_YEAR     0x8C
-#define DS1302_REG_WP       0x8E
-#define DS1302_REG_CTRL     0x90
+#    define DS1302_REG_SECOND 0x80
+#    define DS1302_REG_MINUTE 0x82
+#    define DS1302_REG_HOUR 0x84
+#    define DS1302_REG_DAY 0x86
+#    define DS1302_REG_MONTH 0x88
+#    define DS1302_REG_WEEKDAY 0x8A
+#    define DS1302_REG_YEAR 0x8C
+#    define DS1302_REG_WP 0x8E
+#    define DS1302_REG_CTRL 0x90
 
-#define DS1302_READ_BIT     0x01
-#define DS1302_WRITE_BIT    0x00
-#define DS1302_MULTI_BIT    0x80
+#    define DS1302_READ_BIT 0x01
+#    define DS1302_WRITE_BIT 0x00
+#    define DS1302_MULTI_BIT 0x80
 
 typedef struct {
     uint8_t second;

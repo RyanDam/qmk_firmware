@@ -14,6 +14,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
- #include "qp_lvgl.h"
+#include "qp_lvgl.h"
 
-lv_obj_t * screen_boot_init(void);
+lv_obj_t *screen_boot_init(void);

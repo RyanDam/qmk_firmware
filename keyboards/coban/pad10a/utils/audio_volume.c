@@ -11,11 +11,11 @@ typedef enum audio_volume_level {
 } audio_volume_level_t;
 
 static const uint8_t audio_volume_timbre_map[] = {
-    1, // MUTE   → 0% duty cycle
+    1,  // MUTE   → 0% duty cycle
     1,  // LOW    → 25% duty cycle
-    10,  // MEDIUM → 50% duty cycle
-    25,  // HIGH   → 75% duty cycle
-    50,   // MAX    → 100% duty cycle
+    10, // MEDIUM → 50% duty cycle
+    25, // HIGH   → 75% duty cycle
+    50, // MAX    → 100% duty cycle
 };
 
 void audio_volume_set(uint8_t level) {

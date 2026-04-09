@@ -18,9 +18,9 @@
 
 extern bool render_running;
 
-void render_cb(lv_timer_t * timer);
+void render_cb(lv_timer_t *timer);
 
-lv_obj_t * screen_render_init(void);
+lv_obj_t *screen_render_init(void);
 
 void screen_render_stop(void);
 

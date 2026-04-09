@@ -18,9 +18,9 @@
 
 extern bool layers_running;
 
-void layers_cb(lv_timer_t * timer);
+void layers_cb(lv_timer_t *timer);
 
-lv_obj_t * screen_layers_init(void);
+lv_obj_t *screen_layers_init(void);
 
 void screen_layers_set_indice(uint8_t layer_idx);
 

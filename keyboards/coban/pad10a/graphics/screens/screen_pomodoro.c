@@ -25,50 +25,50 @@
 
 static lv_obj_t *screen_pomodoro = NULL;
 // static lv_timer_t *pomo_timer = NULL;
-bool pomo_running = false;
-static enum coban_pomo_state pomo_state = coban_pomo_state_idle;
+bool                         pomo_running = false;
+static enum coban_pomo_state pomo_state   = coban_pomo_state_idle;
 
 /* Canvas buffer */
 #define CANVAS_POMO_WIDTH SCREEN_WIDTH
 #define CANVAS_POMO_HEIGHT 6
-static lv_obj_t * pomo_layout_holder = NULL;
-static lv_obj_t * pomo_progress_bar = NULL;
-static lv_obj_t * pomo_time_holder = NULL;
-static lv_obj_t * pomo_time_text = NULL;
-static lv_obj_t * pomo_time_status = NULL;
-static lv_obj_t * pomo_breath_indicator = NULL;
+static lv_obj_t *pomo_layout_holder    = NULL;
+static lv_obj_t *pomo_progress_bar     = NULL;
+static lv_obj_t *pomo_time_holder      = NULL;
+static lv_obj_t *pomo_time_text        = NULL;
+static lv_obj_t *pomo_time_status      = NULL;
+static lv_obj_t *pomo_breath_indicator = NULL;
 
 static uint32_t session_start_timestamp = 0;
 
-static int pomo_total_set_num;
+static int      pomo_total_set_num;
 static uint32_t pomo_total_session_duration_min;
-static int pomo_work_set_width;
-static int pomo_rest_set_width;
-static uint8_t pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
-static int quote_offset;
+static int      pomo_work_set_width;
+static int      pomo_rest_set_width;
+static uint8_t  pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
+static int      quote_offset;
 
 // animation variables
 static uint32_t pomo_breath_size = 60;
 
 // notify variables
 static uint32_t pomo_noti_start_timestamp = 0;
-static uint32_t pomo_noti_duration_ms = 3000;
-static bool pomo_noti_restored = false;
+static uint32_t pomo_noti_duration_ms     = 3000;
+static bool     pomo_noti_restored        = false;
 // #ifdef RGB_MATRIX_ENABLE
 // static int last_rgb_matrix_effect;
 // #endif
 
 #ifdef AUDIO_ENABLE
-#define SIMPLE_ALARM_SOUND Q__NOTE(_C6), Q__NOTE(_C6),
-#define SIMPLE_ALARM_LONG_SOUND Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6),
-float work_song[][2] = SONG(SIMPLE_ALARM_LONG_SOUND);
-float rest_song[][2] = SONG(SIMPLE_ALARM_LONG_SOUND);
+#    define SIMPLE_ALARM_SOUND Q__NOTE(_C6), Q__NOTE(_C6),
+#    define SIMPLE_ALARM_LONG_SOUND Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6), B__NOTE(_REST), Q__NOTE(_C6), Q__NOTE(_C6),
+float work_song[][2]   = SONG(SIMPLE_ALARM_LONG_SOUND);
+float rest_song[][2]   = SONG(SIMPLE_ALARM_LONG_SOUND);
 float cancel_song[][2] = SONG(SIMPLE_ALARM_SOUND);
 #endif
 
-char * get_current_quote(void);
+char *get_current_quote(void);
 
-lv_obj_t * screen_pomodoro_init(void) {
+lv_obj_t *screen_pomodoro_init(void) {
     quote_offset = rand();
 
     screen_pomodoro = lv_obj_create(NULL);
@@ -80,7 +80,7 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_100, 0);
     lv_obj_set_style_bg_color(pomo_breath_indicator, lv_color_hex(0x005639), 0);
     lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
-    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size/2, 0);
+    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size / 2, 0);
 
     pomo_layout_holder = lv_obj_create(screen_pomodoro);
     lv_obj_add_style(pomo_layout_holder, &style_container, 0);
@@ -89,11 +89,10 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_obj_set_style_pad_row(pomo_layout_holder, 0, 0);
     lv_obj_set_style_bg_opa(pomo_layout_holder, LV_OPA_TRANSP, 0);
 
-
     // main time + status holder
     pomo_time_holder = lv_obj_create(pomo_layout_holder);
     lv_obj_add_style(pomo_time_holder, &style_container, 0);
-    lv_obj_set_size(pomo_time_holder, SCREEN_WIDTH, SCREEN_HEIGHT-CANVAS_POMO_HEIGHT);
+    lv_obj_set_size(pomo_time_holder, SCREEN_WIDTH, SCREEN_HEIGHT - CANVAS_POMO_HEIGHT);
     use_flex_column(pomo_time_holder);
     lv_obj_set_style_pad_row(pomo_time_holder, 6, 0);
     lv_obj_set_flex_align(pomo_time_holder, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_SPACE_AROUND);
@@ -125,7 +124,6 @@ lv_obj_t * screen_pomodoro_init(void) {
     lv_bar_set_value(pomo_progress_bar, 25, LV_ANIM_OFF);
     lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
 
-
     screen_pomodoro_ui_update();
     screen_pomodoro_set_time_style(config.time_style_id);
 
@@ -137,14 +135,16 @@ void screen_pomodoro_ui_update(void) {
     if (config.pomo_work_duration == 0) config.pomo_work_duration = 25;
     if (config.pomo_rest_duration == 0) config.pomo_rest_duration = 5;
 
-    pomo_total_set_num = 2*config.pomo_num_set - 1;
+    pomo_total_set_num              = 2 * config.pomo_num_set - 1;
     pomo_total_session_duration_min = config.pomo_work_duration * config.pomo_num_set + config.pomo_rest_duration * (config.pomo_num_set - 1);
-    pomo_work_set_width = (int) (CANVAS_POMO_WIDTH * (((float) config.pomo_work_duration) / ((float) pomo_total_session_duration_min)));
-    pomo_rest_set_width = (int) (CANVAS_POMO_WIDTH * (((float) config.pomo_rest_duration) / ((float) pomo_total_session_duration_min)));
+    pomo_work_set_width             = (int)(CANVAS_POMO_WIDTH * (((float)config.pomo_work_duration) / ((float)pomo_total_session_duration_min)));
+    pomo_rest_set_width             = (int)(CANVAS_POMO_WIDTH * (((float)config.pomo_rest_duration) / ((float)pomo_total_session_duration_min)));
 }
 
 void screen_pomodoro_set_time_style(uint8_t time_style) {
     config.time_style_id = time_style;
+
+    lv_obj_remove_style_all(pomo_time_text);
 
     switch (config.time_style_id) {
         case coban_time_style_2: {
@@ -188,7 +188,7 @@ void screen_pomodoro_do_notify(enum coban_pomo_noti_kind_id noti_kind_id) {
     }
     if (config.pomo_noti_mode == coban_pomo_noti_mode_light || config.pomo_noti_mode == coban_pomo_noti_mode_both) {
         pomo_noti_start_timestamp = timer_read32();
-        pomo_noti_restored = false;
+        pomo_noti_restored        = false;
         switch (noti_kind_id) {
             case coban_pomo_noti_kind_work: {
                 pomo_noti_duration_ms = 3000;
@@ -215,8 +215,8 @@ void screen_pomodoro_do_notify(enum coban_pomo_noti_kind_id noti_kind_id) {
 
 void screen_pomodoro_notify_task(void) {
     uint32_t current_timestamp = timer_read32();
-    uint32_t elapsed_time = current_timestamp - pomo_noti_start_timestamp;
-    bool is_finished = (elapsed_time >= pomo_noti_duration_ms);
+    uint32_t elapsed_time      = current_timestamp - pomo_noti_start_timestamp;
+    bool     is_finished       = (elapsed_time >= pomo_noti_duration_ms);
 #ifdef RGB_MATRIX_ENABLE
     if (is_finished) {
         if (!pomo_noti_restored) {
@@ -231,7 +231,7 @@ void screen_pomodoro_notify_task(void) {
 
 void screen_pomodoro_session_start(void) {
     session_start_timestamp = timer_read32();
-    pomo_current_set_idx = 0;
+    pomo_current_set_idx    = 0;
     // lv_obj_set_x(pomo_indice, 0);
     lv_obj_clear_flag(pomo_time_text, LV_OBJ_FLAG_HIDDEN);
     lv_obj_clear_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);
@@ -290,7 +290,7 @@ static inline double smoothstep(double x) {
 
 // Continuous breathing waveform
 double breathing_wave(double t, double T_in, double T_hold, double T_out, double T_hold2) {
-    double T = T_in + T_hold + T_out + T_hold2;
+    double T     = T_in + T_hold + T_out + T_hold2;
     double phase = fmod(t, T);
 
     // Inhale phase
@@ -321,7 +321,7 @@ double breathing_wave(double t, double T_in, double T_hold, double T_out, double
     }
 }
 
-void pomo_cb(lv_timer_t * timer) {
+void pomo_cb(lv_timer_t *timer) {
     if (!pomo_running) {
         return;
     }
@@ -331,10 +331,10 @@ void pomo_cb(lv_timer_t * timer) {
     uint32_t current_timestamp = timer_read32();
 
     // calculate breath cycle state
-    float breath_progress_percentage = (breathing_wave((float)current_timestamp/1000, 3, 0.5, 3, 0.5) + 1 ) / 2; // from 0 to 1
-    pomo_breath_size = (uint32_t) (breath_progress_percentage * (64-28) + 28);  // map to 28 - 64
+    float breath_progress_percentage = (breathing_wave((float)current_timestamp / 1000, 3, 0.5, 3, 0.5) + 1) / 2; // from 0 to 1
+    pomo_breath_size                 = (uint32_t)(breath_progress_percentage * (64 - 28) + 28);                   // map to 28 - 64
     lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
-    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size/2, 0);
+    lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size / 2, 0);
 
     if (pomo_state == coban_pomo_state_idle) {
         // No pomo session yet
@@ -343,8 +343,7 @@ void pomo_cb(lv_timer_t * timer) {
         return;
     }
 
-
-    uint32_t elapsed_time_sec = (current_timestamp - session_start_timestamp)/1000;
+    uint32_t elapsed_time_sec = (current_timestamp - session_start_timestamp) / 1000;
     if (elapsed_time_sec >= pomo_total_session_duration_min * 60) {
         // session is completed
         screen_pomodoro_session_complete();
@@ -353,17 +352,17 @@ void pomo_cb(lv_timer_t * timer) {
 
     // Calculate the current stat
     uint32_t set_time_start_sec = 0;
-    uint32_t set_time_left_sec = 0;
+    uint32_t set_time_left_sec  = 0;
     uint32_t set_time_total_sec = 0;
-    uint8_t set_idx = 0;
+    uint8_t  set_idx            = 0;
     for (int idx = 0; idx < pomo_total_set_num; idx++) {
-        uint32_t set_duration_sec = (idx % 2 == 0 ? config.pomo_work_duration : config.pomo_rest_duration)*60;
+        uint32_t set_duration_sec = (idx % 2 == 0 ? config.pomo_work_duration : config.pomo_rest_duration) * 60;
 
         uint32_t set_time_end_sec = set_time_start_sec + set_duration_sec;
         if (elapsed_time_sec >= set_time_start_sec && elapsed_time_sec < set_time_end_sec) {
             // this is the current set
-            set_idx = idx;
-            set_time_left_sec = set_duration_sec - (elapsed_time_sec - set_time_start_sec);
+            set_idx            = idx;
+            set_time_left_sec  = set_duration_sec - (elapsed_time_sec - set_time_start_sec);
             set_time_total_sec = set_duration_sec;
         }
 
@@ -384,13 +383,13 @@ void pomo_cb(lv_timer_t * timer) {
     uint8_t time_left_second = set_time_left_sec % 60;
     lv_label_set_text_fmt(pomo_time_text, "%02d:%02d", time_left_minute, time_left_second);
     if (set_idx % 2 == 0) {
-        lv_label_set_text_fmt(pomo_time_status, "FOCUS #%d", (int)(set_idx/2) + 1);
+        lv_label_set_text_fmt(pomo_time_status, "FOCUS #%d", (int)(set_idx / 2) + 1);
     } else {
         lv_label_set_text(pomo_time_status, get_current_quote());
     }
 
     float set_progress_percentage = 1.0 - (((float)set_time_left_sec) / ((float)set_time_total_sec));
-    lv_bar_set_value(pomo_progress_bar, (int32_t) (set_progress_percentage * 100), false);
+    lv_bar_set_value(pomo_progress_bar, (int32_t)(set_progress_percentage * 100), false);
 }
 
 void screen_pomodoro_stop(void) {
@@ -419,63 +418,61 @@ void screen_pomodoro_reload(void) {
     pomo_running = true;
 }
 
-const char* quotes[] = {
-    "Có công mài sắt\ncó ngày nên kim",
-    "Kiến tha lâu\ncũng đầy tổ",
-    "Có chí thì nên",
-    "Công thành\nchẳng quản lâu",
-    "Học thầy không tày học bạn",
-    "Đi một ngày đàng\nhọc một sàng khôn",
-    "Uống nước\nnhớ nguồn",
-    "Ăn quả\nnhớ kẻ trồng cây",
-    "Đói cho sạch\nrách cho thơm",
-    "Tốt gỗ\nhơn tốt nước sơn",
-    "Thất bại\nlà mẹ thành công",
-    "Cây ngay\nkhông lo chết đứng",
-    "Biết người biết ta\ntrăm trận trăm thắng",
-    "Gần mực thì đen\ngần đèn thì sáng",
-    "Chân cứng đá mềm",
-    "Tiền nào của nấy",
-    "Không thầy\nđố mày làm nên",
-    "Học ăn, học nói\nhọc gói, học mở",
-    "Hữu chí\ncánh thành",
-    "Lửa thử vàng\ngian nan thử sức",
-    "Thua keo này\nta bày keo khác",
-    "Được mùa chớ phụ ngô khoai",
-    "Giấy rách\nphải giữ lấy lề",
-    "Đèn nhà ai nấy rạng",
-    "Ở hiền gặp lành",
-    "Có chí làm quan\ncó gan làm giàu",
-    "Còn nước, còn tát",
-    "Trời sinh voi\ntrời sinh cỏ",
-    "Nước chảy đá mòn",
-    "Cái khó\nló cái khôn",
-    "Cần cù\nbù thông minh",
-    "Ăn vóc học hay",
-    "Học một biết mười",
-    "Góp gió thành bão",
-    "Học đi đôi với hành",
-    "Tre già măng mọc",
-    "Khó khăn\nthử thách lòng người",
-    "Đói cho sạch\nrách cho thơm",
-    "Không ai giàu ba họ\nkhông ai khó ba đời",
-    "Trăng mờ còn tỏ\nngười khó còn khôn",
-    "Có chí thì nên",
-    "Mưa dầm thấm lâu",
-    "Học thầy\nkhông tày học bạn",
-    "Giận quá mất khôn",
-    "Khéo ăn thì no\nkhéo co thì ấm",
-    "Điều lành\nđem lại điều hay",
-    "Ghét của nào\ntrời trao của nấy",
-    "Không có việc gì khó\nchỉ sợ lòng không bền",
-    "Không làm sao nên",
-    "Một điều nhịn\nchín điều lành"
-};
+const char *quotes[] = {"Có công mài sắt\ncó ngày nên kim",
+                        "Kiến tha lâu\ncũng đầy tổ",
+                        "Có chí thì nên",
+                        "Công thành\nchẳng quản lâu",
+                        "Học thầy không tày học bạn",
+                        "Đi một ngày đàng\nhọc một sàng khôn",
+                        "Uống nước\nnhớ nguồn",
+                        "Ăn quả\nnhớ kẻ trồng cây",
+                        "Đói cho sạch\nrách cho thơm",
+                        "Tốt gỗ\nhơn tốt nước sơn",
+                        "Thất bại\nlà mẹ thành công",
+                        "Cây ngay\nkhông lo chết đứng",
+                        "Biết người biết ta\ntrăm trận trăm thắng",
+                        "Gần mực thì đen\ngần đèn thì sáng",
+                        "Chân cứng đá mềm",
+                        "Tiền nào của nấy",
+                        "Không thầy\nđố mày làm nên",
+                        "Học ăn, học nói\nhọc gói, học mở",
+                        "Hữu chí\ncánh thành",
+                        "Lửa thử vàng\ngian nan thử sức",
+                        "Thua keo này\nta bày keo khác",
+                        "Được mùa chớ phụ ngô khoai",
+                        "Giấy rách\nphải giữ lấy lề",
+                        "Đèn nhà ai nấy rạng",
+                        "Ở hiền gặp lành",
+                        "Có chí làm quan\ncó gan làm giàu",
+                        "Còn nước, còn tát",
+                        "Trời sinh voi\ntrời sinh cỏ",
+                        "Nước chảy đá mòn",
+                        "Cái khó\nló cái khôn",
+                        "Cần cù\nbù thông minh",
+                        "Ăn vóc học hay",
+                        "Học một biết mười",
+                        "Góp gió thành bão",
+                        "Học đi đôi với hành",
+                        "Tre già măng mọc",
+                        "Khó khăn\nthử thách lòng người",
+                        "Đói cho sạch\nrách cho thơm",
+                        "Không ai giàu ba họ\nkhông ai khó ba đời",
+                        "Trăng mờ còn tỏ\nngười khó còn khôn",
+                        "Có chí thì nên",
+                        "Mưa dầm thấm lâu",
+                        "Học thầy\nkhông tày học bạn",
+                        "Giận quá mất khôn",
+                        "Khéo ăn thì no\nkhéo co thì ấm",
+                        "Điều lành\nđem lại điều hay",
+                        "Ghét của nào\ntrời trao của nấy",
+                        "Không có việc gì khó\nchỉ sợ lòng không bền",
+                        "Không làm sao nên",
+                        "Một điều nhịn\nchín điều lành"};
 
 const int quotes_count = 50;
 
-char * get_current_quote(void) {
+char *get_current_quote(void) {
     uint32_t current_time = screen_time_get_current_time32();
-    int quote_index = (((current_time / 1000 / 60 / 5) % quotes_count) + (quote_offset % quotes_count)) % quotes_count;
+    int      quote_index  = (((current_time / 1000 / 60 / 5) % quotes_count) + (quote_offset % quotes_count)) % quotes_count;
     return (char *)quotes[quote_index];
 }

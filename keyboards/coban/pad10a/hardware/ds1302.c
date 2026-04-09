@@ -144,15 +144,15 @@ bool ds1302_write_datetime(const ds1302_datetime_t *datetime) {
     }
 
     uint8_t data[9] = {};
-    data[0] = (((uint8_t)(datetime->second  / 10)) << 4) | (datetime->second % 10); // DS1302_DEC_TO_BCD(datetime->second);
-    data[1] = (((uint8_t)(datetime->minute  / 10)) << 4) | (datetime->minute % 10); // DS1302_DEC_TO_BCD(datetime->minute);
-    data[2] = (((uint8_t)(datetime->hour    / 10)) << 4) | (datetime->hour % 10); // DS1302_DEC_TO_BCD(datetime->hour);
-    data[3] = (((uint8_t)(datetime->day     / 10)) << 4) | (datetime->day % 10); // DS1302_DEC_TO_BCD(datetime->day);
-    data[4] = (((uint8_t)(datetime->month   / 10)) << 4) | (datetime->month % 10); // DS1302_DEC_TO_BCD(datetime->month);
-    data[5] = (((uint8_t)(datetime->weekday / 10)) << 4) | (datetime->weekday % 10); // DS1302_DEC_TO_BCD(datetime->weekday);
-    data[6] = (((uint8_t)(datetime->year    / 10)) << 4) | (datetime->year % 10); // DS1302_DEC_TO_BCD(datetime->year);
-    data[7] = 0;
-    data[8] = 0;
+    data[0]         = (((uint8_t)(datetime->second / 10)) << 4) | (datetime->second % 10);   // DS1302_DEC_TO_BCD(datetime->second);
+    data[1]         = (((uint8_t)(datetime->minute / 10)) << 4) | (datetime->minute % 10);   // DS1302_DEC_TO_BCD(datetime->minute);
+    data[2]         = (((uint8_t)(datetime->hour / 10)) << 4) | (datetime->hour % 10);       // DS1302_DEC_TO_BCD(datetime->hour);
+    data[3]         = (((uint8_t)(datetime->day / 10)) << 4) | (datetime->day % 10);         // DS1302_DEC_TO_BCD(datetime->day);
+    data[4]         = (((uint8_t)(datetime->month / 10)) << 4) | (datetime->month % 10);     // DS1302_DEC_TO_BCD(datetime->month);
+    data[5]         = (((uint8_t)(datetime->weekday / 10)) << 4) | (datetime->weekday % 10); // DS1302_DEC_TO_BCD(datetime->weekday);
+    data[6]         = (((uint8_t)(datetime->year / 10)) << 4) | (datetime->year % 10);       // DS1302_DEC_TO_BCD(datetime->year);
+    data[7]         = 0;
+    data[8]         = 0;
 
     // Use burst mode for writing: 0xbe = write to second register with auto-increment
     ds1302_start_tx();

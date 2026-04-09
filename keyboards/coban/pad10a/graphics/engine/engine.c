@@ -32,19 +32,19 @@ void vector_fillv(Vector *a, Vector *b) {
 }
 
 void vector_cross(Vector *a, Vector *b, Vector *r) {
-    r->x = a->y*b->z - a->z*b->y;
-    r->y = a->z*b->x - a->x*b->z;
-    r->z = a->x*b->y - a->y*b->x;
+    r->x = a->y * b->z - a->z * b->y;
+    r->y = a->z * b->x - a->x * b->z;
+    r->z = a->x * b->y - a->y * b->x;
 }
 
 void vector_devide(Vector *a, float s, Vector *r) {
-    r->x = a->x/s;
-    r->y = a->y/s;
-    r->z = a->z/s;
+    r->x = a->x / s;
+    r->y = a->y / s;
+    r->z = a->z / s;
 }
 
 void vector_norm(Vector *a, Vector *r) {
-    float l = sqrt(a->x*a->x + a->y*a->y + a->z*a->z);
+    float l = sqrt(a->x * a->x + a->y * a->y + a->z * a->z);
     vector_devide(a, l, r);
 }
 
@@ -55,11 +55,11 @@ void vector_minus(Vector *a, Vector *b, Vector *r) {
 }
 
 float vector_dot3(Vector *a, Vector *b) {
-    return a->x*b->x + a->y*b->y + a->z*b->z;
+    return a->x * b->x + a->y * b->y + a->z * b->z;
 }
 
 float vector_dot4(Vector *a, Vector *b) {
-    return a->x*b->x + a->y*b->y + a->z*b->z + a->s*b->s;
+    return a->x * b->x + a->y * b->y + a->z * b->z + a->s * b->s;
 }
 
 void matrix_mul(Matrix *m, Vector *v, Vector *r) {
@@ -99,24 +99,24 @@ void build_camera_matrix(Vector *pos, Vector *at, Vector *up, Matrix *r) {
 }
 
 void build_projection_matrix(int screen_width, int screen_height, float zNear, float zFar, float fov, Matrix *r) {
-    float ratio = (float)screen_width/screen_height;
-    float zRange = zNear - zFar;
-    float tanHFov = tanf((M_PI/180.0)*fov/2.0);
+    float ratio   = (float)screen_width / screen_height;
+    float zRange  = zNear - zFar;
+    float tanHFov = tanf((M_PI / 180.0) * fov / 2.0);
 
-    r->r1.x = 1/(tanHFov*ratio);
+    r->r1.x = 1 / (tanHFov * ratio);
     r->r1.y = 0;
     r->r1.z = 0;
     r->r1.s = 0;
 
     r->r2.x = 0;
-    r->r2.y = 1/tanHFov;
+    r->r2.y = 1 / tanHFov;
     r->r2.z = 0;
     r->r2.s = 0;
 
     r->r3.x = 0;
     r->r3.y = 0;
-    r->r3.z = (-zNear-zFar)/zRange;
-    r->r3.s = 2*zFar*zNear/zRange;
+    r->r3.z = (-zNear - zFar) / zRange;
+    r->r3.s = 2 * zFar * zNear / zRange;
 
     r->r4.x = 0;
     r->r4.y = 0;

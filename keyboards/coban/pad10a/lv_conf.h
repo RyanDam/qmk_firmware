@@ -75,7 +75,7 @@
 #define LV_TXT_ENC LV_TXT_ENC_UTF8
 
 #ifdef LV_USE_FONT_SUBPX
-#undef LV_USE_FONT_SUBPX
+#    undef LV_USE_FONT_SUBPX
 #endif
 #define LV_USE_FONT_SUBPX 1
 #define LV_FONT_SUBPX_BGR 0
