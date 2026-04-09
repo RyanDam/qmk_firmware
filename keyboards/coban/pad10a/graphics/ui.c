@@ -28,15 +28,15 @@
 static painter_device_t oled;
 
 lv_obj_t *screen_clock;
-lv_obj_t *screen_stats;
+// lv_obj_t *screen_stats;
 lv_obj_t *screen_anime;
 lv_obj_t *screen_layer;
 lv_obj_t *screen_render;
 lv_obj_t *screen_pomodoro;
 lv_obj_t *screen_boot;
 
-const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro, coban_screen_stats};
-const int                   num_avail_screen  = 5;
+const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int                   num_avail_screen  = 4;
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
 static lv_timer_t *ui_timer          = NULL;
@@ -61,7 +61,7 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
-        screen_stats = screen_hardware_stat_init();
+        // screen_stats = screen_hardware_stat_init();
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
@@ -122,16 +122,16 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_clock;
             break;
         }
-        case coban_screen_stats: {
-            screen_animation_stop();
-            // screen_render_stop();
-            screen_time_stop();
-            screen_pomodoro_stop();
-            screen_layers_stop();
-            lv_scr_load(screen_stats);
-            ui_current_screen = coban_screen_stats;
-            break;
-        }
+        // case coban_screen_stats: {
+        //     screen_animation_stop();
+        //     // screen_render_stop();
+        //     screen_time_stop();
+        //     screen_pomodoro_stop();
+        //     screen_layers_stop();
+        //     lv_scr_load(screen_stats);
+        //     ui_current_screen = coban_screen_stats;
+        //     break;
+        // }
         case coban_screen_anime: {
             // screen_render_stop();
             screen_time_stop();
