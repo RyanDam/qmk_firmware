@@ -20,7 +20,7 @@
 #include "graphics/screens/styles.h"
 #include "graphics/screens/screen_boot.h"
 #include "graphics/screens/screen_time.h"
-// #include "graphics/screens/screen_hardware_stats.h"
+#include "graphics/screens/screen_hardware_stats.h"
 #include "graphics/screens/screen_animation.h"
 #include "graphics/screens/screen_layers.h"
 // #include "graphics/screens/screen_render.h"
@@ -28,7 +28,7 @@
 
 enum coban_screen_id {
     coban_screen_clock = 0x00,
-    // coban_screen_stats = 0x01,
+    coban_screen_stats = 0x01,
     coban_screen_anime = 0x02,
     coban_screen_layer = 0x03,
     // coban_screen_render = 0x04,

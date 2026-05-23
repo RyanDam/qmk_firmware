@@ -55,10 +55,11 @@ void coban_init_config(void) {
         }
     }
 
-    config.stats_layout_id = 0x00;
-    for (int i = 0; i < 4; i++) {
-        config.stats_data_ids[i] = 0x00;
-    }
+    config.stats_layout_id   = coban_stats_layout_2x1;
+    config.stats_data_ids[0] = coban_stats_data_cpu_util;
+    config.stats_data_ids[1] = coban_stats_data_ram;
+    config.stats_data_ids[2] = coban_stats_data_cpu_temp;
+    config.stats_data_ids[3] = coban_stats_data_cpu_util;
 }
 
 void coban_save_config(void) {

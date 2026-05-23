@@ -156,15 +156,24 @@ static void update_arc_display(uint8_t index, uint8_t data_index) {
     }
 
     const char *unit_symbol = get_unit_symbol(stat_data[data_index].unit_id);
+    char        buf[16];
 
     if (stat_data[data_index].max_value > 0) {
         uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
         lv_arc_set_value(arc_ui[index].arc, (int16_t)percentage);
-        lv_label_set_text_fmt(arc_ui[index].value, "%d%s", stat_data[data_index].value, unit_symbol);
+        if (data_index == coban_stats_data_ram) {
+            uint16_t left  = stat_data[data_index].value / 10;
+            uint16_t right = stat_data[data_index].value % 10;
+            snprintf(buf, sizeof(buf), "%u.%01u%s", left, right, unit_symbol);
+        } else {
+            snprintf(buf, sizeof(buf), "%u%s", stat_data[data_index].value, unit_symbol);
+        }
+        lv_label_set_text(arc_ui[index].value, buf);
         lv_label_set_text_fmt(arc_ui[index].label, "%s", get_data_name(data_index));
     } else {
         lv_arc_set_value(arc_ui[index].arc, 0);
-        lv_label_set_text_fmt(arc_ui[index].value, "--%s", unit_symbol);
+        snprintf(buf, sizeof(buf), "--%s", unit_symbol);
+        lv_label_set_text(arc_ui[index].value, buf);
         lv_label_set_text_fmt(arc_ui[index].label, "%s", get_data_name(data_index));
     }
 }
@@ -175,15 +184,24 @@ static void update_bar_display(uint8_t index, uint8_t data_index) {
     }
 
     const char *unit_symbol = get_unit_symbol(stat_data[data_index].unit_id);
+    char        buf[16];
 
     if (stat_data[data_index].max_value > 0) {
         uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
         lv_bar_set_value(bar_ui[index].bar, percentage, LV_ANIM_OFF);
-        lv_label_set_text_fmt(bar_ui[index].value, "%d%s", stat_data[data_index].value, unit_symbol);
+        if (data_index == coban_stats_data_ram) {
+            uint16_t left  = stat_data[data_index].value / 10;
+            uint16_t right = stat_data[data_index].value % 10;
+            snprintf(buf, sizeof(buf), "%u.%01u%s", left, right, unit_symbol);
+        } else {
+            snprintf(buf, sizeof(buf), "%u%s", stat_data[data_index].value, unit_symbol);
+        }
+        lv_label_set_text(bar_ui[index].value, buf);
         lv_label_set_text_fmt(bar_ui[index].label, "%s", get_data_name(data_index));
     } else {
         lv_bar_set_value(bar_ui[index].bar, 0, LV_ANIM_OFF);
-        lv_label_set_text_fmt(bar_ui[index].value, "--%s", unit_symbol);
+        snprintf(buf, sizeof(buf), "--%s", unit_symbol);
+        lv_label_set_text(bar_ui[index].value, buf);
         lv_label_set_text_fmt(bar_ui[index].label, "%s", get_data_name(data_index));
     }
 }

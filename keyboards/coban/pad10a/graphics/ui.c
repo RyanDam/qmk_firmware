@@ -27,15 +27,15 @@
 
 static painter_device_t oled;
 
-lv_obj_t *screen_clock = NULL;
-// lv_obj_t *screen_stats = NULL;
+lv_obj_t *screen_clock    = NULL;
+lv_obj_t *screen_stats    = NULL;
 lv_obj_t *screen_anime    = NULL;
 lv_obj_t *screen_layer    = NULL;
 lv_obj_t *screen_render   = NULL;
 lv_obj_t *screen_pomodoro = NULL;
 lv_obj_t *screen_boot     = NULL;
 
-const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_stats, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
 const int                   num_avail_screen  = 4;
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
@@ -61,7 +61,7 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
-        // screen_stats = screen_hardware_stat_init();
+        screen_stats = screen_hardware_stat_init();
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
@@ -122,16 +122,16 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_clock;
             break;
         }
-        // case coban_screen_stats: {
-        //     screen_animation_stop();
-        //     // screen_render_stop();
-        //     screen_time_stop();
-        //     screen_pomodoro_stop();
-        //     screen_layers_stop();
-        //     lv_scr_load(screen_stats);
-        //     ui_current_screen = coban_screen_stats;
-        //     break;
-        // }
+        case coban_screen_stats: {
+            screen_animation_stop();
+            // screen_render_stop();
+            screen_time_stop();
+            screen_pomodoro_stop();
+            screen_layers_stop();
+            lv_scr_load(screen_stats);
+            ui_current_screen = coban_screen_stats;
+            break;
+        }
         case coban_screen_anime: {
             // screen_render_stop();
             screen_time_stop();
