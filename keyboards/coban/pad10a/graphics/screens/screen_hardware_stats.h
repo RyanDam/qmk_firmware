@@ -20,25 +20,39 @@
 
 enum coban_stats_layout_id { coban_stats_layout_2x1 = 0x00, coban_stats_layout_2x2 = 0x01 };
 
-#define STATS_DATA_COUNT 6
+#define STATS_DATA_COUNT 17
 
 enum coban_stats_data_id {
-    coban_stats_data_none     = 0x00,
-    coban_stats_data_cpu_util = 0x01,
-    coban_stats_data_cpu_temp = 0x02,
-    coban_stats_data_ram      = 0x03,
-    coban_stats_data_gpu_util = 0x04,
-    coban_stats_data_gpu_temp = 0x05,
+    coban_stats_data_none      = 0x00,
+    coban_stats_data_cpu_util  = 0x01,
+    coban_stats_data_cpu_temp  = 0x02,
+    coban_stats_data_ram       = 0x03,
+    coban_stats_data_gpu_util  = 0x04,
+    coban_stats_data_gpu_temp  = 0x05,
+    coban_stats_data_disk_usage = 0x06,
+    coban_stats_data_disk_total = 0x07,
+    coban_stats_data_net_sent   = 0x08,
+    coban_stats_data_net_recv   = 0x09,
+    coban_stats_data_swap_usage = 0x0A,
+    coban_stats_data_cpu_freq   = 0x0B,
+    coban_stats_data_soc_temp   = 0x0C,
+    coban_stats_data_disk_read  = 0x0D,
+    coban_stats_data_disk_write = 0x0E,
+    coban_stats_data_cpu_power  = 0x0F,
+    coban_stats_data_gpu_power  = 0x10,
 };
 
 enum coban_stats_unit_id {
-    coban_stats_unit_none       = 0x00,
-    coban_stats_unit_percent    = 0x01,
-    coban_stats_unit_celsius    = 0x02,
-    coban_stats_unit_fahrenheit = 0x03,
-    coban_stats_unit_megabytes  = 0x04,
-    coban_stats_unit_gigabytes  = 0x05,
-    coban_stats_unit_terabytes  = 0x06,
+    coban_stats_unit_none        = 0x00,
+    coban_stats_unit_percent     = 0x01,
+    coban_stats_unit_celsius     = 0x02,
+    coban_stats_unit_fahrenheit  = 0x03,
+    coban_stats_unit_megabytes   = 0x04,
+    coban_stats_unit_gigabytes   = 0x05,
+    coban_stats_unit_terabytes   = 0x06,
+    coban_stats_unit_mbps        = 0x07,
+    coban_stats_unit_mhz         = 0x08,
+    coban_stats_unit_milliwatts  = 0x09,
 };
 
 typedef struct {

@@ -27,7 +27,7 @@ static lv_obj_t          *screen_home                 = NULL;
 static lv_obj_t          *mods                        = NULL;
 static lv_obj_t          *layout_2x1_holder           = NULL;
 static lv_obj_t          *layout_2x2_holder           = NULL;
-static coban_stats_data_t stat_data[STATS_SLOT_COUNT] = {{0}};
+static coban_stats_data_t stat_data[STATS_DATA_COUNT] = {{0}};
 static uint8_t            current_layout              = coban_stats_layout_2x1;
 
 typedef struct {
@@ -57,6 +57,28 @@ static const char *get_data_name(uint8_t data_id) {
             return "GPU";
         case coban_stats_data_gpu_temp:
             return "GPU";
+        case coban_stats_data_disk_usage:
+            return "DISK";
+        case coban_stats_data_disk_total:
+            return "DISK";
+        case coban_stats_data_net_sent:
+            return "NET↓";
+        case coban_stats_data_net_recv:
+            return "NET↑";
+        case coban_stats_data_swap_usage:
+            return "SWAP";
+        case coban_stats_data_cpu_freq:
+            return "CPU";
+        case coban_stats_data_soc_temp:
+            return "SOC";
+        case coban_stats_data_disk_read:
+            return "D.R";
+        case coban_stats_data_disk_write:
+            return "D.W";
+        case coban_stats_data_cpu_power:
+            return "CPU";
+        case coban_stats_data_gpu_power:
+            return "GPU";
         default:
             return "";
     }
@@ -76,8 +98,30 @@ static const char *get_unit_symbol(uint8_t unit_id) {
             return "GB";
         case coban_stats_unit_terabytes:
             return "TB";
+        case coban_stats_unit_mbps:
+            return "Mbps";
+        case coban_stats_unit_mhz:
+            return "MHz";
+        case coban_stats_unit_milliwatts:
+            return "mW";
         default:
             return "";
+    }
+}
+
+static bool needs_decimal_format(uint8_t data_id) {
+    switch (data_id) {
+        case coban_stats_data_ram:
+        case coban_stats_data_disk_usage:
+        case coban_stats_data_disk_total:
+        case coban_stats_data_swap_usage:
+        case coban_stats_data_net_sent:
+        case coban_stats_data_net_recv:
+        case coban_stats_data_disk_read:
+        case coban_stats_data_disk_write:
+            return true;
+        default:
+            return false;
     }
 }
 
@@ -161,7 +205,7 @@ static void update_arc_display(uint8_t index, uint8_t data_index) {
     if (stat_data[data_index].max_value > 0) {
         uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
         lv_arc_set_value(arc_ui[index].arc, (int16_t)percentage);
-        if (data_index == coban_stats_data_ram) {
+        if (needs_decimal_format(data_index)) {
             uint16_t left  = stat_data[data_index].value / 10;
             uint16_t right = stat_data[data_index].value % 10;
             snprintf(buf, sizeof(buf), "%u.%01u%s", left, right, unit_symbol);
@@ -189,7 +233,7 @@ static void update_bar_display(uint8_t index, uint8_t data_index) {
     if (stat_data[data_index].max_value > 0) {
         uint8_t percentage = (uint8_t)((stat_data[data_index].value * 100UL) / stat_data[data_index].max_value);
         lv_bar_set_value(bar_ui[index].bar, percentage, LV_ANIM_OFF);
-        if (data_index == coban_stats_data_ram) {
+        if (needs_decimal_format(data_index)) {
             uint16_t left  = stat_data[data_index].value / 10;
             uint16_t right = stat_data[data_index].value % 10;
             snprintf(buf, sizeof(buf), "%u.%01u%s", left, right, unit_symbol);
@@ -257,14 +301,14 @@ static void update_all_displays(void) {
     if (current_layout == coban_stats_layout_2x1) {
         for (uint8_t i = 0; i < 2; i++) {
             uint8_t data_id = config.stats_data_ids[i];
-            if (data_id != coban_stats_data_none && data_id < STATS_SLOT_COUNT) {
+            if (data_id != coban_stats_data_none && data_id < STATS_DATA_COUNT) {
                 update_arc_display(i, data_id);
             }
         }
     } else if (current_layout == coban_stats_layout_2x2) {
         for (uint8_t i = 0; i < STATS_SLOT_COUNT; i++) {
             uint8_t data_id = config.stats_data_ids[i];
-            if (data_id != coban_stats_data_none && data_id < STATS_SLOT_COUNT) {
+            if (data_id != coban_stats_data_none && data_id < STATS_DATA_COUNT) {
                 update_bar_display(i, data_id);
             }
         }
@@ -308,7 +352,7 @@ lv_obj_t *screen_hardware_stat_init(void) {
 }
 
 void screen_hardware_stat_set_data(uint8_t data_id, uint16_t value, uint16_t max_value, uint8_t unit_id) {
-    if (data_id >= STATS_SLOT_COUNT) {
+    if (data_id >= STATS_DATA_COUNT) {
         return;
     }
 
