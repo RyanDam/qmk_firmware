@@ -30,6 +30,7 @@ enum coban_command_id { // via start at 0x00, currently end at 0x15
     coban_cmd_id_set_layer        = 0x60,
     coban_cmd_id_set_audio_volume = 0x61,
     coban_cmd_id_set_macro_name   = 0x62,
+    coban_cmd_id_set_gif_bg       = 0x63,
 
     coban_cmd_id_reset_layer_ui = 0x95,
     coban_cmd_id_save_eeprom    = 0x96,

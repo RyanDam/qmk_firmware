@@ -37,9 +37,12 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             config.screen_switch_layer         = command_data[1];
             config.screen_switch_layer_timeout = command_data[2];
             config.screen_idle_timeout         = command_data[3];
-            config.screen_background_enable    = command_data[4];
-            screen_background_update();
             change_screen(config.screen_idx);
+            break;
+        }
+        case coban_cmd_id_set_gif_bg: {
+            config.screen_background_enable = command_data[0];
+            screen_background_update();
             break;
         }
         case coban_cmd_id_set_time: {
@@ -193,7 +196,10 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 1) = 0xff & config.screen_switch_layer;
             *(command_data + 2) = 0xff & config.screen_switch_layer_timeout;
             *(command_data + 3) = 0xff & config.screen_idle_timeout;
-            *(command_data + 4) = 0xff & config.screen_background_enable;
+            break;
+        }
+        case coban_cmd_id_set_gif_bg: {
+            *(command_data + 0) = 0xff & config.screen_background_enable;
             break;
         }
         case coban_cmd_id_set_time_format: {
