@@ -55,11 +55,13 @@ void coban_init_config(void) {
         }
     }
 
+ #ifdef COBAN_STATS_SCREEN_ENABLE
     config.stats_layout_id   = coban_stats_layout_2x1;
     config.stats_data_ids[0] = coban_stats_data_cpu_util;
     config.stats_data_ids[1] = coban_stats_data_ram;
     config.stats_data_ids[2] = coban_stats_data_cpu_temp;
     config.stats_data_ids[3] = coban_stats_data_cpu_util;
+#endif
 }
 
 void coban_save_config(void) {

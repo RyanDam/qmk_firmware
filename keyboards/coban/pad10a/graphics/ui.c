@@ -28,14 +28,20 @@
 static painter_device_t oled;
 
 lv_obj_t *screen_clock    = NULL;
+#ifdef COBAN_STATS_SCREEN_ENABLE
 lv_obj_t *screen_stats    = NULL;
+#endif
 lv_obj_t *screen_anime    = NULL;
 lv_obj_t *screen_layer    = NULL;
 lv_obj_t *screen_render   = NULL;
 lv_obj_t *screen_pomodoro = NULL;
 lv_obj_t *screen_boot     = NULL;
 
+#ifdef COBAN_STATS_SCREEN_ENABLE
 const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_stats, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+#else
+const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+#endif
 const int                   num_avail_screen  = 4;
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
@@ -61,7 +67,9 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
+ #ifdef COBAN_STATS_SCREEN_ENABLE
         screen_stats = screen_hardware_stat_init();
+#endif
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
@@ -122,6 +130,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_clock;
             break;
         }
+ #ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_screen_stats: {
             screen_animation_stop();
             // screen_render_stop();
@@ -132,6 +141,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_stats;
             break;
         }
+#endif
         case coban_screen_anime: {
             // screen_render_stop();
             screen_time_stop();

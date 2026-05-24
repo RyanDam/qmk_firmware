@@ -62,6 +62,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 #endif
             break;
         }
+ #ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             config.stats_layout_id = command_data[0];
             for (int i = 0; i < 4; i++) {
@@ -84,6 +85,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             }
             break;
         }
+#endif
         case coban_cmd_id_set_time_format: {
             uint8_t time_style      = command_data[0];
             uint8_t time_format     = command_data[1];
@@ -203,6 +205,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 1) = 0xff & config.layer_switch_default_timeout;
             break;
         }
+  #ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             *(command_data + 0) = 0xff & config.stats_layout_id;
             for (int i = 0; i < 4; i++) {
@@ -210,6 +213,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             }
             break;
         }
+#endif
         case coban_cmd_id_set_gif_buffer: {
             uint8_t  offset_1 = command_data[0];
             uint8_t  offset_2 = command_data[1];
