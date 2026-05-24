@@ -128,3 +128,8 @@ compile_commands.json
 via*.json
 /keyboards/**/keymaps/via/*
 /keyboards/**/keymaps/vial/*
+compile_copy.sh
+.gitignore
+flash.sh
+debug.sh
+reset.sh
