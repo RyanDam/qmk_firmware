@@ -30,6 +30,7 @@ void coban_init_config(void) {
     config.screen_switch_layer         = 1;
     config.screen_switch_layer_timeout = 5;
     config.screen_idle_timeout         = 15;
+    config.screen_background_enable    = 1;
 
     config.layer_switch_default         = 1;
     config.layer_switch_default_timeout = 60; // in sec, switch back to default layer if not have key event
@@ -55,7 +56,7 @@ void coban_init_config(void) {
         }
     }
 
- #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
     config.stats_layout_id   = coban_stats_layout_2x1;
     config.stats_data_ids[0] = coban_stats_data_cpu_util;
     config.stats_data_ids[1] = coban_stats_data_ram;

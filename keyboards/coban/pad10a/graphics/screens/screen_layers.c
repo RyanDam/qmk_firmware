@@ -79,6 +79,7 @@ lv_obj_t *screen_layers_init(void) {
     lv_obj_set_style_pad_left(holder_layer_indices, 12, 0);
     lv_obj_set_style_pad_right(holder_layer_indices, 12, 0);
     lv_obj_align(holder_layer_indices, LV_ALIGN_TOP_MID, 0, 8);
+    lv_obj_set_style_bg_opa(holder_layer_indices, LV_OPA_TRANSP, 0);
 
     for (int l = 0; l < 4; l++) {
         indices[l] = lv_obj_create(holder_layer_indices);

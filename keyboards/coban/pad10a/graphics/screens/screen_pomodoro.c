@@ -78,7 +78,9 @@ lv_obj_t *screen_pomodoro_init(void) {
     lv_obj_add_style(pomo_breath_indicator, &style_container, 0);
     lv_obj_center(pomo_breath_indicator);
     lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(pomo_breath_indicator, lv_color_hex(0x005639), 0);
+    // lv_obj_set_style_bg_color(pomo_breath_indicator, lv_color_hex(0x005639), 0);
+    lv_obj_set_style_bg_color(pomo_breath_indicator, lv_color_hex(0xffffff), 0);
+    lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_20, 0);
     lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
     lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size / 2, 0);
 

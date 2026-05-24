@@ -37,6 +37,8 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             config.screen_switch_layer         = command_data[1];
             config.screen_switch_layer_timeout = command_data[2];
             config.screen_idle_timeout         = command_data[3];
+            config.screen_background_enable    = command_data[4];
+            screen_background_update();
             change_screen(config.screen_idx);
             break;
         }
@@ -62,7 +64,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 #endif
             break;
         }
- #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             config.stats_layout_id = command_data[0];
             for (int i = 0; i < 4; i++) {
@@ -78,10 +80,10 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
                 if (data_id == coban_stats_data_none) {
                     continue;
                 }
-                uint16_t max_value  = command_data[i * 6 + 1] | (command_data[i * 6 + 2] << 8);
-                uint8_t  unit_id    = command_data[i * 6 + 3];
-                uint16_t value      = command_data[i * 6 + 4] | (command_data[i * 6 + 5] << 8);
-               screen_hardware_stat_set_data(data_id, value, max_value, unit_id);
+                uint16_t max_value = command_data[i * 6 + 1] | (command_data[i * 6 + 2] << 8);
+                uint8_t  unit_id   = command_data[i * 6 + 3];
+                uint16_t value     = command_data[i * 6 + 4] | (command_data[i * 6 + 5] << 8);
+                screen_hardware_stat_set_data(data_id, value, max_value, unit_id);
             }
             break;
         }
@@ -130,6 +132,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             if (current_screen() == coban_screen_anime) {
                 screen_animation_reload();
             }
+            screen_background_reload();
             break;
         }
         case coban_cmd_id_set_pomo_config: {
@@ -190,6 +193,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 1) = 0xff & config.screen_switch_layer;
             *(command_data + 2) = 0xff & config.screen_switch_layer_timeout;
             *(command_data + 3) = 0xff & config.screen_idle_timeout;
+            *(command_data + 4) = 0xff & config.screen_background_enable;
             break;
         }
         case coban_cmd_id_set_time_format: {
@@ -205,7 +209,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 1) = 0xff & config.layer_switch_default_timeout;
             break;
         }
-  #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             *(command_data + 0) = 0xff & config.stats_layout_id;
             for (int i = 0; i < 4; i++) {
