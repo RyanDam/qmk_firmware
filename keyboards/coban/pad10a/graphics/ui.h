@@ -43,6 +43,8 @@ enum coban_screen_id {
 
 void ui_init(void);
 
+void screen_ui_apply_theme(void);
+
 void screen_ui_stop(void);
 
 void screen_ui_reload(void);

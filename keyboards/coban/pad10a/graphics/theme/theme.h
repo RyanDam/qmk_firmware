@@ -14,26 +14,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+#pragma once
+
 #include "qp_lvgl.h"
-#include "graphics/theme/theme.h"
 
-extern lv_style_t style_screen;
-extern lv_style_t style_container;
-extern lv_style_t style_text;
-extern lv_style_t style_arc_main;
-extern lv_style_t style_arc_positive;
-extern lv_style_t style_arc_knob;
-extern lv_style_t style_bar_main;
-extern lv_style_t style_bar_positive;
-extern lv_style_t style_indice;
+enum coban_theme_id {
+    coban_theme_dark  = 0,
+    coban_theme_light = 1,
+    coban_theme_count
+};
 
-extern lv_style_t style_text_time1;
-extern lv_style_t style_text_time2;
-extern lv_style_t style_text_time3;
+typedef struct {
+    lv_color_t bg;
+    lv_color_t text_primary;
+    lv_color_t text_secondary;
+    lv_color_t accent;
+    lv_color_t surface;
+    lv_color_t surface_pressed;
+    lv_color_t surface_pressed_text;
+    lv_color_t inactive;
+    lv_color_t pomo_bg;
+    lv_color_t pomo_indicator;
+} theme_color_t;
 
-extern lv_style_t style_key;
-extern lv_style_t style_key_trans;
-extern lv_style_t style_key_pressed;
-
-void init_styles(void);
-void apply_theme(void);
+const theme_color_t *get_current_theme(void);
+void                 apply_theme(void);

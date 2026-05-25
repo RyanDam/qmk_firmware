@@ -19,6 +19,7 @@
 
 #include "graphics/ui.h"
 #include "eeprom/cb_eeprom.h"
+#include "graphics/theme/theme.h"
 #include "utils/audio_volume.h"
 #include "hardware/flash.h"
 #include <hardware/sync.h>
@@ -170,6 +171,15 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             }
             break;
         }
+        case coban_cmd_id_set_theme: {
+            uint8_t theme = command_data[0];
+            if (theme < coban_theme_count) {
+                config.theme_id = theme;
+                screen_ui_apply_theme();
+                coban_save_config();
+            }
+            break;
+        }
         case coban_cmd_id_reboot_board: {
             soft_reset_keyboard();
             break;
@@ -282,6 +292,10 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
                     *(command_data + i + 1) = config.macro_names[macro_idx][i];
                 }
             }
+            break;
+        }
+        case coban_cmd_id_set_theme: {
+            *(command_data + 0) = 0xff & config.theme_id;
             break;
         }
         default:

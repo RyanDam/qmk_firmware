@@ -16,6 +16,7 @@
 
 #include "eeprom/cb_eeprom.h"
 #include "graphics/ui.h"
+#include "graphics/theme/theme.h"
 // #include "eeprom.h"
 #include "via.h"
 
@@ -47,6 +48,8 @@ void coban_init_config(void) {
     config.pomo_noti_mode     = coban_pomo_noti_mode_beep;
 
     config.audio_volume = 0;
+
+    config.theme_id = coban_theme_dark;
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 

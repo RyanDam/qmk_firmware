@@ -83,6 +83,11 @@ void ui_init(void) {
     screen_ui_reload();
 }
 
+void screen_ui_apply_theme(void) {
+    apply_theme();
+    screen_background_reload();
+}
+
 enum coban_screen_id current_screen(void) {
     return ui_current_screen;
 }

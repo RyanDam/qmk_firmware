@@ -51,6 +51,9 @@ typedef struct _cb_config_t {
     // stats screen config
     uint8_t stats_layout_id;
     uint8_t stats_data_ids[4];
+
+    // theme
+    uint8_t theme_id;
 } cb_config;
 
 extern cb_config config;
