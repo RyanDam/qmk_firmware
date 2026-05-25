@@ -40,6 +40,11 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             change_screen(config.screen_idx);
             break;
         }
+        case coban_cmd_id_set_gif_bg: {
+            config.screen_background_enable = command_data[0];
+            screen_background_update();
+            break;
+        }
         case coban_cmd_id_set_time: {
             uint8_t hour   = command_data[0];
             uint8_t minute = command_data[1];
@@ -62,7 +67,7 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 #endif
             break;
         }
- #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             config.stats_layout_id = command_data[0];
             for (int i = 0; i < 4; i++) {
@@ -78,10 +83,10 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
                 if (data_id == coban_stats_data_none) {
                     continue;
                 }
-                uint16_t max_value  = command_data[i * 6 + 1] | (command_data[i * 6 + 2] << 8);
-                uint8_t  unit_id    = command_data[i * 6 + 3];
-                uint16_t value      = command_data[i * 6 + 4] | (command_data[i * 6 + 5] << 8);
-               screen_hardware_stat_set_data(data_id, value, max_value, unit_id);
+                uint16_t max_value = command_data[i * 6 + 1] | (command_data[i * 6 + 2] << 8);
+                uint8_t  unit_id   = command_data[i * 6 + 3];
+                uint16_t value     = command_data[i * 6 + 4] | (command_data[i * 6 + 5] << 8);
+                screen_hardware_stat_set_data(data_id, value, max_value, unit_id);
             }
             break;
         }
@@ -102,8 +107,9 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_gif_buffer: {
-            // first, stop animation to prevent crash because of data writing
-            screen_animation_stop();
+            // first, stop animation and background to prevent crash because of data writing
+            screen_animation_delete();
+            screen_background_delete();
 
             uint8_t  offset_1 = command_data[0];
             uint8_t  offset_2 = command_data[1];
@@ -127,9 +133,13 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 
             config.gif_data_size      = gif_datasize;
             gif_data_header.data_size = config.gif_data_size;
+
+            lv_img_cache_invalidate_src(&gif_data_header);
+
             if (current_screen() == coban_screen_anime) {
                 screen_animation_reload();
             }
+            screen_background_reload();
             break;
         }
         case coban_cmd_id_set_pomo_config: {
@@ -192,6 +202,10 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 3) = 0xff & config.screen_idle_timeout;
             break;
         }
+        case coban_cmd_id_set_gif_bg: {
+            *(command_data + 0) = 0xff & config.screen_background_enable;
+            break;
+        }
         case coban_cmd_id_set_time_format: {
             *(command_data + 0) = 0xff & config.time_style_id;
             *(command_data + 1) = 0xff & config.time_format;
@@ -205,7 +219,7 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             *(command_data + 1) = 0xff & config.layer_switch_default_timeout;
             break;
         }
-  #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_cmd_id_set_stats_config: {
             *(command_data + 0) = 0xff & config.stats_layout_id;
             for (int i = 0; i < 4; i++) {

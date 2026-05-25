@@ -75,6 +75,8 @@ void ui_init(void) {
         screen_layer = screen_layers_init();
         // screen_render = screen_render_init();
         screen_pomodoro = screen_pomodoro_init();
+
+        screen_background_init();
     }
 
     backlight_enable();
@@ -119,45 +121,42 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         return ui_current_screen;
     }
 
-    switch (screen_idx) {
+   switch (screen_idx) {
         case coban_screen_clock: {
-            screen_animation_stop();
-            // screen_render_stop();
             screen_pomodoro_stop();
             screen_layers_stop();
             lv_scr_load(screen_clock);
+            screen_background_set(screen_clock, false);
             screen_time_reload();
             ui_current_screen = coban_screen_clock;
             break;
         }
  #ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_screen_stats: {
-            screen_animation_stop();
-            // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
             screen_layers_stop();
             lv_scr_load(screen_stats);
+            screen_background_set(screen_stats, false);
             ui_current_screen = coban_screen_stats;
             break;
         }
 #endif
         case coban_screen_anime: {
-            // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
             screen_layers_stop();
             lv_scr_load(screen_anime);
-            screen_animation_reload();
+            screen_background_set(screen_anime, true);
             ui_current_screen = coban_screen_anime;
             break;
         }
         case coban_screen_layer: {
-            screen_animation_stop();
-            // screen_render_stop();
             screen_time_stop();
             screen_pomodoro_stop();
+            screen_layers_stop();
             lv_scr_load(screen_layer);
+            screen_background_set(screen_layer, false);
             screen_layers_reload();
             ui_current_screen = coban_screen_layer;
             break;
@@ -170,21 +169,19 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         //     lv_scr_load(screen_render);
         //     screen_render_reload();
         //     ui_current_screen = coban_screen_render;
-        //     break;
         // }
         case coban_screen_pomodoro: {
-            screen_animation_stop();
-            // screen_render_stop();
             screen_time_stop();
             screen_layers_stop();
             lv_scr_load(screen_pomodoro);
+            screen_background_set(screen_pomodoro, false);
             screen_pomodoro_reload();
             ui_current_screen = coban_screen_pomodoro;
             break;
         }
         default:
             break;
-    }
+   }
 
     // if (screen_boot != NULL) {
     //     // save memory after the boot sequence is complete

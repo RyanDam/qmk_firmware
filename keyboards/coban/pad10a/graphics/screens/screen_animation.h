@@ -23,4 +23,19 @@ lv_obj_t *screen_animation_init(void);
 
 void screen_animation_stop(void);
 
+void screen_animation_delete(void);
+
 void screen_animation_reload(void);
+
+// Background GIF management
+void screen_background_init(void);
+
+void screen_background_set(lv_obj_t *parent_screen, bool animate);
+
+void screen_background_update(void);
+
+void screen_background_stop(void);
+
+void screen_background_delete(void);
+
+void screen_background_reload(void);

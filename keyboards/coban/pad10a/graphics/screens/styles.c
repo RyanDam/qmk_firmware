@@ -88,7 +88,7 @@ void init_styles(void) {
     lv_style_set_text_align(&style_key, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style_key, lv_color_hex(0xffffff));
     lv_style_set_bg_color(&style_key, lv_color_hex(0xffffff));
-    lv_style_set_bg_opa(&style_key, LV_OPA_10);
+    lv_style_set_bg_opa(&style_key, LV_OPA_20);
     // lv_style_set_border_color(&style_key, lv_color_hex(0x111111));
     lv_style_set_radius(&style_key, 5);
     lv_style_set_text_font(&style_key, &barlow);
@@ -104,7 +104,7 @@ void init_styles(void) {
     lv_style_set_text_align(&style_key_trans, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style_key_trans, lv_color_hex(0xffffff));
     lv_style_set_bg_color(&style_key_trans, lv_color_hex(0x000000));
-    lv_style_set_bg_opa(&style_key_trans, LV_OPA_100);
+    lv_style_set_bg_opa(&style_key_trans, LV_OPA_TRANSP);
     // lv_style_set_border_color(&style_key_trans, lv_color_hex(0x555555));
     // lv_style_set_radius(&style_key_trans, 5);
     lv_style_set_text_font(&style_key_trans, &barlow);
