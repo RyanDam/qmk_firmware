@@ -67,10 +67,14 @@ void screen_animation_stop(void) {
     view_image = NULL;
 }
 
+void screen_animation_delete(void) {
+    screen_animation_stop();
+}
+
 void screen_animation_reload(void) {
     if (screen_animation == NULL) return;
     screen_animation_stop();
-    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
+    int check_code = parse_gif(gif_data, gif_data_header.data_size);
     if (check_code > 0 && check_code < 15) {
         if (gif_status_label != NULL) lv_obj_del(gif_status_label);
         gif_status_label = NULL;
@@ -93,7 +97,7 @@ void screen_animation_reload(void) {
 
 // Background GIF management
 void screen_background_init(void) {
-    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
+    int check_code = parse_gif(gif_data, gif_data_header.data_size);
     if (check_code > 0 && check_code < 15) {
         return;
     }
@@ -142,12 +146,30 @@ void screen_background_update(void) {
     }
 }
 
+void screen_background_stop(void) {
+    if (bg_gif != NULL) {
+        _lv_gif_t *gifobj = (_lv_gif_t *)bg_gif;
+        lv_timer_pause(gifobj->timer);
+    }
+}
+
+void screen_background_delete(void) {
+    if (bg_gif != NULL) {
+        lv_obj_del(bg_gif);
+        bg_gif = NULL;
+    }
+}
+
 void screen_background_reload(void) {
     if (bg_gif != NULL) {
         lv_obj_del(bg_gif);
         bg_gif = NULL;
     }
     screen_background_init();
+    lv_obj_t *cur_screen = lv_scr_act();
+    if (cur_screen != NULL) {
+        screen_background_set(cur_screen, cur_screen == screen_animation);
+    }
 }
 
 int parse_gif(const uint8_t *data, size_t size) {

@@ -107,8 +107,9 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_gif_buffer: {
-            // first, stop animation to prevent crash because of data writing
-            screen_animation_stop();
+            // first, stop animation and background to prevent crash because of data writing
+            screen_animation_delete();
+            screen_background_delete();
 
             uint8_t  offset_1 = command_data[0];
             uint8_t  offset_2 = command_data[1];
@@ -132,6 +133,9 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
 
             config.gif_data_size      = gif_datasize;
             gif_data_header.data_size = config.gif_data_size;
+
+            lv_img_cache_invalidate_src(&gif_data_header);
+
             if (current_screen() == coban_screen_anime) {
                 screen_animation_reload();
             }
