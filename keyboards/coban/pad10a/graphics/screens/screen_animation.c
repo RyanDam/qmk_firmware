@@ -139,7 +139,7 @@ void screen_background_set(lv_obj_t *parent_screen, bool animate) {
 
 void screen_background_update(void) {
     if (bg_gif == NULL) return;
-    if (config.screen_background_enable) {
+    if (config.screen_background_enable || lv_scr_act() == screen_animation) {
         lv_obj_clear_flag(bg_gif, LV_OBJ_FLAG_HIDDEN);
     } else {
         lv_obj_add_flag(bg_gif, LV_OBJ_FLAG_HIDDEN);
