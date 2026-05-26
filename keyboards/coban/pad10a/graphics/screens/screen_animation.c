@@ -100,7 +100,7 @@ void screen_animation_reload(void) {
 
 // Background GIF management
 void screen_background_init(void) {
-    int check_code = parse_gif(gif_data, gif_data_header.data_size);
+    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
     if (check_code > 0 && check_code < 15) {
         return;
     }
@@ -113,7 +113,7 @@ void screen_background_init(void) {
 void screen_background_set(lv_obj_t *parent_screen, bool animate) {
     if (parent_screen == NULL) return;
 
-    int check_code = parse_gif(gif_data, gif_data_header.data_size);
+    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
     if (check_code > 0 && check_code < 15) {
         return;
     }
