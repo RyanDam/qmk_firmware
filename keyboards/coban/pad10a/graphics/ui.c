@@ -83,8 +83,24 @@ void ui_init(void) {
     screen_ui_reload();
 }
 
+static void refresh_all_obj_styles(lv_obj_t *parent) {
+    if (!parent) return;
+    lv_obj_refresh_style(parent, LV_PART_MAIN, true);
+    for (int i = 0; i < lv_obj_get_child_cnt(parent); i++) {
+        refresh_all_obj_styles(lv_obj_get_child(parent, i));
+    }
+}
+
 void screen_ui_apply_theme(void) {
     apply_theme();
+    refresh_all_obj_styles(screen_clock);
+    refresh_all_obj_styles(screen_layer);
+    refresh_all_obj_styles(screen_pomodoro);
+#ifdef COBAN_STATS_SCREEN_ENABLE
+    refresh_all_obj_styles(screen_stats);
+#endif
+    refresh_all_obj_styles(screen_anime);
+    lv_refr_now(NULL);
     screen_background_reload();
 }
 

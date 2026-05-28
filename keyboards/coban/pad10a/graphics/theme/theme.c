@@ -19,10 +19,13 @@
 
 static theme_color_t theme_dark;
 static theme_color_t theme_light;
+static theme_color_t theme_gray;
+static theme_color_t theme_pink;
+static theme_color_t theme_olive;
+static theme_color_t theme_orange;
 
 static const theme_color_t *themes[coban_theme_count] = {
-    &theme_dark,
-    &theme_light,
+    &theme_dark, &theme_light, &theme_gray, &theme_pink, &theme_olive, &theme_orange,
 };
 
 static void init_theme_colors(void) {
@@ -47,6 +50,50 @@ static void init_theme_colors(void) {
     theme_light.inactive             = lv_color_hex(0x000000);
     theme_light.pomo_bg              = lv_color_hex(0x252525);
     theme_light.pomo_indicator       = lv_color_hex(0x009664);
+
+    theme_gray.bg                   = lv_color_hex(0x0A2727);
+    theme_gray.text_primary         = lv_color_hex(0xCECECE);
+    theme_gray.text_secondary       = lv_color_hex(0xCECECE);
+    theme_gray.accent               = lv_color_hex(0x969696);
+    theme_gray.surface              = lv_color_hex(0x969696);
+    theme_gray.surface_pressed      = lv_color_hex(0x707070);
+    theme_gray.surface_pressed_text = lv_color_hex(0xFFFFFF);
+    theme_gray.inactive             = lv_color_hex(0xCECECE);
+    theme_gray.pomo_bg              = lv_color_hex(0x383838);
+    theme_gray.pomo_indicator       = lv_color_hex(0x969696);
+
+    theme_pink.bg                   = lv_color_hex(0x8F2946);
+    theme_pink.text_primary         = lv_color_hex(0xD08F93);
+    theme_pink.text_secondary       = lv_color_hex(0xD08F93);
+    theme_pink.accent               = lv_color_hex(0xFFB2B3);
+    theme_pink.surface              = lv_color_hex(0xFFB2B3);
+    theme_pink.surface_pressed      = lv_color_hex(0xE09090);
+    theme_pink.surface_pressed_text = lv_color_hex(0xFFFFFF);
+    theme_pink.inactive             = lv_color_hex(0xD08F93);
+    theme_pink.pomo_bg              = lv_color_hex(0x382028);
+    theme_pink.pomo_indicator       = lv_color_hex(0xFFB2B3);
+
+    theme_olive.bg                   = lv_color_hex(0x0E251D);
+    theme_olive.text_primary         = lv_color_hex(0x56D783);
+    theme_olive.text_secondary       = lv_color_hex(0x56D783);
+    theme_olive.accent               = lv_color_hex(0x384011);
+    theme_olive.surface              = lv_color_hex(0x5A6A20);
+    theme_olive.surface_pressed      = lv_color_hex(0x384011);
+    theme_olive.surface_pressed_text = lv_color_hex(0xE8E8D0);
+    theme_olive.inactive             = lv_color_hex(0x56D783);
+    theme_olive.pomo_bg              = lv_color_hex(0x202810);
+    theme_olive.pomo_indicator       = lv_color_hex(0x169A44);
+
+    theme_orange.bg                   = lv_color_hex(0x502014);
+    theme_orange.text_primary         = lv_color_hex(0xFF894E);
+    theme_orange.text_secondary       = lv_color_hex(0xFF894E);
+    theme_orange.accent               = lv_color_hex(0x943605);
+    theme_orange.surface              = lv_color_hex(0xC05010);
+    theme_orange.surface_pressed      = lv_color_hex(0x943605);
+    theme_orange.surface_pressed_text = lv_color_hex(0xFFF0E0);
+    theme_orange.inactive             = lv_color_hex(0xFF894E);
+    theme_orange.pomo_bg              = lv_color_hex(0x382018);
+    theme_orange.pomo_indicator       = lv_color_hex(0x943605);
 }
 
 const theme_color_t *get_current_theme(void) {

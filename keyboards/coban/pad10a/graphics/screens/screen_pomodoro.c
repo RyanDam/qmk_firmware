@@ -20,8 +20,6 @@
 #include "graphics/screens/screen_time.h"
 #include "graphics/screens/styles.h"
 #include "graphics/lvgl_helpers.h"
-#include "graphics/theme/theme.h"
-
 #include "eeprom/cb_eeprom.h"
 
 static lv_obj_t *screen_pomodoro = NULL;
@@ -70,18 +68,15 @@ float cancel_song[][2] = SONG(SIMPLE_ALARM_SOUND);
 char *get_current_quote(void);
 
 lv_obj_t *screen_pomodoro_init(void) {
-    quote_offset           = rand();
-    const theme_color_t *t = get_current_theme();
+    quote_offset = rand();
 
     screen_pomodoro = lv_obj_create(NULL);
     lv_obj_add_style(screen_pomodoro, &style_screen, 0);
 
     pomo_breath_indicator = lv_obj_create(screen_pomodoro);
     lv_obj_add_style(pomo_breath_indicator, &style_container, 0);
+    lv_obj_add_style(pomo_breath_indicator, &style_pomo_breath, 0);
     lv_obj_center(pomo_breath_indicator);
-    lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_100, 0);
-    lv_obj_set_style_bg_color(pomo_breath_indicator, t->surface, 0);
-    lv_obj_set_style_bg_opa(pomo_breath_indicator, LV_OPA_20, 0);
     lv_obj_set_size(pomo_breath_indicator, pomo_breath_size, pomo_breath_size);
     lv_obj_set_style_radius(pomo_breath_indicator, pomo_breath_size / 2, 0);
 
@@ -118,11 +113,9 @@ lv_obj_t *screen_pomodoro_init(void) {
     // Progress holder
     pomo_progress_bar = lv_bar_create(pomo_layout_holder);
     lv_obj_add_style(pomo_progress_bar, &style_container, 0);
+    lv_obj_add_style(pomo_progress_bar, &style_pomo_bar_bg, 0);
+    lv_obj_add_style(pomo_progress_bar, &style_pomo_bar_indicator, LV_PART_INDICATOR);
     lv_obj_set_size(pomo_progress_bar, SCREEN_WIDTH, CANVAS_POMO_HEIGHT);
-    lv_obj_set_style_bg_color(pomo_progress_bar, t->pomo_bg, 0);
-    lv_obj_set_style_bg_opa(pomo_progress_bar, LV_OPA_20, 0);
-    lv_obj_set_style_bg_color(pomo_progress_bar, t->pomo_indicator, LV_PART_INDICATOR);
-    lv_obj_set_style_bg_opa(pomo_progress_bar, LV_OPA_100, LV_PART_INDICATOR);
     lv_bar_set_range(pomo_progress_bar, 0, 100);
     lv_bar_set_value(pomo_progress_bar, 25, LV_ANIM_OFF);
     lv_obj_add_flag(pomo_progress_bar, LV_OBJ_FLAG_HIDDEN);

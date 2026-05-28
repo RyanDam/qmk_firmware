@@ -40,6 +40,10 @@ lv_style_t style_key;
 lv_style_t style_key_trans;
 lv_style_t style_key_pressed;
 
+lv_style_t style_pomo_breath;
+lv_style_t style_pomo_bar_bg;
+lv_style_t style_pomo_bar_indicator;
+
 void apply_theme(void) {
     const theme_color_t *t = get_current_theme();
 
@@ -87,7 +91,7 @@ void apply_theme(void) {
     lv_style_set_width(&style_key, 38);
     lv_style_set_height(&style_key, 24);
     lv_style_set_text_align(&style_key, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_color(&style_key, t->surface);
+    lv_style_set_text_color(&style_key, t->text_primary);
     lv_style_set_bg_color(&style_key, t->surface);
     lv_style_set_bg_opa(&style_key, LV_OPA_20);
     lv_style_set_radius(&style_key, 5);
@@ -102,7 +106,7 @@ void apply_theme(void) {
     lv_style_set_width(&style_key_trans, 38);
     lv_style_set_height(&style_key_trans, 24);
     lv_style_set_text_align(&style_key_trans, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_color(&style_key_trans, t->surface);
+    lv_style_set_text_color(&style_key_trans, t->text_primary);
     lv_style_set_bg_color(&style_key_trans, t->bg);
     lv_style_set_bg_opa(&style_key_trans, LV_OPA_TRANSP);
     lv_style_set_text_font(&style_key_trans, &barlow);
@@ -168,6 +172,18 @@ void apply_theme(void) {
     lv_style_set_pad_right(&style_text_time3, 0);
     lv_style_set_text_color(&style_text_time3, t->text_primary);
     lv_style_set_text_font(&style_text_time3, &dm_serif);
+
+    lv_style_reset(&style_pomo_breath);
+    lv_style_set_bg_color(&style_pomo_breath, t->surface);
+    lv_style_set_bg_opa(&style_pomo_breath, LV_OPA_20);
+
+    lv_style_reset(&style_pomo_bar_bg);
+    lv_style_set_bg_color(&style_pomo_bar_bg, t->pomo_bg);
+    lv_style_set_bg_opa(&style_pomo_bar_bg, LV_OPA_30);
+
+    lv_style_reset(&style_pomo_bar_indicator);
+    lv_style_set_bg_color(&style_pomo_bar_indicator, t->pomo_indicator);
+    lv_style_set_bg_opa(&style_pomo_bar_indicator, LV_OPA_100);
 }
 
 void init_styles(void) {
@@ -186,6 +202,9 @@ void init_styles(void) {
     lv_style_init(&style_text_time1);
     lv_style_init(&style_text_time2);
     lv_style_init(&style_text_time3);
+    lv_style_init(&style_pomo_breath);
+    lv_style_init(&style_pomo_bar_bg);
+    lv_style_init(&style_pomo_bar_indicator);
 
     apply_theme();
 }
