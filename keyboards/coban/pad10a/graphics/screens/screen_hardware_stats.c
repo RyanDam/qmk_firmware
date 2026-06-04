@@ -27,6 +27,7 @@ static lv_obj_t          *screen_home                 = NULL;
 static lv_obj_t          *mods                        = NULL;
 static lv_obj_t          *layout_2x1_holder           = NULL;
 static lv_obj_t          *layout_2x2_holder           = NULL;
+static lv_obj_t          *layout_hybrid_holder        = NULL;
 static coban_stats_data_t stat_data[STATS_DATA_COUNT] = {{0}};
 static uint8_t            current_layout              = coban_stats_layout_2x1;
 
@@ -102,8 +103,8 @@ static const char *get_unit_symbol(uint8_t unit_id) {
             return "Mbps";
         case coban_stats_unit_mhz:
             return "MHz";
-        case coban_stats_unit_milliwatts:
-            return "mW";
+        case coban_stats_unit_watts:
+            return "W";
         default:
             return "";
     }
@@ -297,6 +298,45 @@ static void build_layout_2x2(void) {
     }
 }
 
+static void build_layout_hybrid(void) {
+    if (layout_hybrid_holder == NULL) {
+        layout_hybrid_holder = lv_obj_create(mods);
+        lv_obj_add_style(layout_hybrid_holder, &style_container, 0);
+        use_flex_row(layout_hybrid_holder);
+        lv_obj_set_flex_align(layout_hybrid_holder, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_all(layout_hybrid_holder, 0, 0);
+        lv_obj_set_style_pad_row(layout_hybrid_holder, 0, 0);
+        lv_obj_set_style_pad_column(layout_hybrid_holder, 0, 0);
+        lv_obj_set_size(layout_hybrid_holder, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+        // Left side: single arc (data index 0)
+        lv_obj_t *left_col = lv_obj_create(layout_hybrid_holder);
+        lv_obj_add_style(left_col, &style_container, 0);
+        use_flex_column(left_col);
+        lv_obj_set_flex_align(left_col, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_all(left_col, 0, 0);
+        lv_obj_set_size(left_col, SCREEN_WIDTH / 2 + STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT);
+
+        uint8_t data_id = config.stats_data_ids[0];
+        create_arc_ui(0, left_col, data_id);
+
+        // Right side: 2 bars stacked vertically (data index 1 and 2)
+        lv_obj_t *right_col = lv_obj_create(layout_hybrid_holder);
+        lv_obj_add_style(right_col, &style_container, 0);
+        use_flex_column(right_col);
+        lv_obj_set_flex_align(right_col, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
+        lv_obj_set_style_pad_all(right_col, 0, 0);
+        lv_obj_set_style_pad_row(right_col, 0, 0);
+        lv_obj_set_style_pad_column(right_col, 0, 0);
+        lv_obj_set_size(right_col, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT);
+
+        for (uint8_t i = 0; i < 2; i++) {
+            uint8_t bar_data_id = config.stats_data_ids[1 + i];
+            create_bar_ui(i, right_col, bar_data_id);
+        }
+    }
+}
+
 static void update_all_displays(void) {
     if (current_layout == coban_stats_layout_2x1) {
         for (uint8_t i = 0; i < 2; i++) {
@@ -308,6 +348,19 @@ static void update_all_displays(void) {
     } else if (current_layout == coban_stats_layout_2x2) {
         for (uint8_t i = 0; i < STATS_SLOT_COUNT; i++) {
             uint8_t data_id = config.stats_data_ids[i];
+            if (data_id != coban_stats_data_none && data_id < STATS_DATA_COUNT) {
+                update_bar_display(i, data_id);
+            }
+        }
+    } else if (current_layout == coban_stats_layout_hybrid) {
+        {
+            uint8_t data_id = config.stats_data_ids[0];
+            if (data_id != coban_stats_data_none && data_id < STATS_DATA_COUNT) {
+                update_arc_display(0, data_id);
+            }
+        }
+        for (uint8_t i = 0; i < 2; i++) {
+            uint8_t data_id = config.stats_data_ids[1 + i];
             if (data_id != coban_stats_data_none && data_id < STATS_DATA_COUNT) {
                 update_bar_display(i, data_id);
             }
@@ -327,6 +380,7 @@ lv_obj_t *screen_hardware_stat_init(void) {
 
         build_layout_2x1();
         build_layout_2x2();
+        build_layout_hybrid();
     }
 
     current_layout = config.stats_layout_id;
@@ -343,6 +397,13 @@ lv_obj_t *screen_hardware_stat_init(void) {
             lv_obj_add_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
         } else {
             lv_obj_clear_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
+        }
+    }
+    if (layout_hybrid_holder != NULL) {
+        if (current_layout != coban_stats_layout_hybrid) {
+            lv_obj_add_flag(layout_hybrid_holder, LV_OBJ_FLAG_HIDDEN);
+        } else {
+            lv_obj_clear_flag(layout_hybrid_holder, LV_OBJ_FLAG_HIDDEN);
         }
     }
 
@@ -380,6 +441,13 @@ void screen_hardware_stat_set_layout(uint8_t layout_id) {
                 lv_obj_clear_flag(layout_2x2_holder, LV_OBJ_FLAG_HIDDEN);
             }
         }
+        if (layout_hybrid_holder != NULL) {
+            if (current_layout != coban_stats_layout_hybrid) {
+                lv_obj_add_flag(layout_hybrid_holder, LV_OBJ_FLAG_HIDDEN);
+            } else {
+                lv_obj_clear_flag(layout_hybrid_holder, LV_OBJ_FLAG_HIDDEN);
+            }
+        }
         update_all_displays();
     }
 }
@@ -392,6 +460,10 @@ void screen_hardware_stat_reload(void) {
     if (layout_2x2_holder != NULL) {
         lv_obj_del(layout_2x2_holder);
         layout_2x2_holder = NULL;
+    }
+    if (layout_hybrid_holder != NULL) {
+        lv_obj_del(layout_hybrid_holder);
+        layout_hybrid_holder = NULL;
     }
     memset(arc_ui, 0, sizeof(arc_ui));
     memset(bar_ui, 0, sizeof(bar_ui));
