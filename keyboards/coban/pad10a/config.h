@@ -75,5 +75,5 @@
 #define DS1302_PIN_SDA GP14
 #define DS1302_PIN_SCK GP15
 
-// // Experimental features
-// #define COBAN_STATS_SCREEN_ENABLE
+// Experimental features
+#define COBAN_STATS_SCREEN_ENABLE

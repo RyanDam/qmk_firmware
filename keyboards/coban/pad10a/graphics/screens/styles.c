@@ -128,12 +128,12 @@ void apply_theme(void) {
 
     lv_style_reset(&style_arc_main);
     lv_style_set_arc_color(&style_arc_main, t->inactive);
-    lv_style_set_arc_opa(&style_arc_main, LV_OPA_10);
-    lv_style_set_arc_width(&style_arc_main, 4);
+    lv_style_set_arc_opa(&style_arc_main, LV_OPA_20);
+    lv_style_set_arc_width(&style_arc_main, 8);
 
     lv_style_reset(&style_arc_positive);
     lv_style_set_arc_color(&style_arc_positive, t->accent);
-    lv_style_set_arc_width(&style_arc_positive, 4);
+    lv_style_set_arc_width(&style_arc_positive, 8);
 
     lv_style_reset(&style_arc_knob);
     lv_style_set_arc_color(&style_arc_knob, t->accent);

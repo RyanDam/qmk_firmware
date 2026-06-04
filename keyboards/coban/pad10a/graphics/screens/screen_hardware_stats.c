@@ -22,6 +22,7 @@
 
 #define STAT_BAR_COL_PAD 6
 #define STATS_SLOT_COUNT 4
+#define STAT_ALL_PAD 4
 
 static lv_obj_t          *screen_home                 = NULL;
 static lv_obj_t          *mods                        = NULL;
@@ -130,7 +131,7 @@ static lv_obj_t *create_arc_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id)
     lv_obj_t *holder = lv_obj_create(parent);
     lv_obj_add_style(holder, &style_container, 0);
     use_flex_column(holder);
-    lv_obj_set_style_pad_row(holder, -8, 0);
+    lv_obj_set_style_pad_row(holder, -12, 0);
 
     lv_obj_t *indicator_holder = lv_obj_create(holder);
     lv_obj_add_style(indicator_holder, &style_container, 0);
@@ -163,7 +164,7 @@ static lv_obj_t *create_bar_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id)
     lv_obj_add_style(holder, &style_container, 0);
     use_flex_column(holder);
     lv_obj_set_style_pad_all(holder, 0, 0);
-    lv_obj_set_size(holder, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT / 2);
+    lv_obj_set_size(holder, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2 - STAT_ALL_PAD, SCREEN_HEIGHT / 2 - STAT_ALL_PAD);
 
     lv_obj_t *text_row = lv_obj_create(holder);
     lv_obj_add_style(text_row, &style_container, 0);
@@ -183,10 +184,10 @@ static lv_obj_t *create_bar_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id)
     lv_obj_add_style(bar_row, &style_container, 0);
     use_flex_row(bar_row);
     lv_obj_set_flex_align(bar_row, LV_FLEX_ALIGN_SPACE_BETWEEN, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
-    lv_obj_set_size(bar_row, LV_PCT(100), SCREEN_HEIGHT / 4);
+    lv_obj_set_size(bar_row, LV_PCT(100), SCREEN_HEIGHT / 4 - STAT_ALL_PAD);
 
     bar_ui[index].bar = lv_bar_create(bar_row);
-    lv_obj_set_size(bar_ui[index].bar, LV_PCT(100), SCREEN_HEIGHT / 4);
+    lv_obj_set_size(bar_ui[index].bar, LV_PCT(100), SCREEN_HEIGHT / 4 - STAT_ALL_PAD);
     lv_obj_add_style(bar_ui[index].bar, &style_bar_main, LV_PART_MAIN);
     lv_obj_add_style(bar_ui[index].bar, &style_bar_positive, LV_PART_INDICATOR);
     lv_bar_set_range(bar_ui[index].bar, 0, 100);
@@ -304,7 +305,7 @@ static void build_layout_hybrid(void) {
         lv_obj_add_style(layout_hybrid_holder, &style_container, 0);
         use_flex_row(layout_hybrid_holder);
         lv_obj_set_flex_align(layout_hybrid_holder, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
-        lv_obj_set_style_pad_all(layout_hybrid_holder, 0, 0);
+        lv_obj_set_style_pad_all(layout_hybrid_holder, STAT_ALL_PAD, 0);
         lv_obj_set_style_pad_row(layout_hybrid_holder, 0, 0);
         lv_obj_set_style_pad_column(layout_hybrid_holder, 0, 0);
         lv_obj_set_size(layout_hybrid_holder, SCREEN_WIDTH, SCREEN_HEIGHT);
@@ -315,7 +316,7 @@ static void build_layout_hybrid(void) {
         use_flex_column(left_col);
         lv_obj_set_flex_align(left_col, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         lv_obj_set_style_pad_all(left_col, 0, 0);
-        lv_obj_set_size(left_col, SCREEN_WIDTH / 2 + STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT);
+        lv_obj_set_size(left_col, SCREEN_WIDTH / 2 + STAT_BAR_COL_PAD / 2 - STAT_ALL_PAD, LV_PCT(100));
 
         uint8_t data_id = config.stats_data_ids[0];
         create_arc_ui(0, left_col, data_id);
@@ -328,7 +329,7 @@ static void build_layout_hybrid(void) {
         lv_obj_set_style_pad_all(right_col, 0, 0);
         lv_obj_set_style_pad_row(right_col, 0, 0);
         lv_obj_set_style_pad_column(right_col, 0, 0);
-        lv_obj_set_size(right_col, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2, SCREEN_HEIGHT);
+        lv_obj_set_size(right_col, SCREEN_WIDTH / 2 - STAT_BAR_COL_PAD / 2 - STAT_ALL_PAD, LV_PCT(100));
 
         for (uint8_t i = 0; i < 2; i++) {
             uint8_t bar_data_id = config.stats_data_ids[1 + i];
