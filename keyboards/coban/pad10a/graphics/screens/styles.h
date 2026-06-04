@@ -15,6 +15,7 @@
  */
 
 #include "qp_lvgl.h"
+#include "graphics/theme/theme.h"
 
 extern lv_style_t style_screen;
 extern lv_style_t style_container;
@@ -34,4 +35,9 @@ extern lv_style_t style_key;
 extern lv_style_t style_key_trans;
 extern lv_style_t style_key_pressed;
 
+extern lv_style_t style_pomo_breath;
+extern lv_style_t style_pomo_bar_bg;
+extern lv_style_t style_pomo_bar_indicator;
+
 void init_styles(void);
+void apply_theme(void);

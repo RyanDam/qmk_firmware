@@ -18,7 +18,7 @@
 
 #include "qp_lvgl.h"
 
-enum coban_stats_layout_id { coban_stats_layout_2x1 = 0x00, coban_stats_layout_2x2 = 0x01 };
+enum coban_stats_layout_id { coban_stats_layout_2x1 = 0x00, coban_stats_layout_2x2 = 0x01, coban_stats_layout_hybrid = 0x02 };
 
 #define STATS_DATA_COUNT 17
 
@@ -52,7 +52,7 @@ enum coban_stats_unit_id {
     coban_stats_unit_terabytes   = 0x06,
     coban_stats_unit_mbps        = 0x07,
     coban_stats_unit_mhz         = 0x08,
-    coban_stats_unit_milliwatts  = 0x09,
+    coban_stats_unit_watts       = 0x09,
 };
 
 typedef struct {

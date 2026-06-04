@@ -60,6 +60,7 @@ lv_obj_t *screen_time_init(void) {
 
     indicator_text = lv_label_create(time_holder);
     lv_label_set_text(indicator_text, "--");
+    lv_obj_add_style(indicator_text, &style_text, 0);
 
     screen_time_set_format(config.time_style_id, config.time_format, config.time_indicator, config.date_format, config.date_visibility);
 
@@ -84,7 +85,7 @@ void screen_time_set_time(uint8_t hour, uint8_t minute) {
     if (indicator_text != NULL) {
         switch (config.time_indicator) {
             case coban_time_indicator_ampm: {
-                if (hour < 12) {
+                if (hour <= 12) {
                     lv_label_set_text_fmt(indicator_text, "AM");
                 } else {
                     lv_label_set_text_fmt(indicator_text, "PM");
@@ -178,19 +179,11 @@ void screen_time_set_time_indicator(uint8_t time_indicator) {
     switch (config.time_indicator) {
         case coban_time_indicator_ampm: {
             lv_obj_clear_flag(indicator_text, LV_OBJ_FLAG_HIDDEN);
-            // if (indicator_text == NULL) {
-            //     indicator_text  = lv_label_create(time_holder);
-            //     lv_label_set_text(indicator_text, "--");
-            // }
             break;
         }
         case coban_time_indicator_default:
         default: {
             lv_obj_add_flag(indicator_text, LV_OBJ_FLAG_HIDDEN);
-            // if (indicator_text != NULL) {
-            //     lv_obj_del(indicator_text);
-            //     indicator_text = NULL;
-            // }
             break;
         }
     }
@@ -206,20 +199,11 @@ void screen_time_set_date_visibility(uint8_t date_visibility) {
     switch (config.date_visibility) {
         case coban_date_visibility_visible: {
             lv_obj_clear_flag(date_text, LV_OBJ_FLAG_HIDDEN);
-            // if (date_text == NULL) {
-            //     date_text = lv_label_create(datetime_holder);
-            //     lv_label_set_text(date_text, "-- / -- / ---");
-            //     lv_obj_add_style(date_text, &style_text, 0);
-            // }
             break;
         }
         case coban_date_visibility_invisible:
         default: {
             lv_obj_add_flag(date_text, LV_OBJ_FLAG_HIDDEN);
-            // if (date_text != NULL) {
-            //     lv_obj_del(date_text);
-            //     date_text = NULL;
-            // }
             break;
         }
     }

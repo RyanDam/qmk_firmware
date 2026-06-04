@@ -91,13 +91,16 @@ void screen_animation_reload(void) {
 
         view_image = lv_gif_create(screen_animation);
         lv_gif_set_src(view_image, &gif_data_header);
-        lv_gif_restart(view_image);
+        _lv_gif_t *gifobj = (_lv_gif_t *)view_image;
+        if (gifobj->gif != NULL) {
+            lv_gif_restart(view_image);
+        }
     }
 }
 
 // Background GIF management
 void screen_background_init(void) {
-    int check_code = parse_gif(gif_data, gif_data_header.data_size);
+    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
     if (check_code > 0 && check_code < 15) {
         return;
     }
@@ -110,6 +113,15 @@ void screen_background_init(void) {
 void screen_background_set(lv_obj_t *parent_screen, bool animate) {
     if (parent_screen == NULL) return;
 
+    int check_code = parse_gif(gif_data, EEPROM_MAX_GIF_SIZE);
+    if (check_code > 0 && check_code < 15) {
+        return;
+    }
+
+    if (check_code == 15) {
+        gif_data_header.data_size = gif_status;
+    }
+
     if (bg_gif == NULL) {
         bg_gif = lv_gif_create(parent_screen);
         lv_gif_set_src(bg_gif, &gif_data_header);
@@ -119,7 +131,9 @@ void screen_background_set(lv_obj_t *parent_screen, bool animate) {
         lv_obj_move_to_index(bg_gif, 0);
         if (!animate) {
             _lv_gif_t *gifobj = (_lv_gif_t *)bg_gif;
-            lv_timer_pause(gifobj->timer);
+            if (gifobj->timer != NULL) {
+                lv_timer_pause(gifobj->timer);
+            }
         }
     } else {
         lv_obj_set_parent(bg_gif, parent_screen);
@@ -128,10 +142,16 @@ void screen_background_set(lv_obj_t *parent_screen, bool animate) {
         lv_obj_set_pos(bg_gif, 0, 0);
         _lv_gif_t *gifobj = (_lv_gif_t *)bg_gif;
         if (animate) {
-            lv_gif_restart(bg_gif);
-            lv_timer_resume(gifobj->timer);
+            if (gifobj->gif != NULL) {
+                lv_gif_restart(bg_gif);
+            }
+            if (gifobj->timer != NULL) {
+                lv_timer_resume(gifobj->timer);
+            }
         } else {
-            lv_timer_pause(gifobj->timer);
+            if (gifobj->timer != NULL) {
+                lv_timer_pause(gifobj->timer);
+            }
         }
     }
     screen_background_update();
@@ -139,7 +159,7 @@ void screen_background_set(lv_obj_t *parent_screen, bool animate) {
 
 void screen_background_update(void) {
     if (bg_gif == NULL) return;
-    if (config.screen_background_enable) {
+    if (config.screen_background_enable || lv_scr_act() == screen_animation) {
         lv_obj_clear_flag(bg_gif, LV_OBJ_FLAG_HIDDEN);
     } else {
         lv_obj_add_flag(bg_gif, LV_OBJ_FLAG_HIDDEN);
@@ -149,7 +169,9 @@ void screen_background_update(void) {
 void screen_background_stop(void) {
     if (bg_gif != NULL) {
         _lv_gif_t *gifobj = (_lv_gif_t *)bg_gif;
-        lv_timer_pause(gifobj->timer);
+        if (gifobj->timer != NULL) {
+            lv_timer_pause(gifobj->timer);
+        }
     }
 }
 
