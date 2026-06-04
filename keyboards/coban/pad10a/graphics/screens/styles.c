@@ -141,7 +141,7 @@ void apply_theme(void) {
 
     lv_style_reset(&style_bar_main);
     lv_style_set_bg_color(&style_bar_main, t->inactive);
-    lv_style_set_bg_opa(&style_bar_main, LV_OPA_10);
+    lv_style_set_bg_opa(&style_bar_main, LV_OPA_20);
     lv_style_set_radius(&style_bar_main, 3);
 
     lv_style_reset(&style_bar_positive);

@@ -24,7 +24,7 @@ typedef struct {
     lv_color_t bg;                   // main background (maybe transparent when gif is used as background)
     lv_color_t text_primary;         // main text: clock, pomo
     lv_color_t text_secondary;       // not used yet
-    lv_color_t accent;               // stat arc fg
+    lv_color_t accent;               // stat arc fg, bar fg
     lv_color_t surface;              // layer key text + bg, pomo breath
     lv_color_t surface_pressed;      // layer bg pressed
     lv_color_t surface_pressed_text; // layer key pressed

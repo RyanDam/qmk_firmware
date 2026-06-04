@@ -32,7 +32,7 @@ static void init_theme_colors(void) {
     theme_dark.bg                   = lv_color_hex(0x000000);
     theme_dark.text_primary         = lv_color_hex(0xFFFFFF);
     theme_dark.text_secondary       = lv_color_hex(0xFFFFFF);
-    theme_dark.accent               = lv_color_hex(0x0096FF);
+    theme_dark.accent               = lv_color_hex(0x0FFFFFF);
     theme_dark.surface              = lv_color_hex(0xFFFFFF);
     theme_dark.surface_pressed      = lv_color_hex(0xFFFFFF);
     theme_dark.surface_pressed_text = lv_color_hex(0x000000);
@@ -43,7 +43,7 @@ static void init_theme_colors(void) {
     theme_light.bg                   = lv_color_hex(0xFFFFFF);
     theme_light.text_primary         = lv_color_hex(0x000000);
     theme_light.text_secondary       = lv_color_hex(0x000000);
-    theme_light.accent               = lv_color_hex(0x0066FF);
+    theme_light.accent               = lv_color_hex(0x000000);
     theme_light.surface              = lv_color_hex(0x000000);
     theme_light.surface_pressed      = lv_color_hex(0x000000);
     theme_light.surface_pressed_text = lv_color_hex(0xFFFFFF);
