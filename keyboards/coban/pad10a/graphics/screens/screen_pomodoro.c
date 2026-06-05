@@ -44,7 +44,6 @@ static uint32_t pomo_total_session_duration_min;
 static int      pomo_work_set_width;
 static int      pomo_rest_set_width;
 static uint8_t  pomo_current_set_idx = 0; // default not zero to ensure set event is triggered
-static int      quote_offset;
 
 // animation variables
 static uint32_t pomo_breath_size = 60;
@@ -68,8 +67,6 @@ float cancel_song[][2] = SONG(SIMPLE_ALARM_SOUND);
 char *get_current_quote(void);
 
 lv_obj_t *screen_pomodoro_init(void) {
-    quote_offset = rand();
-
     screen_pomodoro = lv_obj_create(NULL);
     lv_obj_add_style(screen_pomodoro, &style_screen, 0);
 
@@ -469,6 +466,6 @@ const int quotes_count = 50;
 
 char *get_current_quote(void) {
     uint32_t current_time = screen_time_get_current_time32();
-    int      quote_index  = (((current_time / 1000 / 60 / 5) % quotes_count) + (quote_offset % quotes_count)) % quotes_count;
+    int      quote_index  = (current_time / 1000 / 60 / 5) % quotes_count;
     return (char *)quotes[quote_index];
 }

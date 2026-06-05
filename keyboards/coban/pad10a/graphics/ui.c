@@ -27,9 +27,9 @@
 
 static painter_device_t oled;
 
-lv_obj_t *screen_clock    = NULL;
+lv_obj_t *screen_clock = NULL;
 #ifdef COBAN_STATS_SCREEN_ENABLE
-lv_obj_t *screen_stats    = NULL;
+lv_obj_t *screen_stats = NULL;
 #endif
 lv_obj_t *screen_anime    = NULL;
 lv_obj_t *screen_layer    = NULL;
@@ -38,11 +38,13 @@ lv_obj_t *screen_pomodoro = NULL;
 lv_obj_t *screen_boot     = NULL;
 
 #ifdef COBAN_STATS_SCREEN_ENABLE
-const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_stats, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int screen_indexes[] = {coban_screen_clock, coban_screen_stats, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int num_avail_screen = 5;
 #else
-const int                   screen_indexes[]  = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int screen_indexes[] = {coban_screen_clock, coban_screen_anime, coban_screen_layer, coban_screen_pomodoro};
+const int num_avail_screen = 4;
 #endif
-const int                   num_avail_screen  = 4;
+
 static enum coban_screen_id ui_current_screen = coban_screen_undefined;
 
 static lv_timer_t *ui_timer          = NULL;
@@ -67,7 +69,7 @@ void ui_init(void) {
         screen_boot = screen_boot_init();
         lv_scr_load(screen_boot);
 
- #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         screen_stats = screen_hardware_stat_init();
 #endif
         screen_clock = screen_time_init();
@@ -142,7 +144,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         return ui_current_screen;
     }
 
-   switch (screen_idx) {
+    switch (screen_idx) {
         case coban_screen_clock: {
             screen_pomodoro_stop();
             screen_layers_stop();
@@ -152,7 +154,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_clock;
             break;
         }
- #ifdef COBAN_STATS_SCREEN_ENABLE
+#ifdef COBAN_STATS_SCREEN_ENABLE
         case coban_screen_stats: {
             screen_time_stop();
             screen_pomodoro_stop();
@@ -202,7 +204,7 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         }
         default:
             break;
-   }
+    }
 
     // if (screen_boot != NULL) {
     //     // save memory after the boot sequence is complete
