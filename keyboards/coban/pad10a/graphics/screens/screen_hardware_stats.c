@@ -44,10 +44,10 @@ typedef struct {
     lv_obj_t *bar;
 } bar_ui_t;
 
-static arc_ui_t arc_ui_2x1[2]       = {{NULL}};
-static bar_ui_t bar_ui_2x2[4]       = {{NULL}};
-static arc_ui_t arc_ui_hybrid[1]    = {{NULL}};
-static bar_ui_t bar_ui_hybrid[2]    = {{NULL}};
+static arc_ui_t arc_ui_2x1[2]    = {{NULL}};
+static bar_ui_t bar_ui_2x2[4]    = {{NULL}};
+static arc_ui_t arc_ui_hybrid[1] = {{NULL}};
+static bar_ui_t bar_ui_hybrid[2] = {{NULL}};
 
 static const char *get_data_name(uint8_t data_id) {
     switch (data_id) {
@@ -97,11 +97,11 @@ static const char *get_unit_symbol(uint8_t unit_id) {
         case coban_stats_unit_fahrenheit:
             return "°F";
         case coban_stats_unit_megabytes:
-            return "MB";
+            return "M";
         case coban_stats_unit_gigabytes:
-            return "GB";
+            return "G";
         case coban_stats_unit_terabytes:
-            return "TB";
+            return "T";
         case coban_stats_unit_mbps:
             return "Mbps";
         case coban_stats_unit_mhz:
@@ -246,7 +246,7 @@ static void update_bar_display(uint8_t index, uint8_t data_index, bar_ui_t *ui_a
         }
         lv_label_set_text(ui_arr[index].value, buf);
         lv_label_set_text_fmt(ui_arr[index].label, "%s", get_data_name(data_index));
-   } else {
+    } else {
         lv_bar_set_value(ui_arr[index].bar, 0, LV_ANIM_OFF);
         snprintf(buf, sizeof(buf), "--%s", unit_symbol);
         lv_label_set_text(ui_arr[index].value, buf);
