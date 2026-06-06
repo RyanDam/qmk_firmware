@@ -18,20 +18,13 @@
 
 #include "qp_lvgl.h"
 
-enum coban_theme_id { coban_theme_dark = 0, coban_theme_light = 1, coban_theme_gray = 2, coban_theme_pink = 3, coban_theme_olive = 4, coban_theme_orange = 5, coban_theme_count };
-
 typedef struct {
-    lv_color_t bg;                   // main background (maybe transparent when gif is used as background)
-    lv_color_t text_primary;         // main text: clock, pomo
-    lv_color_t text_secondary;       // not used yet
-    lv_color_t accent;               // stat arc fg, bar fg
-    lv_color_t surface;              // layer key text + bg, pomo breath
-    lv_color_t surface_pressed;      // layer bg pressed
-    lv_color_t surface_pressed_text; // layer key pressed
-    lv_color_t inactive;             // layer indice bg, stats arc bg
-    lv_color_t pomo_bg;              // pomo bar bg
-    lv_color_t pomo_indicator;       // pomo bar fg
+    lv_color_t background;
+    lv_color_t text_primary;
+    lv_color_t text_secondary;
+    lv_color_t accent;
+    lv_color_t inactive;
 } theme_color_t;
 
-const theme_color_t *get_current_theme(void);
+const theme_color_t *get_theme_colors(void);
 void                 apply_theme(void);

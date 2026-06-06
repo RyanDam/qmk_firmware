@@ -20,6 +20,7 @@
 extern lv_style_t style_screen;
 extern lv_style_t style_container;
 extern lv_style_t style_text;
+extern lv_style_t style_text_secondary;
 extern lv_style_t style_arc_main;
 extern lv_style_t style_arc_positive;
 extern lv_style_t style_arc_knob;

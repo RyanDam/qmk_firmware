@@ -147,14 +147,16 @@ void layers_cb(lv_timer_t *timer) {
 
     if (key_matrix_changed) {
         key_matrix_changed = false;
-        // for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
-        //     lv_obj_remove_style_all(keys[idx]);
-        //     if (key_presses[idx]) {
-        //         lv_obj_add_style(keys[idx], &style_key_pressed, 0);
-        //     } else {
-        //         lv_obj_add_style(keys[idx], &style_key, 0);
-        //     }
-        // }
+        for (int idx = 0; idx < MATRIX_ROWS * MATRIX_COLS; idx++) {
+            if (idx == 1 || idx == 2) {
+                continue;
+            }
+            if (key_presses[idx]) {
+                lv_obj_set_style_bg_opa(keys[idx], LV_OPA_100, 0);
+            } else {
+                lv_obj_set_style_bg_opa(keys[idx], LV_OPA_20, 0);
+            }
+        }
     }
 }
 

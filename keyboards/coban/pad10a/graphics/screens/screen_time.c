@@ -47,7 +47,7 @@ lv_obj_t *screen_time_init(void) {
 
     date_text = lv_label_create(datetime_holder);
     lv_label_set_text(date_text, "-- / -- / ---");
-    lv_obj_add_style(date_text, &style_text, 0);
+    lv_obj_add_style(date_text, &style_text_secondary, 0);
 
     time_holder = lv_obj_create(datetime_holder);
     lv_obj_add_style(time_holder, &style_container, 0);

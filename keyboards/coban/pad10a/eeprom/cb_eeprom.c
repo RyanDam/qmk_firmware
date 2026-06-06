@@ -16,7 +16,6 @@
 
 #include "eeprom/cb_eeprom.h"
 #include "graphics/ui.h"
-#include "graphics/theme/theme.h"
 // #include "eeprom.h"
 #include "via.h"
 
@@ -49,7 +48,31 @@ void coban_init_config(void) {
 
     config.audio_volume = 0;
 
-    config.theme_id = coban_theme_dark;
+    // Default theme colors (dark theme)
+    // background
+    config.theme_colors[0] = 0x00;
+    config.theme_colors[1] = 0x00;
+    config.theme_colors[2] = 0x00;
+    // text_primary
+    config.theme_colors[3] = 0xFF;
+    config.theme_colors[4] = 0xFF;
+    config.theme_colors[5] = 0xFF;
+    // text_secondary
+    config.theme_colors[6] = 0x88;
+    config.theme_colors[7] = 0x88;
+    config.theme_colors[8] = 0x88;
+    // accent
+    config.theme_colors[9]  = 0x00;
+    config.theme_colors[10] = 0xFF;
+    config.theme_colors[11] = 0x00;
+    // inactive
+    config.theme_colors[12] = 0xFF;
+    config.theme_colors[13] = 0xFF;
+    config.theme_colors[14] = 0xFF;
+
+    for (int i = 0; i < 3; i++) {
+        config.reserved[i] = 0;
+    }
 
     config.gif_data_size = EEPROM_MAX_GIF_SIZE;
 

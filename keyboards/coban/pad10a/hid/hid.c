@@ -19,7 +19,6 @@
 
 #include "graphics/ui.h"
 #include "eeprom/cb_eeprom.h"
-#include "graphics/theme/theme.h"
 #include "utils/audio_volume.h"
 #include "hardware/flash.h"
 #include <hardware/sync.h>
@@ -172,12 +171,11 @@ void cb_raw_hid_receive_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_theme: {
-            uint8_t theme = command_data[0];
-            if (theme < coban_theme_count) {
-                config.theme_id = theme;
-                screen_ui_apply_theme();
-                coban_save_config();
+            for (int i = 0; i < 15; i++) {
+                config.theme_colors[i] = command_data[i];
             }
+            screen_ui_apply_theme();
+            coban_save_config();
             break;
         }
         case coban_cmd_id_reboot_board: {
@@ -295,7 +293,9 @@ void cb_raw_hid_response_kb(uint8_t *data, uint8_t length) {
             break;
         }
         case coban_cmd_id_set_theme: {
-            *(command_data + 0) = 0xff & config.theme_id;
+            for (int i = 0; i < 15; i++) {
+                *(command_data + i) = 0xff & config.theme_colors[i];
+            }
             break;
         }
         default:

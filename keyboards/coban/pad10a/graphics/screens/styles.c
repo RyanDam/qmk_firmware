@@ -25,6 +25,7 @@ LV_FONT_DECLARE(icons)
 lv_style_t style_screen;
 lv_style_t style_container;
 lv_style_t style_text;
+lv_style_t style_text_secondary;
 lv_style_t style_arc_main;
 lv_style_t style_arc_positive;
 lv_style_t style_arc_knob;
@@ -45,11 +46,11 @@ lv_style_t style_pomo_bar_bg;
 lv_style_t style_pomo_bar_indicator;
 
 void apply_theme(void) {
-    const theme_color_t *t = get_current_theme();
+    const theme_color_t *t = get_theme_colors();
 
     lv_style_reset(&style_screen);
     lv_style_set_bg_opa(&style_screen, LV_OPA_100);
-    lv_style_set_bg_color(&style_screen, t->bg);
+    lv_style_set_bg_color(&style_screen, t->background);
 
     lv_style_reset(&style_indice);
     lv_style_set_pad_top(&style_indice, 0);
@@ -60,7 +61,7 @@ void apply_theme(void) {
     lv_style_set_width(&style_indice, 9);
     lv_style_set_height(&style_indice, 9);
     lv_style_set_bg_opa(&style_indice, LV_OPA_100);
-    lv_style_set_bg_color(&style_indice, t->inactive);
+    lv_style_set_bg_color(&style_indice, t->accent);
 
     lv_style_reset(&style_container);
     lv_style_set_pad_top(&style_container, 0);
@@ -82,6 +83,14 @@ void apply_theme(void) {
     lv_style_set_text_color(&style_text, t->text_primary);
     lv_style_set_text_font(&style_text, &barlow);
 
+    lv_style_reset(&style_text_secondary);
+    lv_style_set_pad_top(&style_text_secondary, 0);
+    lv_style_set_pad_bottom(&style_text_secondary, 0);
+    lv_style_set_pad_left(&style_text_secondary, 0);
+    lv_style_set_pad_right(&style_text_secondary, 0);
+    lv_style_set_text_color(&style_text_secondary, t->text_secondary);
+    lv_style_set_text_font(&style_text_secondary, &barlow);
+
     lv_style_reset(&style_key);
     lv_style_set_pad_top(&style_key, 3);
     lv_style_set_pad_bottom(&style_key, 0);
@@ -92,7 +101,7 @@ void apply_theme(void) {
     lv_style_set_height(&style_key, 24);
     lv_style_set_text_align(&style_key, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style_key, t->text_primary);
-    lv_style_set_bg_color(&style_key, t->surface);
+    lv_style_set_bg_color(&style_key, t->inactive);
     lv_style_set_bg_opa(&style_key, LV_OPA_20);
     lv_style_set_radius(&style_key, 5);
     lv_style_set_text_font(&style_key, &barlow);
@@ -107,7 +116,7 @@ void apply_theme(void) {
     lv_style_set_height(&style_key_trans, 24);
     lv_style_set_text_align(&style_key_trans, LV_TEXT_ALIGN_CENTER);
     lv_style_set_text_color(&style_key_trans, t->text_primary);
-    lv_style_set_bg_color(&style_key_trans, t->bg);
+    lv_style_set_bg_color(&style_key_trans, t->background);
     lv_style_set_bg_opa(&style_key_trans, LV_OPA_TRANSP);
     lv_style_set_text_font(&style_key_trans, &barlow);
 
@@ -120,8 +129,8 @@ void apply_theme(void) {
     lv_style_set_width(&style_key_pressed, 38);
     lv_style_set_height(&style_key_pressed, 24);
     lv_style_set_text_align(&style_key_pressed, LV_TEXT_ALIGN_CENTER);
-    lv_style_set_text_color(&style_key_pressed, t->surface_pressed_text);
-    lv_style_set_bg_color(&style_key_pressed, t->surface_pressed);
+    lv_style_set_text_color(&style_key_pressed, t->text_primary);
+    lv_style_set_bg_color(&style_key_pressed, t->inactive);
     lv_style_set_bg_opa(&style_key_pressed, LV_OPA_100);
     lv_style_set_radius(&style_key_pressed, 5);
     lv_style_set_text_font(&style_key_pressed, &barlow);
@@ -174,15 +183,15 @@ void apply_theme(void) {
     lv_style_set_text_font(&style_text_time3, &dm_serif);
 
     lv_style_reset(&style_pomo_breath);
-    lv_style_set_bg_color(&style_pomo_breath, t->surface);
+    lv_style_set_bg_color(&style_pomo_breath, t->accent);
     lv_style_set_bg_opa(&style_pomo_breath, LV_OPA_20);
 
     lv_style_reset(&style_pomo_bar_bg);
-    lv_style_set_bg_color(&style_pomo_bar_bg, t->pomo_bg);
+    lv_style_set_bg_color(&style_pomo_bar_bg, t->inactive);
     lv_style_set_bg_opa(&style_pomo_bar_bg, LV_OPA_30);
 
     lv_style_reset(&style_pomo_bar_indicator);
-    lv_style_set_bg_color(&style_pomo_bar_indicator, t->pomo_indicator);
+    lv_style_set_bg_color(&style_pomo_bar_indicator, t->accent);
     lv_style_set_bg_opa(&style_pomo_bar_indicator, LV_OPA_100);
 }
 
@@ -191,6 +200,7 @@ void init_styles(void) {
     lv_style_init(&style_indice);
     lv_style_init(&style_container);
     lv_style_init(&style_text);
+    lv_style_init(&style_text_secondary);
     lv_style_init(&style_key);
     lv_style_init(&style_key_trans);
     lv_style_init(&style_key_pressed);

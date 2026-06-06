@@ -52,8 +52,16 @@ typedef struct _cb_config_t {
     uint8_t stats_layout_id;
     uint8_t stats_data_ids[4];
 
-    // theme
-    uint8_t theme_id;
+    // theme colors: 5 RGB colors (15 bytes total)
+    // [0..2]  background
+    // [3..5]  text_primary
+    // [6..8]  text_secondary
+    // [9..11] accent
+    // [12..14] inactive
+    uint8_t theme_colors[15];
+
+    // padding to reach 144 bytes
+    uint8_t reserved[3];
 } cb_config;
 
 extern cb_config config;

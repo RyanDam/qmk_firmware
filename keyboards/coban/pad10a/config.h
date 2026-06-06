@@ -32,7 +32,7 @@
 #define OLED_BKL_PIN GP0
 
 // un-commend if compile for rev 0 test platform
-#define OLED_PART_REV_2
+// #define OLED_PART_REV_2
 #define OLED_SCREEN_ROTATE_180 1
 
 #ifdef BACKLIGHT_ENABLE
@@ -59,7 +59,7 @@
 
 #define QP_LVGL_TASK_PERIOD 41
 
-#define EEPROM_CB_CONFIG_SIZE 128
+#define EEPROM_CB_CONFIG_SIZE 144
 #define VIA_EEPROM_CUSTOM_CONFIG_SIZE EEPROM_CB_CONFIG_SIZE
 
 // https://www.makermatrix.com/blog/read-and-write-data-with-the-pi-pico-onboard-flash/
