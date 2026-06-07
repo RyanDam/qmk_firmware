@@ -58,13 +58,13 @@ void coban_init_config(void) {
     config.theme_colors[4] = 0xFF;
     config.theme_colors[5] = 0xFF;
     // text_secondary
-    config.theme_colors[6] = 0x88;
-    config.theme_colors[7] = 0x88;
-    config.theme_colors[8] = 0x88;
+    config.theme_colors[6] = 0xC9;
+    config.theme_colors[7] = 0xC9;
+    config.theme_colors[8] = 0xC9;
     // accent
-    config.theme_colors[9]  = 0x00;
-    config.theme_colors[10] = 0xFF;
-    config.theme_colors[11] = 0x00;
+    config.theme_colors[9]  = 0xE9;
+    config.theme_colors[10] = 0xB9;
+    config.theme_colors[11] = 0xA5;
     // inactive
     config.theme_colors[12] = 0xFF;
     config.theme_colors[13] = 0xFF;
