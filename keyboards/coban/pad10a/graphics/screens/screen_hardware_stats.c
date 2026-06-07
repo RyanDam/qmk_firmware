@@ -133,7 +133,7 @@ static lv_obj_t *create_arc_ui(uint8_t index, lv_obj_t *parent, uint8_t data_id,
     lv_obj_t *holder = lv_obj_create(parent);
     lv_obj_add_style(holder, &style_container, 0);
     use_flex_column(holder);
-    lv_obj_set_style_pad_row(holder, -12, 0);
+    lv_obj_set_style_pad_row(holder, -14, 0);
 
     lv_obj_t *indicator_holder = lv_obj_create(holder);
     lv_obj_add_style(indicator_holder, &style_container, 0);
@@ -259,6 +259,7 @@ static void build_layout_2x1(void) {
         layout_2x1_holder = lv_obj_create(mods);
         lv_obj_add_style(layout_2x1_holder, &style_container, 0);
         use_flex_row(layout_2x1_holder);
+        lv_obj_set_style_pad_top(layout_2x1_holder, 4, 0);
         lv_obj_set_flex_align(layout_2x1_holder, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
 
         for (uint8_t i = 0; i < 2; i++) {
@@ -309,7 +310,7 @@ static void build_layout_hybrid(void) {
         lv_obj_set_flex_align(layout_hybrid_holder, LV_FLEX_ALIGN_SPACE_EVENLY, LV_FLEX_ALIGN_START, LV_FLEX_ALIGN_CENTER);
         lv_obj_set_style_pad_all(layout_hybrid_holder, STAT_ALL_PAD, 0);
         lv_obj_set_style_pad_row(layout_hybrid_holder, 0, 0);
-        lv_obj_set_style_pad_column(layout_hybrid_holder, 0, 0);
+        lv_obj_set_style_pad_column(layout_hybrid_holder, 4, 0);
         lv_obj_set_size(layout_hybrid_holder, SCREEN_WIDTH, SCREEN_HEIGHT);
 
         // Left side: single arc (data index 0)
@@ -318,7 +319,8 @@ static void build_layout_hybrid(void) {
         use_flex_column(left_col);
         lv_obj_set_flex_align(left_col, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER, LV_FLEX_ALIGN_CENTER);
         lv_obj_set_style_pad_all(left_col, 0, 0);
-        lv_obj_set_size(left_col, SCREEN_WIDTH / 2 + STAT_BAR_COL_PAD / 2 - STAT_ALL_PAD, LV_PCT(100));
+        lv_obj_set_style_pad_top(left_col, 4, 0);
+        lv_obj_set_size(left_col, SCREEN_WIDTH / 2 + STAT_BAR_COL_PAD / 2 - STAT_ALL_PAD - 4, LV_PCT(100));
 
         uint8_t data_id = config.stats_data_ids[0];
         create_arc_ui(0, left_col, data_id, arc_ui_hybrid);
