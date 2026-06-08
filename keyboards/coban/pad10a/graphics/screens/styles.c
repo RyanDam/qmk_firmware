@@ -61,7 +61,7 @@ void apply_theme(void) {
     lv_style_set_width(&style_indice, 9);
     lv_style_set_height(&style_indice, 9);
     lv_style_set_bg_opa(&style_indice, LV_OPA_100);
-    lv_style_set_bg_color(&style_indice, t->accent);
+    lv_style_set_bg_color(&style_indice, t->text_primary);
 
     lv_style_reset(&style_container);
     lv_style_set_pad_top(&style_container, 0);
