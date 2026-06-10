@@ -77,3 +77,4 @@
 
 // Experimental features
 #define COBAN_STATS_SCREEN_ENABLE
+// #define COBAN_EASTER_EGG_RENDER

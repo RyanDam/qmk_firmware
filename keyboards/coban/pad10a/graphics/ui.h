@@ -25,7 +25,9 @@
 #endif
 #include "graphics/screens/screen_animation.h"
 #include "graphics/screens/screen_layers.h"
-// #include "graphics/screens/screen_render.h"
+#ifdef COBAN_EASTER_EGG_RENDER
+#include "graphics/screens/screen_render.h"
+#endif
 #include "graphics/screens/screen_pomodoro.h"
 
 enum coban_screen_id {
@@ -35,7 +37,9 @@ enum coban_screen_id {
 #endif
     coban_screen_anime = 0x02,
     coban_screen_layer = 0x03,
-    // coban_screen_render = 0x04,
+ #ifdef COBAN_EASTER_EGG_RENDER
+    coban_screen_render = 0x04,
+#endif
     coban_screen_pomodoro = 0x05,
 
     coban_screen_undefined = 0x99

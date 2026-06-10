@@ -6,8 +6,8 @@ QUANTUM_PAINTER_ENABLE = yes
 QUANTUM_PAINTER_DRIVERS += st7735_spi
 QUANTUM_PAINTER_LVGL_INTEGRATION = yes
 
-# SRC += graphics/engine/engine.c
-# SRC += graphics/engine/animation.c
+SRC += graphics/engine/engine.c
+SRC += graphics/engine/animation.c
 # SRC += graphics/engine/render_bangle.c
 SRC += graphics/ui.c
 SRC += graphics/lvgl_helpers.c
@@ -22,7 +22,7 @@ SRC += hardware/ds1302.c
 SRC += graphics/screens/screen_animation.c
 SRC += graphics/screens/screen_layers.c
 SRC += graphics/screens/screen_boot.c
-# SRC += graphics/screens/screen_render.c
+SRC += graphics/screens/screen_render.c
 SRC += graphics/screens/screen_pomodoro.c
 SRC += utils/audio_volume.c
 

@@ -75,7 +75,9 @@ void ui_init(void) {
         screen_clock = screen_time_init();
         screen_anime = screen_animation_init();
         screen_layer = screen_layers_init();
-        // screen_render = screen_render_init();
+ #ifdef COBAN_EASTER_EGG_RENDER
+        screen_render = screen_render_init();
+#endif
         screen_pomodoro = screen_pomodoro_init();
 
         screen_background_init();
@@ -102,6 +104,9 @@ void screen_ui_apply_theme(void) {
     refresh_all_obj_styles(screen_stats);
 #endif
     refresh_all_obj_styles(screen_anime);
+#ifdef COBAN_EASTER_EGG_RENDER
+    refresh_all_obj_styles(screen_render);
+#endif
     lv_refr_now(NULL);
     screen_background_reload();
 }
@@ -148,6 +153,9 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         case coban_screen_clock: {
             screen_pomodoro_stop();
             screen_layers_stop();
+#ifdef COBAN_EASTER_EGG_RENDER
+            screen_render_stop();
+#endif
             lv_scr_load(screen_clock);
             screen_background_set(screen_clock, false);
             screen_time_reload();
@@ -159,6 +167,9 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             screen_time_stop();
             screen_pomodoro_stop();
             screen_layers_stop();
+#ifdef COBAN_EASTER_EGG_RENDER
+            screen_render_stop();
+#endif
             lv_scr_load(screen_stats);
             screen_background_set(screen_stats, false);
             ui_current_screen = coban_screen_stats;
@@ -169,6 +180,9 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             screen_time_stop();
             screen_pomodoro_stop();
             screen_layers_stop();
+#ifdef COBAN_EASTER_EGG_RENDER
+            screen_render_stop();
+#endif
             lv_scr_load(screen_anime);
             screen_background_set(screen_anime, true);
             ui_current_screen = coban_screen_anime;
@@ -177,6 +191,9 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
         case coban_screen_layer: {
             screen_time_stop();
             screen_pomodoro_stop();
+#ifdef COBAN_EASTER_EGG_RENDER
+            screen_render_stop();
+#endif
             screen_layers_stop();
             lv_scr_load(screen_layer);
             screen_background_set(screen_layer, false);
@@ -184,18 +201,24 @@ enum coban_screen_id change_screen(uint8_t screen_idx) {
             ui_current_screen = coban_screen_layer;
             break;
         }
-        // case coban_screen_render: {
-        //     screen_animation_stop();
-        //     screen_time_stop();
-        //     screen_pomodoro_stop();
-        //     screen_layers_stop();
-        //     lv_scr_load(screen_render);
-        //     screen_render_reload();
-        //     ui_current_screen = coban_screen_render;
-        // }
+#ifdef COBAN_EASTER_EGG_RENDER
+        case coban_screen_render: {
+            screen_time_stop();
+            screen_pomodoro_stop();
+            screen_layers_stop();
+            lv_scr_load(screen_render);
+            screen_background_set(screen_render, false);
+            screen_render_reload();
+            ui_current_screen = coban_screen_render;
+            break;
+        }
+#endif
         case coban_screen_pomodoro: {
             screen_time_stop();
             screen_layers_stop();
+#ifdef COBAN_EASTER_EGG_RENDER
+            screen_render_stop();
+#endif
             lv_scr_load(screen_pomodoro);
             screen_background_set(screen_pomodoro, false);
             screen_pomodoro_reload();
@@ -223,9 +246,11 @@ static void ui_cb(lv_timer_t *timer) {
         timer_cb(timer);
     }
 
-    // if (render_running) {
-    //     render_cb(timer);
-    // }
+ #ifdef COBAN_EASTER_EGG_RENDER
+    if (render_running) {
+        render_cb(timer);
+    }
+#endif
 
     if (pomo_running) {
         pomo_cb(timer);

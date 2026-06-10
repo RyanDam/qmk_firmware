@@ -32,7 +32,21 @@ uint8_t _current_keyboard_layer_idx = 0;
 bool                 _key_event_detected = false;
 enum coban_screen_id _target_screen_idx  = -1;
 bool                 _need_save_eeprom   = false;
-bool                 _skip_layer_change  = false;
+  bool                 _skip_layer_change  = false;
+
+#ifdef COBAN_EASTER_EGG_RENDER
+static bool easter_egg_render_triggered = false;
+#endif
+
+#ifdef COBAN_EASTER_EGG_RENDER
+static bool easter_egg_all_rows_pressed(void) {
+    for (int col = 0; col < 4; col++) {
+        if (!matrix_is_on(1, col)) return false;
+        if (!matrix_is_on(2, col)) return false;
+    }
+    return true;
+}
+#endif
 
 void keyboard_post_init_user(void) {
     // Load eeprom
@@ -171,7 +185,9 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
     // if (current_screen_idx == coban_screen_layer) {
     //     screen_layers_set_key_code(keycode, record);
     // }
-    // screen_render_set_key_code(keycode, record);
+  #ifdef COBAN_EASTER_EGG_RENDER
+    screen_render_set_key_code(keycode, record);
+#endif
 
     // reset state
     _target_screen_idx = current_screen_idx;
@@ -180,6 +196,16 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
 
     if (record->event.pressed) {
         _key_event_detected = true;
+
+#ifdef COBAN_EASTER_EGG_RENDER
+        if (!easter_egg_render_triggered && easter_egg_all_rows_pressed()) {
+            easter_egg_render_triggered = true;
+            _target_screen_idx = coban_screen_render;
+            _need_save_eeprom = false;
+            _skip_layer_change = true;
+        }
+#endif
+
         switch (keycode) {
             case CB_SCREEN_NEXT: {
                 _target_screen_idx = next_screen(false);
@@ -226,6 +252,11 @@ void post_process_record_user(uint16_t keycode, keyrecord_t *record) {
             default:
                 break;
         }
+#ifdef COBAN_EASTER_EGG_RENDER
+        if (easter_egg_render_triggered && _target_screen_idx != current_screen_idx) {
+            easter_egg_render_triggered = false;
+        }
+#endif
     }
 
     return;
